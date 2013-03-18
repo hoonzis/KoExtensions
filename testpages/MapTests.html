@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+ 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head>
+<title>Map Test Page</title>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<script type="text/javascript" src="../libs/knockout-2.2.1.js"></script>
+<script type="text/javascript" src="../tools.js"></script>
+<script type="text/javascript" src="../kotools.js"></script>
+
+</head>
+<body>
+    <div id="map" width="200" height="200">
+	</div>
+	<div data-bind="foreach: stations">
+		<div data-bind="latitude: lat, longitude:lng, map:map, selected:selected">
+		</div>
+	</div>
+</body>
+
+<script>
+var map = null;
+function initialize() {
+	try {
+		var myOptions = {
+			zoom: 8,
+			mapTypeId: google.maps.MapTypeId.ROADMAP
+		};
+		map = new google.maps.Map(document.getElementById("map"), myOptions);
+	} catch (err) {
+		console.log(err);
+	}
+}
+initialize();
+var data = {
+  "stations": [
+    {
+      "lat": 55.25,
+      "lng": 55.335,
+      "name": "Station 1"
+    },
+    {
+      "lat": 55.25,
+      "lng": 55.34,
+      "name": "Station 2"
+    },
+    {
+      "lat": 55.25,
+      "lng": 55.345,
+      "name": "Station 3"
+    }
+	]
+};
+
+function StationListViewModel(data){
+	self = this;
+	self.stations = ko.observableArray([]);
+	
+	if(data!=null)
+		self.stations(
+			data.stations.map(function(x) { return new StationViewModel(x);})
+		);
+}
+
+function StationViewModel(data){
+	self = this;
+	self.lat = ko.observable();
+	self.lng = ko.observable();
+	self.name = ko.observable();
+	self.selected = ko.observable();
+	
+	if(data!=null){
+		self.lat(data.lat);
+		self.lng(data.lng);
+		self.name(data.name);
+	}
+}
+
+var vm = new StationListViewModel(data);
+
+ko.applyBindings(vm);
+
+</script>
+
+</html>
