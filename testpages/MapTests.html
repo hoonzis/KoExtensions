@@ -3,19 +3,64 @@
 <html xmlns="http://www.w3.org/1999/xhtml"> 
 <head>
 <title>Map Test Page</title>
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
 <script type="text/javascript" src="../libs/knockout-2.2.1.js"></script>
 <script type="text/javascript" src="../tools.js"></script>
 <script type="text/javascript" src="../kotools.js"></script>
-
+<style type="text/css">
+html { height: 100% }
+body { height: 100%; margin: 0; padding: 0 }
+#map { height: 50% }    
+</style>
 </head>
 <body>
-    <div id="map" width="200" height="200">
+    <div id="map">
 	</div>
 	<div data-bind="foreach: stations">
 		<div data-bind="latitude: lat, longitude:lng, map:map, selected:selected">
 		</div>
 	</div>
+	
+	<div data-bind="foreach: points">
+		<div data-bind="latitude: lat, longitude:lng, map:map, selected:selected">
+		</div>
+	</div>
+	
+	<h3>Stations</h3>
+	<table>
+		<thead>
+			<tr>
+				<td>Latitude</td>
+				<td>Longitude</td>
+				<td>Name</td>
+			</tr>
+		</thead>
+		<tbody data-bind="foreach:stations">
+			<tr>
+				<td><span data-bind="text:lat"></span></td>
+				<td><span data-bind="text:lng"></span></td>
+				<!--<td><span data-bind="text:lat"></span></td>-->
+			</tr>
+		</tbody>
+	</table>
+	
+	<h3>Points</h3>
+	<table>
+		<thead>
+			<tr>
+				<td>Latitude</td>
+				<td>Longitude</td>
+				<td>Name</td>
+			</tr>
+		</thead>
+		<tbody data-bind="foreach:stations">
+			<tr>
+				<td><span data-bind="text:lat"></span></td>
+				<td><span data-bind="text:lng"></span></td>
+				<!--<td><span data-bind="text:lat"></span></td>-->
+			</tr>
+		</tbody>
+	</table>
 </body>
 
 <script>
@@ -32,38 +77,43 @@ function initialize() {
 	}
 }
 initialize();
-var data = {
+var stationsData = {
   "stations": [
-    {
-      "lat": 55.25,
-      "lng": 55.335,
-      "name": "Station 1"
-    },
-    {
-      "lat": 55.25,
-      "lng": 55.34,
-      "name": "Station 2"
-    },
-    {
-      "lat": 55.25,
-      "lng": 55.345,
-      "name": "Station 3"
-    }
+		{
+		  "lat": 55.26,
+		  "lng": 55.335,
+		  "name": "Station 1"
+		},
+		{
+		  "lat": 55.25,
+		  "lng": 55.34,
+		  "name": "Station 2"
+		},
+		{
+		  "lat": 55.23,
+		  "lng": 55.345,
+		  "name": "Station 3"
+		}],
+	"points": [
+		{
+		  "lat": 55.27,
+		  "lng": 55.142,
+		  "name": "Point 1"
+		},
+		{
+		  "lat": 55.274,
+		  "lng": 55.154,
+		  "name": "Point 2"
+		},
+		{
+		  "lat": 55.278,
+		  "lng": 55.148,
+		  "name": "Point 3"
+		}
 	]
 };
-
-function StationListViewModel(data){
-	self = this;
-	self.stations = ko.observableArray([]);
-	
-	if(data!=null)
-		self.stations(
-			data.stations.map(function(x) { return new StationViewModel(x);})
-		);
-}
-
 function StationViewModel(data){
-	self = this;
+	var self = this;
 	self.lat = ko.observable();
 	self.lng = ko.observable();
 	self.name = ko.observable();
@@ -72,11 +122,34 @@ function StationViewModel(data){
 	if(data!=null){
 		self.lat(data.lat);
 		self.lng(data.lng);
-		self.name(data.name);
 	}
 }
 
-var vm = new StationListViewModel(data);
+function PointViewModel(data){
+	var self = this;
+	self.lat = ko.observable();
+	self.lng = ko.observable();
+	self.name = ko.observable();
+	self.selected = ko.observable();
+	
+	if(data!=null){
+		self.lat(data.lat);
+		self.lng(data.lng);
+	}
+}
+
+function StationListViewModel(json){
+	var self = this;
+	self.stations = ko.observableArray([]);
+	self.points = ko.observableArray([]);
+	
+	if(json!=null){
+		self.stations(json.stations.map(function(x) { return new StationViewModel(x);}));
+		self.points(json.points.map(function(x) { return new PointViewModel(x);}));
+	}
+}
+
+var vm = new StationListViewModel(stationsData);
 
 ko.applyBindings(vm);
 

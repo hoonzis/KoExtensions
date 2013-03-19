@@ -62,8 +62,9 @@ function CarViewModel(data) {
 function CarSalesViewModel (data){
 	self.cars = ko.observableArray([]);
 	
-	if(data!=null)
+	if(data!=null){
 		self.cars(data.cars.map(function(x) { return new CarViewModel(x);}));
+	}
 }
 
 function transformToChart(car){
