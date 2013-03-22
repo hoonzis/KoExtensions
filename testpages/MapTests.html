@@ -10,7 +10,7 @@
 <style type="text/css">
 html { height: 100% }
 body { height: 100%; margin: 0; padding: 0 }
-#map { height: 50% }    
+#map { height: 300px; width:200px;float:left }
 </style>
 </head>
 <body>
@@ -26,41 +26,44 @@ body { height: 100%; margin: 0; padding: 0 }
 		</div>
 	</div>
 	
-	<h3>Stations</h3>
-	<table>
-		<thead>
-			<tr>
-				<td>Latitude</td>
-				<td>Longitude</td>
-				<td>Name</td>
-			</tr>
-		</thead>
-		<tbody data-bind="foreach:stations">
-			<tr>
-				<td><span data-bind="text:lat"></span></td>
-				<td><span data-bind="text:lng"></span></td>
-				<!--<td><span data-bind="text:lat"></span></td>-->
-			</tr>
-		</tbody>
-	</table>
-	
+	<div style="margin:5px, float:left">
+		<h3>Stations</h3>
+		<table>
+			<thead>
+				<tr>
+					<td>Name</td>
+					<td>Latitude</td>
+					<td>Longitude</td>
+				</tr>
+			</thead>
+			<tbody data-bind="foreach:stations">
+				<tr>
+					<td><span data-bind="text:name"></span></td>
+					<td><input data-bind="value:lat"></span></td>
+					<td><input data-bind="value:lng"></span></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div>
 	<h3>Points</h3>
 	<table>
 		<thead>
 			<tr>
+				<td>Name</td>
 				<td>Latitude</td>
 				<td>Longitude</td>
-				<td>Name</td>
 			</tr>
 		</thead>
-		<tbody data-bind="foreach:stations">
+		<tbody data-bind="foreach:points">
 			<tr>
-				<td><span data-bind="text:lat"></span></td>
-				<td><span data-bind="text:lng"></span></td>
-				<!--<td><span data-bind="text:lat"></span></td>-->
+				<td><span data-bind="text:name"></span></td>
+				<td><input data-bind="value:lat"></span></td>
+				<td><input data-bind="value:lng"></span></td>
 			</tr>
 		</tbody>
 	</table>
+	</div>
 </body>
 
 <script>
@@ -80,7 +83,7 @@ initialize();
 var stationsData = {
   "stations": [
 		{
-		  "lat": 55.26,
+		  "lat": 55.16,
 		  "lng": 55.335,
 		  "name": "Station 1"
 		},
@@ -96,7 +99,7 @@ var stationsData = {
 		}],
 	"points": [
 		{
-		  "lat": 55.27,
+		  "lat": 55.172,
 		  "lng": 55.142,
 		  "name": "Point 1"
 		},
@@ -122,6 +125,7 @@ function StationViewModel(data){
 	if(data!=null){
 		self.lat(data.lat);
 		self.lng(data.lng);
+		self.name(data.name);
 	}
 }
 
@@ -135,6 +139,7 @@ function PointViewModel(data){
 	if(data!=null){
 		self.lat(data.lat);
 		self.lng(data.lng);
+		self.name(data.name);
 	}
 }
 
