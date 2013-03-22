@@ -3,12 +3,13 @@ KoExtensions
 
 Additional binding and tools for KnockouJS.
 
-##The pie-chart binding##
+###The pie-chart binding###
 Based on D3JS, this binding enables visualization of any collection as a piechart if the developer submits a function to convert each item into title - value pair.
 
 ![alt text][piechart]
 [piechart]: http://hoonzis.github.com/KoExtensions/img/piechart.PNG
 
+'''
 <div id="carsChart" data-bind="piechart: cars, transformation:transformToChart, chartOptions:testOptions">
 </div>
 
@@ -38,14 +39,15 @@ function CarSalesViewModel (data){
 function transformToChart(car){
 	return { x: car.name(), y: car.totalSales()};
 }
+'''
 
-
-##The map binding##
+###The map binding###
 The map binding uses google maps to viualize on or more ViewModel on the map. The developer has to specify which observables of the ViewModel hold the latitude and longitude properties.
 
-![alt text][piechart]
-[piechart]: http://hoonzis.github.com/KoExtensions/img/maps.PNG
+![alt text][maps]
+[maps]: http://hoonzis.github.com/KoExtensions/img/maps.PNG
 
+'''
 <div id="map">
 </div>
 <div data-bind="foreach: stations">
@@ -66,4 +68,6 @@ function StationViewModel(data){
 		self.name(data.name);
 	}
 }
-##The datepicker binding##
+'''
+
+###The datepicker binding###
