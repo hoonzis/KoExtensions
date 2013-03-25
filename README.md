@@ -76,8 +76,8 @@ function StationViewModel(data){
 ###The datepicker binding###
 This binding makes use of bootstrap-datepicker plugin to render boostrap style date picker and conncect it directly to Knockout observable.
 
-![alt text][maps]
-[maps]: http://hoonzis.github.com/KoExtensions/img/datepicker.PNG
+![alt text][datepicker]
+[datepicker]: http://hoonzis.github.com/KoExtensions/img/datepicker.PNG
 
 ```html
 <div class="control-group">
