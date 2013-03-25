@@ -9,10 +9,11 @@ Based on D3JS, this binding enables visualization of any collection as a piechar
 ![alt text][piechart]
 [piechart]: http://hoonzis.github.com/KoExtensions/img/piechart.PNG
 
-'''
+```html
 <div id="carsChart" data-bind="piechart: cars, transformation:transformToChart, chartOptions:testOptions">
 </div>
-
+```
+```javascript
 function CarViewModel(data) {
 	self = this;
 	self.sales = ko.observableArray([]);
@@ -39,7 +40,7 @@ function CarSalesViewModel (data){
 function transformToChart(car){
 	return { x: car.name(), y: car.totalSales()};
 }
-'''
+```
 
 ###The map binding###
 The map binding uses google maps to viualize on or more ViewModel on the map. The developer has to specify which observables of the ViewModel hold the latitude and longitude properties.
@@ -47,14 +48,16 @@ The map binding uses google maps to viualize on or more ViewModel on the map. Th
 ![alt text][maps]
 [maps]: http://hoonzis.github.com/KoExtensions/img/maps.PNG
 
-'''
+```html
 <div id="map">
 </div>
 <div data-bind="foreach: stations">
 	<div data-bind="latitude: lat, longitude:lng, map:map, selected:selected">
 	</div>
 </div>
+```
 
+```javascript
 function StationViewModel(data){
 	var self = this;
 	self.lat = ko.observable();
@@ -68,6 +71,36 @@ function StationViewModel(data){
 		self.name(data.name);
 	}
 }
-'''
+```
 
 ###The datepicker binding###
+This binding makes use of bootstrap-datepicker plugin to render boostrap style date picker and conncect it directly to Knockout observable.
+
+![alt text][maps]
+[maps]: http://hoonzis.github.com/KoExtensions/img/datepicker.PNG
+
+```html
+<div class="control-group">
+	<label class="control-label">Start</label>
+	<div class="controls">
+		<input type="text" data-bind="datepicker:start">
+	</div>
+</div>
+```
+
+```javascript
+function VoyageViewModel(data){
+	self = this;
+	self.start = ko.observable();
+	self.end = ko.observable();
+	self.destination = ko.observable();
+	
+	self.duration = ko.computed(function(x) { return daysBetween(self.start(), self.end());},self);
+	
+	if(data!=null){
+		self.start(data.start);
+		self.end(data.end);
+		self.destination(data.destination);
+	}
+}
+```
