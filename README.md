@@ -3,6 +3,8 @@ KoExtensions
 
 Additional binding and tools for KnockouJS.
 
+[Sample application](http://hoonzis.blogspot.fr/2013/03/sample-application-ravendb-knockoutjs.html)
+
 ###The pie-chart binding###
 Based on D3JS, this binding enables visualization of any collection as a piechart if the developer submits a function to convert each item into title - value pair.
 
