@@ -4,7 +4,7 @@ KoExtensions
 Additional binding and tools for KnockouJS.
 
 ###The pie-chart binding###
-Based on D3JS, this binding enables visualization of any collection as a piechart if the developer submits a function to convert each item into title - value pair.
+Based on [D3JS](http://d3js.org/), this binding enables visualization of any collection as a piechart if the developer submits a function to convert each item into title - value pair.
 
 ![alt text][piechart]
 [piechart]: http://hoonzis.github.com/KoExtensions/img/piechart.PNG
@@ -43,7 +43,7 @@ function transformToChart(car){
 ```
 
 ###The map binding###
-The map binding uses google maps to viualize on or more ViewModel on the map. The developer has to specify which observables of the ViewModel hold the latitude and longitude properties.
+The map binding uses [google maps](https://developers.google.com/maps/documentation/javascript/) to viualize on or more ViewModel on the map. The developer has to specify which observables of the ViewModel hold the latitude and longitude properties.
 
 ![alt text][maps]
 [maps]: http://hoonzis.github.com/KoExtensions/img/maps.PNG
@@ -74,7 +74,7 @@ function StationViewModel(data){
 ```
 
 ###The datepicker binding###
-This binding makes use of bootstrap-datepicker plugin to render boostrap style date picker and conncect it directly to Knockout observable.
+This binding makes use of [bootstrap-datepicker](www.eyecon.ro/bootstrap-datepicker/) plugin to render boostrap style date picker and conncect it directly to Knockout observable.
 
 ![alt text][datepicker]
 [datepicker]: http://hoonzis.github.com/KoExtensions/img/datepicker.PNG
