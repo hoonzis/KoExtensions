@@ -18,42 +18,38 @@ var testOptions = { legend: true, width:300, height:150}
 
  <div class="container-fluid">
     <div class="row-fluid">
-        <div id="carsChart" data-bind="piechart: cars, transformation:transformToChart, chartOptions:testOptions">
-
-        </div>
-		
-		<div id="stackedChart" data-bind="stackedbarchart: cars">
+        
+		<div id="stackedChart" data-bind="stackedbarchart: carSales">
 		
 		<div>
+		
+		<!--<div id="carsChart" data-bind="piechart: cars, transformation:transformToChart, chartOptions:testOptions">
+
+        </div>-->
+		
     </div>
 </div>
 </body>
 
 <script>
-
-var data = {
-  "cars": [
-    {
-      "sales":[300,120,130],
-      "name": "Audi",
-    },
-    {
-      "sales": [110,145,103],
-      "name": "Peugot"
-    },
-    {
-      "sales": [500,600,450],
-      "name": "BMW"
-    }
-	]
-};
-
 var carSales = [ 
 	{
-		month:'january',
+		x:'january',
 		peugot: '100',
 		audit: '200',
 		bmw:'300'
+	},
+	{
+		x:'february',
+		peugot: '50',
+		audit: '110',
+		bmw:'80'
+	},
+	{
+		x:'marz',
+		peugot: '120',
+		audit: '230',
+		bmw:'115'
 	}
 ]
 
@@ -73,18 +69,16 @@ function CarViewModel(data) {
 }
 
 function CarSalesViewModel (data){
-	self.cars = ko.observableArray([]);
-	
-	if(data!=null){
-		self.cars(data.cars.map(function(x) { return new CarViewModel(x);}));
-	}
+	self.carSales = ko.observableArray([]);
+		
+	self.carSales(data);
 }
 
 function transformToChart(car){
 	return { x: car.name(), y: car.totalSales()};
 }
 
-var vm = new CarSalesViewModel(data);
+var vm = new CarSalesViewModel(carSales);
 
 ko.applyBindings(vm);
 
