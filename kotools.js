@@ -123,18 +123,22 @@ ko.bindingHandlers.stackedbarchart = {
     init: function (element, valueAccessor, allBindingsAccessor) {
         var data = allBindingsAccessor().stackedbarchart();
         var options = setDefaultOptions(allBindingsAccessor().chartOptions,"bar");
-        originalData[element.id] = data;
-
-        d3barChart(options.width, options.height, data, element.id, options.legend);
+		var xcoord = allBindingsAccessor().xcoord;
+        if(originalData[element.id] != null)
+			throw "Element: " + element.id + "already used for other chart";
+		originalData[element.id] = data;
+		
+        d3barChart(options.width, options.height, data, element.id, options.legend, xcoord);
     },
     update: function (element, valueAccessor, allBindingsAccessor) {
         var data = allBindingsAccessor().stackedbarchart();
         var options = setDefaultOptions(allBindingsAccessor().chartOptions,"bar");
+        var xcoord = allBindingsAccessor().xcoord;
         
         
         if (!arraysAreEqual(data, originalData[element.id])) {
             element.innerHTML = "";
-            d3barChart(options.width, options.height, data, element.id, options.legend);
+            d3barChart(options.width, options.height, data, element.id, options.legend, xcoord);
             originalData[element.id] = data;
         }
     }

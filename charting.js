@@ -78,7 +78,7 @@ function d3pieChart(width, height, data, elname, showLegend) {
     }
 }
 
-function d3barChart(width, height, data, elname, showLegend) {
+function d3barChart(width, height, data, elname, showLegend,xcoord) {
     var el = d3.select("#" + elname);
     if (el == null) {
         return;
@@ -114,11 +114,17 @@ function d3barChart(width, height, data, elname, showLegend) {
         .attr("height", height + margin.top + margin.bottom)
       .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    color.domain(d3.keys(data[0]).filter(function (key) { return key != "x"; }));
+	
+	//todo: we assume that all elements have the same properties, should scan them all
+    color.domain(d3.keys(data[0]).filter(function (key) { return key != xcoord; }));
+	var arranged = [];
+	
+	//runs overs all the data. copies the result to a new array
     data.forEach(function (d) {
+		var newD = {x: d[xcoord]};
         var y0neg = 0;
         var y0pos = 0;
-        d.values = color.domain().map(function (m) {
+        newD.values = color.domain().map(function (m) {
             if (d[m] > 0)
                 return { name: m, y0: y0pos, y1: y0pos += +d[m] };
             else {
@@ -126,14 +132,13 @@ function d3barChart(width, height, data, elname, showLegend) {
                 return { name: m, y0: y0neg += d[m], y1: y1 };
             } 
         });
-        d.totalPositive = d3.max(d.values, function (v) { return v.y1});
-        d.totalNegative = d3.min(d.values, function (v) { return v.y0 });
+        newD.totalPositive = d3.max(newD.values, function (v) { return v.y1});
+        newD.totalNegative = d3.min(newD.values, function (v) { return v.y0 });
+		arranged.push(newD);
     });
-
-    //data.sort(function (a, b) { return b.total - a.total; });
-
-    x.domain(data.map(function (d) { return d.x; }));
-    y.domain([d3.min(data, function (d) {return d.totalNegative;}), d3.max(data, function (d) {
+	
+    x.domain(arranged.map(function (d) { return d.x; }));
+    y.domain([d3.min(arranged, function (d) {return d.totalNegative;}), d3.max(arranged, function (d) {
         if (d == null)
             return 0;
         return d.totalPositive;
@@ -153,7 +158,7 @@ function d3barChart(width, height, data, elname, showLegend) {
         .text("Amount");
 
     var state = svg.selectAll(".xVal")
-        .data(data)
+        .data(arranged)
       .enter().append("g")
         .attr("class", "g")
         .attr("transform", function (d) { return "translate(" + x(d.x) + ",0)"; });
