@@ -1,12 +1,17 @@
 KoExtensions
 ============
 
-Additional binding and tools for KnockouJS.
+Additional binding and tools for KnockoutJS the package includes:
+1. Piechart binding (based on [D3JS](http://d3js.org/))
+2. Stacked-barchart binding (based on [D3JS](http://d3js.org/))
+3. Google maps binding
+4. Bootstrap DateTime picker binding
+5. FormattedValue binding - simply format the values as you need.
 
 [Sample application](http://hoonzis.blogspot.fr/2013/03/sample-application-ravendb-knockoutjs.html)
 
 ###The pie-chart binding###
-Based on [D3JS](http://d3js.org/), this binding enables visualization of any collection as a piechart if the developer submits a function to convert each item into title - value pair.
+This binding enables visualization of any collection as a piechart if the developer submits a function to convert each item into title - value pair.
 
 ![alt text][piechart]
 [piechart]: http://hoonzis.github.com/KoExtensions/img/piechart.PNG
@@ -43,6 +48,33 @@ function transformToChart(car){
 	return { x: car.name(), y: car.totalSales()};
 }
 ```
+
+###The stacked-bar chart binding###
+Enables visualization of one dimensional collection as a stacked-barchart. The binding assumes that the collection passed in contains the values to be shown in each column. It is obligatory to specify the name of the field which holds the "x" coordinate (the stacked column name).
+
+![alt text][stackedbarchart]
+[stackedbarchart]: http://hoonzis.github.com/KoExtensions/img/stackedbarchart.PNG
+
+```html
+<div id="lifeExpenses" data-bind="stackedbarchart: lifeExpenses, xcoord:'month'">
+</div>
+```
+```javascript
+var lifeExpenses = [
+	{
+		month: 'january',
+		rent: -500,
+		salary : 2200,
+		parties : -300
+	},
+	{
+		month: 'february',
+		rent: -1000,
+		salary : 1500,
+		parties : -400
+	}
+...	
+]```
 
 ###The map binding###
 The map binding uses [google maps](https://developers.google.com/maps/documentation/javascript/) to viualize on or more ViewModel on the map. The developer has to specify which observables of the ViewModel hold the latitude and longitude properties.
@@ -104,5 +136,42 @@ function VoyageViewModel(data){
 		self.end(data.end);
 		self.destination(data.destination);
 	}
+}
+```
+
+###The formattedValue binding###
+Very simple binding which formats the numeric values for the GUI. Spaces and decimal separators are inserted, currency symbol can be added and additional calculation may be performed when displaying the values.
+
+![alt text][formattedValue]
+[formattedValue]: http://hoonzis.github.com/KoExtensions/img/formattedValue.PNG
+
+```html
+	<b>Price:</b>
+    <span data-bind="formattedValue:price, currency:priceCurrency"></span>
+	<br/><b>Power:</b>
+	<span data-bind="formattedValue:power, currency:'kW'"></span>
+	<br/><b>Efficiency:</b>
+	<span data-bind="formattedValue:efficiency, currency:'%', transformation:toPercent"></span>
+	<br/><b>Consumption:</b>
+	<span data-bind="formattedValue:consumption100, currency:'l/100km'"></span>
+	<br/><b>Distance:</b>
+	<input data-bind="value: distance"/>
+	<br/><b>Total consumption:</b>
+	<span data-bind="formattedValue: totalConsumption, currency:'l'"><span>
+```
+
+```javascript
+function toPercent(n) { return n*100}
+function CarViewModel() {
+	self = this;
+	self.efficiency = ko.observable(0.95);
+	self.price = ko.observable(1000000);
+	self.priceCurrency = ko.observable('EUR');
+	self.power = ko.observable(120);
+	self.consumption100 = ko.observable(7);
+	self.distance = ko.observable();
+	self.totalConsumption= ko.computed(function() {
+		return self.distance()*self.consumption100();
+	});
 }
 ```

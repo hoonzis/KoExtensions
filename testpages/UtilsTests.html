@@ -11,21 +11,24 @@
 </style>
 </head>
 <body>
-	Price:
+	<b>Price:</b>
     <span data-bind="formattedValue:price, currency:priceCurrency"></span>
-	Power:
+	<br/><b>Power:</b>
 	<span data-bind="formattedValue:power, currency:'kW'"></span>
-	Consumption:
+	<br/><b>Efficiency:</b>
+	<span data-bind="formattedValue:efficiency, currency:'%', transformation:toPercent"></span>
+	<br/><b>Consumption:</b>
 	<span data-bind="formattedValue:consumption100, currency:'l/100km'"></span>
-	Distance:
+	<br/><b>Distance:</b>
 	<input data-bind="value: distance"/>
-	Total consumption:
+	<br/><b>Total consumption:</b>
 	<span data-bind="formattedValue: totalConsumption, currency:'l'"><span>
 </body>
 <script>
-var map = null;
+function toPercent(n) { return n*100}
 function CarViewModel() {
 	self = this;
+	self.efficiency = ko.observable(0.95);
 	self.price = ko.observable(1000000);
 	self.priceCurrency = ko.observable('EUR');
 	self.power = ko.observable(120);
