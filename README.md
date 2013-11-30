@@ -74,7 +74,8 @@ var lifeExpenses = [
 		salary : 1500,
 		parties : -400
 	}
-]```
+]
+```
 
 ###The map binding###
 The map binding uses [google maps](https://developers.google.com/maps/documentation/javascript/) to viualize on or more ViewModel on the map. The developer has to specify which observables of the ViewModel hold the latitude and longitude properties.
