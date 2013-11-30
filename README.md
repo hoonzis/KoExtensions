@@ -2,6 +2,7 @@ KoExtensions
 ============
 
 Additional binding and tools for KnockoutJS the package includes:
+
 1. Piechart binding (based on [D3JS](http://d3js.org/))
 2. Stacked-barchart binding (based on [D3JS](http://d3js.org/))
 3. Google maps binding
@@ -73,7 +74,6 @@ var lifeExpenses = [
 		salary : 1500,
 		parties : -400
 	}
-...	
 ]```
 
 ###The map binding###
