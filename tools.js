@@ -83,6 +83,10 @@ function toFixed(v,n){
     return v.toFixed(n);
 }
 
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 function isDate(d) {
     return Object.prototype.toString.call(d) == "[object Date]";
 }
@@ -149,4 +153,70 @@ function toPercent(val) {
     if (val == null)
         return;
     return val * 100;
+}
+
+//Size of the object - equivalent of array length
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
+
+function setOrAdd(arr, x,y, value){
+    if(arr[x] == null)
+        arr[x] = [];
+    if(arr[x][y] == null || isNaN(arr[x][y]))
+        arr[x][y] = value;
+    else
+        arr[x][y] += value;
+}
+
+function set(arr, x,y, value){
+    if(arr[x] == null)
+        arr[x] = [];
+    arr[x][y] = value;
+}
+
+function setOrAddSingle(arr, x,value){
+    if(arr[x] == null)
+        arr[x] = value;
+    else
+        arr[x] += value;
+}
+
+var objToString = Object.prototype.toString;
+
+function isString(obj) {
+    return objToString.call(obj) == '[object String]';
+}
+
+
+//returns a dense version of sparse two dimensional matrix
+function toDenseMatrix(arr) {
+    var deskNames = [];
+    var deskIndexes = [];
+    var index1 = 0;
+    var arrLength = Object.size(arr);
+
+    var resultArr =  Array.apply(null, new Array(arrLength)).map(Number.prototype.valueOf,0);
+    for(var id1 in arr){
+        var arr2 = arr[id1];
+        if(deskIndexes[id1] == null){
+            deskNames[index1] = id1;
+            deskIndexes[id1] = index1;
+            index1++;
+        }
+        resultArr[deskIndexes[id1]] =  Array.apply(null, new Array(arrLength)).map(Number.prototype.valueOf,0);
+        for(id2 in arr2){
+            if(deskIndexes[id2] == null){
+                deskNames[index1] = id2;
+                deskIndexes[id2] = index1;
+                index1++;
+            }           
+            resultArr[deskIndexes[id1]][deskIndexes[id2]] = arr2[id2];
+        }
+    }
+    return { names: deskNames, matrix: resultArr};
 }

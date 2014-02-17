@@ -9,6 +9,10 @@
 <script type="text/javascript" src="../tools.js"></script>
 <script type="text/javascript" src="../charting.js"></script>
 <script type="text/javascript" src="../kotools.js"></script>
+<script type="text/javascript" src="../charts/barchart.js"></script>
+<script type="text/javascript" src="../charts/linechart.js"></script>
+<script type="text/javascript" src="../charts/piechart.js"></script>
+
 <script>
 
 var testOptions = { legend: true, width:300, height:150}
@@ -30,10 +34,24 @@ var testOptions = { legend: true, width:300, height:150}
 	<div id="lifeExpenses" data-bind="stackedbarchart: lifeExpenses, xcoord:'month'">
 
 	</div>
+
+	<h2>Sales per car mark</h2>
+	 <!-- ko foreach: cars -->
+		<h3 data-bind="text:name"></h3>
+		<div data-bind="piechart: sales,transformation:identity">
+
+		</div>	 
+	 <!-- /ko -->
 		
 </body>
 
 <script>
+
+//TODO: get rid of identity function if not needed
+function identity(item){
+	return item;
+};
+
 var carSales = [ 
 	{
 		year:'january',

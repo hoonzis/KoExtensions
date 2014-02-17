@@ -1,192 +1,50 @@
-﻿//Takes as input collection of items [data]. Each item has two values [x] and [y].
-function d3pieChart(width, height, data, elname, showLegend) {
-    var el = d3.select("#" + elname);
-    if (el == null) {
-        return;
-    }
-    if (data == null || data.length == 0) {
+﻿function getElementAndCheckData(element, data){
+    var el = d3.select(element);
+    if (data == null) {
         el.innerHTML = "No data available";
-        return;
+        return null;
     }
-
-    try{
-        width = width / 2;
-        var outerRadius = Math.min(width, height) / 2,
-        innerRadius = outerRadius * .6,
-        color = d3.scale.category20(),
-        donut = d3.layout.pie(),
-        arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius),
-        parent = el;
-
-        var maxLegendLength = max(data, function (el) { return el.x.length; });
-    
-        //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
-        var legendWidth = 25 + maxLegendLength * 7;
-
-        donut.value(function (d) { return d.y; });
-        if (showLegend) {
-            var legend = parent
-            .append("svg")
-            .attr("width", legendWidth)
-            .attr("height", height)
-            .selectAll("g")
-             .data(data)
-             .enter().append("g")
-             .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
-
-            legend.append("rect")
-                .attr("width", 18)
-                .attr("height", 18)
-                .style("fill", function (d, i) { return color(i); })
-
-            legend.append("text")
-            .attr("x", 24)
-            .attr("y", 9)
-            .attr("dy", ".35em")
-            .text(function (d) { return d.x; });
-
-        }
-
-        var vis = parent
-        .append("svg")
-          .data([data])
-          .attr("width", width)
-          .attr("height", height);
-
-        var arcs = vis.selectAll("g.arc")
-            .data(donut)
-          .enter().append("g")
-            .attr("class", "arc")
-            .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
-
-        arcs.append("path")
-            .attr("fill", function (d, i) { return color(i); })
-            .attr("d", arc);
-
-        arcs.append("text")
-            .attr("transform", function (d) { return "translate(" + arc.centroid(d) + ")"; })
-            .attr("dy", ".35em")
-            .attr("text-anchor", "middle")
-            .attr("display", function (d) { return d.data.y > .15 ? null : "none"; })
-            .text(function (d, i) {
-                if (isString(d.data.y))
-                    return d.data.y;
-                return d.data.y.toFixed(2);
-            });
-    } catch (error) {
-        el.innerHTML = "Corrupted data";
-    }
+    return el;
 }
 
-function d3barChart(width, height, data, elname, showLegend,xcoord) {
-    var el = d3.select("#" + elname);
-    if (el == null) {
-        return;
+function showStandardLegend(parent, data, descGetter,color, showLegend, height,valueGetter)
+{
+    
+
+    var getItemAndValue = function(item){
+        if(valueGetter!=null){
+            return descGetter(item) + ": " + toFixed(valueGetter(item),2);
+        }else{
+            return descGetter(item);
+        }
     }
-    if (data == null || data.length == 0) {
-        el.innerHTML = "No data available";
-        return;
-    }
 
-    var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = width - margin.left - margin.right,
-    height = height - margin.top - margin.bottom;
-
-    var x = d3.scale.ordinal()
-        .rangeRoundBands([1, width], .1);
-
-    var y = d3.scale.linear()
-        .rangeRound([height, 0]);
-
-    var color = d3.scale.category20();
-
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
-
-    var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left")
-        .tickFormat(d3.format(".2s"));
-
-    var svg = el.append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-	
-	//todo: we assume that all elements have the same properties, should scan them all
-    color.domain(d3.keys(data[0]).filter(function (key) { return key != xcoord; }));
-	var arranged = [];
-	
-	//runs overs all the data. copies the result to a new array
-    data.forEach(function (d) {
-		var newD = {x: d[xcoord]};
-        var y0neg = 0;
-        var y0pos = 0;
-        newD.values = color.domain().map(function (m) {
-            if (d[m] > 0)
-                return { name: m, y0: y0pos, y1: y0pos += +d[m] };
-            else {
-                var y1 = y0neg;
-                return { name: m, y0: y0neg += d[m], y1: y1 };
-            } 
-        });
-        newD.totalPositive = d3.max(newD.values, function (v) { return v.y1});
-        newD.totalNegative = d3.min(newD.values, function (v) { return v.y0 });
-		arranged.push(newD);
+    var maxLegendLength = max(data, function (el) { 
+        return getItemAndValue(el).length;
     });
-	
-    x.domain(arranged.map(function (d) { return d.x; }));
-    y.domain([d3.min(arranged, function (d) {return d.totalNegative;}), d3.max(arranged, function (d) {
-        if (d == null)
-            return 0;
-        return d.totalPositive;
-    })]);
 
-    svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+    //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
+    var legendWidth = 25 + maxLegendLength * 7;
 
-    svg.append("g")
-        .call(yAxis)
-      .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Amount");
+    if (showLegend) {
+        var legend = parent
+        .append("svg")
+        .attr("width", legendWidth)
+        .attr("height", height)
+        .selectAll("g")
+         .data(data)
+         .enter().append("g")
+         .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
 
-    var state = svg.selectAll(".xVal")
-        .data(arranged)
-      .enter().append("g")
-        .attr("class", "g")
-        .attr("transform", function (d) { return "translate(" + x(d.x) + ",0)"; });
+        legend.append("rect")
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", function (i) { return color(descGetter(i)); })
 
-    state.selectAll("rect")
-        .data(function (d) { return d.values; })
-      .enter().append("rect")
-        .attr("width", x.rangeBand())
-        .attr("y", function (d) { return y(d.y1); })
-        .attr("height", function (d) { return y(d.y0) - y(d.y1); })
-        .style("fill", function (d) { return color(d.name); });
-
-    var legend = svg.selectAll(".legend")
-        .data(color.domain().slice().reverse())
-      .enter().append("g")
-        .attr("class", "legend")
-        .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
-
-    legend.append("rect")
-        .attr("x", width - 18)
-        .attr("width", 18)
-        .attr("height", 18)
-        .style("fill", color);
-
-    legend.append("text")
-        .attr("x", width - 24)
+        legend.append("text")
+        .attr("x", 24)
         .attr("y", 9)
         .attr("dy", ".35em")
-        .style("text-anchor", "end")
-        .text(function (d) { return d; });
+        .text(getItemAndValue);
+    }
 }

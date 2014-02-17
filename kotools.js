@@ -90,84 +90,114 @@ function setDefaultOptions(options, type) {
 }
 
 //TODO: storing the original data on the object won't work for computed observables
-ko.bindingHandlers.piechart = {
+ko.bindingHandlers.linechart = {
     init: function(element, valueAccessor, allBindingsAccessor) {
       var transf = allBindingsAccessor().transformation;
-      var vmData = allBindingsAccessor().piechart();
+      var vmData = allBindingsAccessor().linechart();
 
-      var options  = setDefaultOptions(allBindingsAccessor().chartOptions, "pie");
+      var options  = setDefaultOptions(allBindingsAccessor().chartOptions, "line");
       var data = vmData.map(transf);
       vmData._originalData = data;
       vmData._options = options;
       
-      d3pieChart(options.width,options.height,data, element.id, options.legend);
+      lineChart(options.width,options.height,data, element, options.legend);
     },
     update: function(element, valueAccessor,allBindingsAccessor) {
       var transf = allBindingsAccessor().transformation;
-      var vmData = allBindingsAccessor().piechart();
+      var vmData = allBindingsAccessor().linechart();
 
-      var options = setDefaultOptions(vmData._options,"pie");
+      var options = setDefaultOptions(vmData._options,"line");
       
       var data = vmData.map(transf);
       
       if(!arraysAreEqual(vmData, vmData._originalData)){
           element.innerHTML = "";
-        d3pieChart(options.width,options.height,data, element.id, options.legend);
+        lineChart(options.width,options.height,data, element, options.legend);
         vmData._originalData = data;
       }
     }
 };
 
+ko.bindingHandlers.piechart = {
+    init: function(element, valueAccessor, allBindingsAccessor) {
+      var transf = allBindingsAccessor().transformation;
+      var vmData = allBindingsAccessor().piechart();
+      var options  = setDefaultOptions(allBindingsAccessor().chartOptions, "pie");
+      var data = vmData.map(transf);
+      element._originalData = data;
+      element._options = options;
+      
+      d3pieChart(options.width,options.height,data, element, options.legend);
+    },
+    update: function(element, valueAccessor,allBindingsAccessor) {
+      var transf = allBindingsAccessor().transformation;
+      var vmData = allBindingsAccessor().piechart();
+
+      var options = setDefaultOptions(element._options,"pie");
+      var data = vmData.map(transf);
+      
+      if(!arraysAreEqual(vmData, element._originalData)){
+        element.innerHTML = "";
+        d3pieChart(options.width,options.height,data, element, options.legend);
+        element._originalData = data;
+      }
+    }
+};
 
 ko.bindingHandlers.stackedbarchart = {
     init: function (element, valueAccessor, allBindingsAccessor) {
         var data = allBindingsAccessor().stackedbarchart();
         var options = setDefaultOptions(allBindingsAccessor().chartOptions,"bar");
 		var xcoord = allBindingsAccessor().xcoord;
-        if(originalData[element.id] != null)
-			throw "Element: " + element.id + "already used for other chart";
-		originalData[element.id] = data;
+        element._originalData = data;
 		
-        d3barChart(options.width, options.height, data, element.id, options.legend, xcoord);
+        d3barChart(options.width, options.height, data, element, options.legend, xcoord);
     },
     update: function (element, valueAccessor, allBindingsAccessor) {
         var data = allBindingsAccessor().stackedbarchart();
         var options = setDefaultOptions(allBindingsAccessor().chartOptions,"bar");
         var xcoord = allBindingsAccessor().xcoord;
         
-        
-        if (!arraysAreEqual(data, originalData[element.id])) {
+        if (!arraysAreEqual(data, element._originalData)) {
             element.innerHTML = "";
-            d3barChart(options.width, options.height, data, element.id, options.legend, xcoord);
-            originalData[element.id] = data;
+            d3barChart(options.width, options.height, data, element, options.legend, xcoord);
+            element._originalData = data;
         }
     }
 };
 
+function applyFormattedValue(fValue, element){
+  //TODO: test if val is function  => observable then evaluate, test if it is a number before calling toCurrencyString
+  if (fValue.val != null) {
+      if (fValue.transf != null)
+        fValue.val = fValue.transf(fValue.val);
+      if(fValue.rounding!=null && isNumber(fValue.val)){
+        fValue.val = Math.round(fValue.val*1*fValue.val,fValue.rounding) / 1* fValue.val,fValue.rounding;
+        element.innerHTML = fValue.val.toCurrencyString(fValue.currency);
+      }else{
+        element.innerHTML = fValue.val;
+      }
+  }
+}
+
+function getFormattedValueFromAccessor(accessor){
+  var fValue = {
+    currency: getValue(accessor.currency),
+    val : getValue(accessor.formattedValue),
+    transf : accessor.transformation,
+    rounding : getValue(accessor.rounding)
+  };
+  return fValue;
+}
+
 ko.bindingHandlers.formattedValue = {
     init: function (element, valueAccessor, allBindingsAccessor) {
-        var currency = getValue(allBindingsAccessor().currency);
-        var val = getValue(allBindingsAccessor().formattedValue);
-        var transf = allBindingsAccessor().transformation;
-
-        //TODO: test if val is function  => observable then evaluate, test if it is a number before calling toCurrencyString
-        if (val != null) {
-            if (transf != null)
-                val = transf(val);
-
-            element.innerHTML = val.toCurrencyString(currency);
-        }
+        var fValue = getFormattedValueFromAccessor(allBindingsAccessor());
+        applyFormattedValue(fValue,element);
     },
     update: function (element, valueAccessor, allBindingsAccessor) {
-        var currency = getValue(allBindingsAccessor().currency);
-        var val = getValue(allBindingsAccessor().formattedValue);
-        var transf = allBindingsAccessor().transformation;
-
-        if (val != null) {
-            if (transf != null)
-                val = transf(val);
-            element.innerHTML = val.toCurrencyString(currency);
-        }
+      var fValue = getFormattedValueFromAccessor(allBindingsAccessor());
+      applyFormattedValue(fValue,element);
     }
 }
 
