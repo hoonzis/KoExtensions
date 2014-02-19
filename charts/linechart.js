@@ -7,10 +7,12 @@ function lineChart(width, height, data, element, showLegend) {
     if (el == null)
         return;
 
+  //TODO: paramteres to width, height
   var margin = {top: 20, right: 80, bottom: 30, left: 50},
-      width = 960 - margin.left - margin.right,
-      height = 500 - margin.top - margin.bottom;
+      width = 600 - margin.left - margin.right,
+      height = 300 - margin.top - margin.bottom;
 
+  //TODO: if X is linear we won't support names for months etc
   var x = d3.scale.linear()
       .range([0, width]);
 
@@ -74,10 +76,14 @@ function lineChart(width, height, data, element, showLegend) {
 
   point.append("path")
       .attr("class", "line")
-      .attr("d", function(d) { return line(d.values); })
+      .attr("d", function(d) { 
+        return line(d.values); 
+      })
       .style("stroke-width", 2)
       .style("stroke", function(d) { return color(d.x); })
       .style("fill","none");
+
+  //TODO: do something with the data
 
   point.append("text")
       .datum(function(d) { return {name: d.x, value: d.values[d.values.length - 1]}; })

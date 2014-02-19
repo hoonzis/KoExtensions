@@ -29,6 +29,11 @@ var testOptions = { legend: true, width:300, height:150}
 	<div id="monthlySales" data-bind="stackedbarchart: carSales, xcoord:'year'">
 
 	</div>
+
+	<h2>Monthly Sales</h2>
+	<div id="lineChart" data-bind="linechart: expensesPerMonth, transformation:transformToLineChart">
+
+	</div>
 	
 	<h2>Life Expenses</h2>
 	<div id="lifeExpenses" data-bind="stackedbarchart: lifeExpenses, xcoord:'month'">
@@ -37,10 +42,12 @@ var testOptions = { legend: true, width:300, height:150}
 
 	<h2>Sales per car mark</h2>
 	 <!-- ko foreach: cars -->
-		<h3 data-bind="text:name"></h3>
-		<div data-bind="piechart: sales,transformation:identity">
+	 	<div style="float:left;margin-right:10px">
+		 	<h3 data-bind="text:name"></h3>
+			<div data-bind="piechart: sales,transformation:transform2">
 
-		</div>	 
+			</div>
+	 	</div> 
 	 <!-- /ko -->
 		
 </body>
@@ -76,15 +83,27 @@ var carSales = [
 var lastWeek = [
 	{ 
 		name: "peugot",
-		sales: [100,200,300]
+		sales: [ 
+			{model: 'model1', amount:100},
+			{model: 'model2', amount:200},
+			{model: 'model3', amount:300}
+		]
 	},
 	{ 
 		name: "audi",
-		sales: [200,300,100]
+		sales: [
+			{model: 'a3', amount:200},
+			{model: 'qutro', amount:300},
+			{model: 'a8', amount:100}
+		]
 	},
 	{ 
 		name: "bmw",
-		sales: [200,100,150]
+		sales: [
+			{model: 'model5', amount:200},
+			{model: 'model8', amount:100},
+			{model: 'model3',amount:150}
+		]
 	},
 ]
 
@@ -115,7 +134,9 @@ function CarViewModel(data) {
 	self.name = ko.observable();
 	
 	self.totalSales = ko.computed(function(x) {
-		return sum(self.sales());
+		return sum(self.sales().map(function(item){
+			return item.amount;
+		}));
 	},self);
 	
 	if(data!=null){
@@ -125,17 +146,46 @@ function CarViewModel(data) {
 }
 
 function TestViewModels (data, lastWeek, expenses){
+	self = this;
 	self.carSales = ko.observableArray([]);
 	self.cars = ko.observableArray([]);
 	self.lifeExpenses = ko.observableArray([]);
+	self.expensesPerMonth = ko.observableArray([]);
 	
+	var keys = d3.keys(expenses[0]).filter(function (i) { return i != 'month';});
+	var perMonth = keys.map(function(key){
+		return {
+			linename: key,
+			data: expenses
+		};
+	});	
+
+	self.expensesPerMonth(perMonth);
 	self.carSales(data);
 	self.lifeExpenses(expenses);
 	self.cars(lastWeek.map(function(x) { return new CarViewModel(x);}));
 }
 
+function transformToLineChart(i){
+	var months = {};
+	months['january'] = 0;
+	months['february'] = 1;
+	months['marz'] = 2;
+
+    return { 
+    	x: i.linename, 
+    	values: i.data.map(function(item){
+    		return {x:months[item.month],y:item[i.linename]};
+    	})
+    };
+}
+
 function transformToChart(car){
 	return { x: car.name(), y: car.totalSales()};
+}
+
+function transform2(car){
+	return {x:car.model, y:car.amount };
 }
 
 var vm = new TestViewModels(carSales, lastWeek, lifeExpenses);
