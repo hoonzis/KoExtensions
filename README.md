@@ -54,7 +54,7 @@ function transformToChart(car){
 The chart binding can be extremly usefull when there is a need to generate multiple charts - for instance chart per viewmodel.
 
 ![alt text][foreachpiechart]
-[piechart]: http://hoonzis.github.com/KoExtensions/img/multiple_pie.PNG
+[foreachpiechart]: http://hoonzis.github.com/KoExtensions/img/multiple_pie.PNG
 
 ```html
 <!-- ko foreach: cars -->
@@ -99,8 +99,8 @@ var lifeExpenses = [
 ```
 ###Line chart###
 Line chart binding uses a transformation function which is applied on the list of viewmodels. The resulting object should be an array of objects for each line in the following form: {x:line1, values:[{x:0,y:100},{x:1,y:200}]}.
-![alt text][foreachpiechart]
-[piechart]: http://hoonzis.github.com/KoExtensions/img/linechart.PNG
+![alt text][linechart]
+[linechart]: http://hoonzis.github.com/KoExtensions/img/linechart.PNG
 
 ```html
 <div id="lineChart" data-bind="linechart: expensesPerMonth, transformation:transformToLineChart"></div>
