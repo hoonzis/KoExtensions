@@ -50,6 +50,27 @@ function transformToChart(car){
 }
 ```
 
+###Charts in the foreach binding###
+The chart binding can be extremly usefull when there is a need to generate multiple charts - for instance chart per viewmodel.
+
+![alt text][foreachpiechart]
+[piechart]: http://hoonzis.github.com/KoExtensions/img/multiple_pie.PNG
+
+```html
+<!-- ko foreach: cars -->
+ 	<div style="float:left;margin-right:10px">
+	 	<h3 data-bind="text:name"></h3>
+		<div data-bind="piechart: sales,transformation:transform2">
+
+		</div>
+ 	</div> 
+ <!-- /ko -->
+
+function transform2(car){
+	return {x:car.model, y:car.amount };
+}
+```
+
 ###The stacked-bar chart binding###
 Enables visualization of one dimensional collection as a stacked-barchart. The binding assumes that the collection passed in contains the values to be shown in each column. It is obligatory to specify the name of the field which holds the "x" coordinate (the stacked column name).
 
@@ -76,7 +97,22 @@ var lifeExpenses = [
 	}
 ]
 ```
+###Line chart###
+Line chart binding uses a transformation function which is applied on the list of viewmodels. The resulting object should be an array of objects for each line in the following form: {x:line1, values:[{x:0,y:100},{x:1,y:200}]}.
+![alt text][foreachpiechart]
+[piechart]: http://hoonzis.github.com/KoExtensions/img/linechart.PNG
 
+```html
+<div id="lineChart" data-bind="linechart: expensesPerMonth, transformation:transformToLineChart"></div>
+function transformToLineChart(i){
+    return { 
+    	x: i.linename, 
+    	values: i.data.map(function(item){
+    		return {x:item.month,y:item[i.linename]};
+    	})
+    };
+}
+```
 ###The map binding###
 The map binding uses [google maps](https://developers.google.com/maps/documentation/javascript/) to viualize on or more ViewModel on the map. The developer has to specify which observables of the ViewModel hold the latitude and longitude properties.
 
@@ -87,8 +123,7 @@ The map binding uses [google maps](https://developers.google.com/maps/documentat
 <div id="map">
 </div>
 <div data-bind="foreach: stations">
-	<div data-bind="latitude: lat, longitude:lng, map:map, selected:selected">
-	</div>
+	<div data-bind="latitude: lat, longitude:lng, map:map, selected:selected"></div>
 </div>
 ```
 
