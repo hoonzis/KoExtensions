@@ -26,7 +26,12 @@ var testOptions = { legend: true, width:300, height:150}
 	</div>
 	
 	<h2>Monthly Sales</h2>
-	<div id="monthlySales" data-bind="stackedbarchart: carSales, xcoord:'year'">
+	<div id="monthlySales" data-bind="barchart: carSales, xcoord:'year',chartOptions:{legend:true, width:800,height:300,style:'stack'}">
+
+	</div>
+
+	<h2>Monthly Sales</h2>
+	<div id="monthlySales" data-bind="barchart: carSales, xcoord:'year',chartOptions:{legend:true, width:800,height:300,style:'bar'}">
 
 	</div>
 
@@ -62,21 +67,21 @@ function identity(item){
 var carSales = [ 
 	{
 		year:'january',
-		peugot: '100',
-		audit: '200',
-		bmw:'300'
+		peugot: 100,
+		audit: 200,
+		bmw:300
 	},
 	{
 		year:'february',
-		peugot: '50',
-		audit: '110',
-		bmw:'80'
+		peugot: 50,
+		audit: 110,
+		bmw:80
 	},
 	{
 		year:'marz',
-		peugot: '120',
-		audit: '230',
-		bmw:'115'
+		peugot: 120,
+		audit: 230,
+		bmw:115
 	}
 ]
 

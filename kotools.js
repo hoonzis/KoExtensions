@@ -13,7 +13,7 @@ ko.bindingHandlers.map = {
             });
 
             google.maps.event.addListener(marker, 'click', function () {
-                viewModel.select()
+                viewModel.select();
             });
 
             markers.push(marker);
@@ -66,8 +66,8 @@ ko.bindingHandlers.datepicker = {
 };
 
 
-var defaultPieChartOptions = { legend: true, width: 200, height: 200 }
-var defaultBarChartOptions = { legend: true, width: 600, height: 200 }
+var defaultPieChartOptions = { legend: true, width: 200, height: 200 };
+var defaultBarChartOptions = { legend: true, width: 600, height: 200 };
 
 function setDefaultOptions(options, type) {
     var typeOptions;
@@ -84,84 +84,97 @@ function setDefaultOptions(options, type) {
         options.height = typeOptions.height;
 
     if (options.width == null)
-        options.width = type.width;
+        options.width = typeOptions.width;
 
     return options;
 }
 
-//TODO: storing the original data on the object won't work for computed observables
+function transformData(chartData){
+    if(chartData.transf!=null)
+        chartData.data = chartData.data.map(chartData.transf);
+}
+
+function getLineDataFromAccessor(accesor) {
+    var options = setDefaultOptions(accesor.chartOptions, "line");
+    var chartData = {
+        transf: accesor.transformation,
+        data: accesor.linechart(),
+        options:options
+    };
+    chartData.options.unitTransform = accesor.unitTransform;
+    transformData(chartData);
+    return chartData;
+}
+
 ko.bindingHandlers.linechart = {
     init: function(element, valueAccessor, allBindingsAccessor) {
-      var transf = allBindingsAccessor().transformation;
-      var vmData = allBindingsAccessor().linechart();
-
-      var options  = setDefaultOptions(allBindingsAccessor().chartOptions, "line");
-      var data = vmData.map(transf);
-      vmData._originalData = data;
-      vmData._options = options;
-      
-      lineChart(options.width,options.height,data, element, options.legend);
+        var chartData = getLineDataFromAccessor(allBindingsAccessor());
+        element._chartData = chartData;
+        lineChart(chartData.data, element, chartData.options);
     },
     update: function(element, valueAccessor,allBindingsAccessor) {
-      var transf = allBindingsAccessor().transformation;
-      var vmData = allBindingsAccessor().linechart();
-
-      var options = setDefaultOptions(vmData._options,"line");
-      
-      var data = vmData.map(transf);
-      
-      if(!arraysAreEqual(vmData, vmData._originalData)){
-          element.innerHTML = "";
-        lineChart(options.width,options.height,data, element, options.legend);
-        vmData._originalData = data;
-      }
+        var chartData = getLineDataFromAccessor(allBindingsAccessor());
+        if(!arraysAreEqual(chartData.data, element._chartData.data)){
+            element.innerHTML = "";
+            lineChart(chartData.data, element, chartData.options);
+            element._chartData = chartData;
+        }
     }
 };
+
+function getPieDataFromAccessor(accesor) {
+    var chartData = {
+        transf: accesor.transformation,
+        data: accesor.piechart(),
+        options: setDefaultOptions(accesor.chartOptions, "pie")
+    };
+    chartData.options.unitTransform = accesor.unitTransform;
+    transformData(chartData);
+    return chartData;
+}
 
 ko.bindingHandlers.piechart = {
-    init: function(element, valueAccessor, allBindingsAccessor) {
-      var transf = allBindingsAccessor().transformation;
-      var vmData = allBindingsAccessor().piechart();
-      var options  = setDefaultOptions(allBindingsAccessor().chartOptions, "pie");
-      var data = vmData.map(transf);
-      element._originalData = data;
-      element._options = options;
-      
-      d3pieChart(options.width,options.height,data, element, options.legend);
+    init: function (element, valueAccessor, allBindingsAccessor) {
+        var chartData = getPieDataFromAccessor(allBindingsAccessor());
+        element._chartData = chartData;
+        d3pieChart(chartData.data, element, chartData.options);
     },
-    update: function(element, valueAccessor,allBindingsAccessor) {
-      var transf = allBindingsAccessor().transformation;
-      var vmData = allBindingsAccessor().piechart();
-
-      var options = setDefaultOptions(element._options,"pie");
-      var data = vmData.map(transf);
+    update: function (element, valueAccessor, allBindingsAccessor) {
+        var chartData = getPieDataFromAccessor(allBindingsAccessor());
       
-      if(!arraysAreEqual(vmData, element._originalData)){
-        element.innerHTML = "";
-        d3pieChart(options.width,options.height,data, element, options.legend);
-        element._originalData = data;
-      }
+        if (!arraysAreEqual(chartData.data, element._chartData.data)) {
+            element.innerHTML = "";
+            d3pieChart(chartData.data, element, chartData.options);
+            element._chartData = chartData;
+        }
     }
 };
 
-ko.bindingHandlers.stackedbarchart = {
+function getBarChartDataFromAccessor(accessor) {
+    var chartData = {
+        data:accessor.barchart(),
+        options:setDefaultOptions(accessor.chartOptions, "bar"),
+        xcoord: accessor.xcoord
+    };
+    if(accessor.line !=null)
+        chartDat.line = accessor.line();
+    
+    chartData.options.unitTransform = accessor.unitTransform;
+    return chartData;
+}
+
+ko.bindingHandlers.barchart = {
     init: function (element, valueAccessor, allBindingsAccessor) {
-        var data = allBindingsAccessor().stackedbarchart();
-        var options = setDefaultOptions(allBindingsAccessor().chartOptions,"bar");
-		var xcoord = allBindingsAccessor().xcoord;
-        element._originalData = data;
-		
-        d3barChart(options.width, options.height, data, element, options.legend, xcoord);
+        var chartData = getBarChartDataFromAccessor(allBindingsAccessor());
+        element._chartData = chartData;
+        d3barChart(chartData.data, element, chartData.options, chartData.xcoord, chartData.line);
     },
     update: function (element, valueAccessor, allBindingsAccessor) {
-        var data = allBindingsAccessor().stackedbarchart();
-        var options = setDefaultOptions(allBindingsAccessor().chartOptions,"bar");
-        var xcoord = allBindingsAccessor().xcoord;
-        
-        if (!arraysAreEqual(data, element._originalData)) {
+        var chartData = getBarChartDataFromAccessor(allBindingsAccessor());
+        if (!arraysAreEqual(chartData.data, element._chartData.data)) {
             element.innerHTML = "";
-            d3barChart(options.width, options.height, data, element, options.legend, xcoord);
-            element._originalData = data;
+            element._chartData = chartData;
+            d3barChart(chartData.data, element, chartData.options, chartData.xcoord, chartData.line);
         }
     }
 };
@@ -172,8 +185,7 @@ function applyFormattedValue(fValue, element){
       if (fValue.transf != null)
         fValue.val = fValue.transf(fValue.val);
       if(fValue.rounding!=null && isNumber(fValue.val)){
-        fValue.val = Math.round(fValue.val*1*fValue.val,fValue.rounding) / 1* fValue.val,fValue.rounding;
-        element.innerHTML = fValue.val.toCurrencyString(fValue.currency);
+        element.innerHTML = fValue.val.toCurrencyString(fValue.currency, fValue.rounding);
       }else{
         element.innerHTML = fValue.val;
       }
@@ -200,6 +212,25 @@ ko.bindingHandlers.formattedValue = {
       applyFormattedValue(fValue,element);
     }
 }
+
+ko.bindingHandlers.progress = {
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+        var value = valueAccessor()();
+        if (value == null)
+            value = 0;
+        element.style.width = value + "%";
+        element.style.display = 'none';
+        element.style.display = 'block';
+    },
+    update: function (element, valueAccessor, allBindingsAccessor) {
+        var value = valueAccessor()();
+        if (value == null)
+            value = 0;
+        element.style.width = value + "%";
+        element.style.display = 'none';
+        element.style.display = 'block';
+    }
+};
 
 function getValue(val) {
     if (val != null && typeof (val) == 'function')

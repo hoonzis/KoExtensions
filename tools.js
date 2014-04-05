@@ -7,21 +7,12 @@ function isEmpty(str) {
     return (!str || 0 === str.length);
 }
 
-function dToString(d) {
-    if (d == null)
-        return '';
-
-    if (!isDate(d)) {
-        d = new Date(d);
-    }
+Date.prototype.toFormattedString = function (){
     
-    if (!isValidDate(d))
-        return '';
-
-    var curr_date = d.getDate();
-    var curr_month = d.getMonth() + 1; //Months are zero based
-    var curr_year = d.getFullYear();
-    return curr_date + "/" + curr_month + "/" + curr_year;
+    var cDate = this.getDate();
+    var cMonth = this.getMonth() + 1; //Months are zero based
+    var cYear = this.getFullYear();
+    return cDate + "/" + cMonth + "/" + cYear;
 }
 
 /* Sums all elements in the array. The map function is applied on each element to obtain it's value. The predicate is a condition to be added to the sum*/
@@ -40,31 +31,9 @@ function sum(kArray, mapfunc,predicate) {
 }
 
 function find(data, predicate) {
-    var i = 0;
-    for (i = 0; i < data.length; i++)
+    for (var i = 0; i < data.length; i++)
         if(predicate(data[i]))
             return data[i];
-}
-
-function where(data, predicate) {
-    var r = [];
-    var i = 0;
-    for (i = 0; i < data.length; i++)
-        if (predicate(data[i]))
-            r.push(data[i]);
-
-    return r;
-}
-
-function max(kArray, predicate) {
-    var max = 0;
-    for (var p = 0; p < kArray.length; p++) {
-        var v = predicate(kArray[p]);
-        if (v >= max)
-            max = v;
-    }
-
-    return max;
 }
 
 function positiveRounded(d) {
@@ -77,12 +46,6 @@ function isString(x){
     return typeof(x) == 'string';
 }
 
-function toFixed(v,n){
-    if (isString(v))
-        return v;
-    return v.toFixed(n);
-}
-
 function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
@@ -90,6 +53,22 @@ function isNumber(n) {
 function isDate(d) {
     return Object.prototype.toString.call(d) == "[object Date]";
 }
+
+
+function parseDate(input) {
+    if (input instanceof Date)
+        return input;
+
+    var firstSpace = input.indexOf(" ");
+    if (firstSpace != -1) {
+        input = input.substring(0, firstSpace);
+        var parts = input.split('-');
+        if (parts.length == 3)
+            return new Date(parts[0], parts[1] - 1, parts[2]); // Note: months are 0-based
+    } else {
+        return new Date(Date.parse(input));
+    }
+};
 
 //verify that the date is valid => object is date-time and there is a meaningful value
 function isValidDate(d) {
@@ -142,8 +121,8 @@ function toLength(val, length) {
     return returnVal;
 }
 
-Number.prototype.toCurrencyString = function (cur) {
-    var formatted = this.toFixed(2).replace(/(\d)(?=(\d{3})+\b)/g, '$1 ');
+Number.prototype.toCurrencyString = function (cur, decSpaces) {
+    var formatted = this.toFixed(decSpaces).replace(/(\d)(?=(\d{3})+\b)/g, '$1 ');
     if(cur!=null)
         formatted += ' ' + cur;
     return formatted;
@@ -220,3 +199,30 @@ function toDenseMatrix(arr) {
     }
     return { names: deskNames, matrix: resultArr};
 }
+
+String.prototype.endsWith = function (suffix) {
+    return this.indexOf(suffix, this.length - suffix.length) !== -1;
+};
+
+function diff(a1,a2) {
+    return a1.filter(function (i) { return a2.indexOf(i) < 0; });
+};
+
+function tryConvertToNumber(orgValue) {
+    var intValue = parseInt(orgValue);
+    var decimalValue = parseFloat(orgValue);
+    var value = intValue != null ? intValue : (decimalValue != null ? decimalValue : orgValue);
+    return value;
+};
+
+
+function convertAllProperties(obj) {
+    for (var key in obj) {
+        var orgValue = obj[key];
+        var intValue = parseInt(orgValue);
+        var decimalValue = parseFloat(orgValue);
+        var value = intValue != null ? intValue : (decimalValue != null ? decimalValue : orgValue);
+        obj[key] = value;
+    }
+    return obj;
+};

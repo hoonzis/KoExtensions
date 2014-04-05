@@ -1,24 +1,28 @@
 //Takes as input collection of items [data]. Each item has two values [x] and [y].
-function d3pieChart(width, height, data, element, showLegend) {
+function d3pieChart(data, element,options) {
     var el = getElementAndCheckData(element, data);
     if (el == null)
         return;
     
-    width = width / 2;
-    var outerRadius = Math.min(width, height) / 2,
+    var width = options.width / 2;
+    var height = options.height;
+    var outerRadius = Math.min(width, height) / 2 - 3,
     innerRadius = outerRadius * .3,
     color = d3.scale.category20(),
     donut = d3.layout.pie(),
-    arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius),
-    parent = el;
-
+    arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
+    
     donut.value(function (d) { return d.y; });
     
-    var keys = data.map(function(item) { return item.x});
+    var keys = data.map(function (item) { return item.x; });
+    var max = d3.sum(data, function (item) { return item.y; });
     color.domain(keys);
-    showStandardLegend(parent,data,function(i) { return i.x},color,showLegend,height, function(i) { return i.y});
-    var vis = parent
-    .append("svg")
+    showStandardLegend(el, data, function (i) { return i.x; }, color, options.legend, height, function (i) {
+        if (options.unitTransform != null)
+            return options.unitTransform(i.y);
+        return i.y;
+    });
+    var vis = el.append("svg")
       .data([data])
       .attr("width", width)
       .attr("height", height);
@@ -31,10 +35,19 @@ function d3pieChart(width, height, data, element, showLegend) {
 
     arcs.append("path")
         .attr("d", arc)
-        .style("fill", function (d) { 
-            return color(d.data.x);
+        .style("fill", function(d) { return color(d.data.x); })
+        .style("stroke-width", 2)
+        .style("stroke", "none")
+        .on("mouseover", arcMouseOver)
+        .on("mouseout", arcMouseOut)
+        .each(function(d) { 
+            d.percentage = d.data.y / max;
+            if (options.unitTransform != null) {
+                d.formatted = options.unitTransform(d.data.y);
+            }
         });
 
+    /*
     arcs.append("text")
         .attr("transform", function (d) { return "translate(" + arc.centroid(d) + ")"; })
         .attr("dy", ".35em")
@@ -44,5 +57,19 @@ function d3pieChart(width, height, data, element, showLegend) {
             if (isString(d.data.y))
                 return d.data.y;
             return d.data.y.toFixed(2);
-        });
+        });*/
 }
+
+function arcMouseOver(d) {
+    d3.select(this).style("stroke", 'black');
+    var info = {};
+    var value = d.formatted + " (" + (d.percentage * 100).toFixed(1) + "%)";
+    info[d.data.x] = value;
+    showTooltip(info);
+}
+
+function arcMouseOut() {
+    d3.select(this).style("stroke", 'none');
+    hideTooltip();
+}
+
