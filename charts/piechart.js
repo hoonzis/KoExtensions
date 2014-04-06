@@ -40,24 +40,13 @@ function d3pieChart(data, element,options) {
         .style("stroke", "none")
         .on("mouseover", arcMouseOver)
         .on("mouseout", arcMouseOut)
+        .style("cursor", "pointer")
         .each(function(d) { 
             d.percentage = d.data.y / max;
             if (options.unitTransform != null) {
                 d.formatted = options.unitTransform(d.data.y);
             }
         });
-
-    /*
-    arcs.append("text")
-        .attr("transform", function (d) { return "translate(" + arc.centroid(d) + ")"; })
-        .attr("dy", ".35em")
-        .attr("text-anchor", "middle")
-        .attr("display", function (d) { return d.data.y > .15 ? null : "none"; })
-        .text(function (d, i) {
-            if (isString(d.data.y))
-                return d.data.y;
-            return d.data.y.toFixed(2);
-        });*/
 }
 
 function arcMouseOver(d) {

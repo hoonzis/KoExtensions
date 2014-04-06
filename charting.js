@@ -72,3 +72,7 @@ function hideTooltip() {
 		.duration(300)
 		.style("opacity", "0");
 }
+
+var bodySelection = d3.select("body");
+var tooltip = bodySelection.append("div").attr("id","toolTip");
+tooltip.append("div").attr("id","info1header");

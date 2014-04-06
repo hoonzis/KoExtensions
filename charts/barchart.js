@@ -126,6 +126,7 @@ function d3barChart(data, element, options, xcoord, lineData) {
             .attr("height", function (d) { return y(d.y0) - y(d.y1); })
             .on("mouseover", bar_onmouseover)
             .on("mouseout", bar_mouseout)
+            .style("cursor", "pointer")
             .style("fill", function (d) {
                 return color(d.name);
             });
