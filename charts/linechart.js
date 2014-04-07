@@ -56,7 +56,9 @@ function lineChart(data, element, options) {
     y.domain([
         d3.min(data, function (c) {
             return d3.min(c.values, function (v) {
-                return v.y;
+                if(v.y < 0)
+                    return v.y;
+                return 0;
             });
         }),
         d3.max(data, function (c) {
@@ -93,6 +95,8 @@ function lineChart(data, element, options) {
                 item.color = color(d.x);
                 if(item.formattedValue!= null)
                     return;
+                if(item.name == null)
+                  item.name = d.x;
                 var formattedValue = item.y;
                 if (options.unitTransform != null)
                     formattedValue = options.unitTransform(item.y);
@@ -145,7 +149,6 @@ function singlepoint_mouseover(d) {
     var info = {
         "Quarter": xLabel
     };
-    info[d.linename] = null;
     info[d.name] = d.formattedValue;
     showTooltip(info);
     d3.select(this).style("stroke", 'black');

@@ -207,7 +207,10 @@ function d3barChart(data, element, options, xcoord, lineData) {
 function bar_onmouseover(d) {
     d3.select(this).style("stroke", 'black');
     var info = {};
-    info[d.xUnitName] = d.xLabel;
+    var unitName = d.xUnitName;
+    if(unitName == null)
+        unitName = 'x';
+    info[unitName] = d.xLabel;
     info[d.name] = d.formattedValue;
     showTooltip(info);
 }
@@ -215,7 +218,10 @@ function bar_onmouseover(d) {
 function point_mouseOver(d) {
     d3.select(this).style("stroke-width", 6);
     var info = {};
-    info[d.xUnitName] = d.xLabel;
+    var unitName = d.xUnitName;
+    if(unitName == null)
+        unitName = 'x';
+    info[unitName] = d.xLabel;
     //TODO: remove the reference to the global stats vm
     var formatter = statsVM.values.formatters[statsVM.values.variable()];
     info[d.name] = formatter(d.y);

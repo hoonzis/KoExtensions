@@ -73,6 +73,27 @@ function hideTooltip() {
 		.style("opacity", "0");
 }
 
-var bodySelection = d3.select("body");
-var tooltip = bodySelection.append("div").attr("id","toolTip");
-tooltip.append("div").attr("id","info1header");
+function initializeCharts(){
+    var tooltip = d3.select("body").append("div");
+
+    tooltip
+        .attr("id","toolTip")
+        .style("position","absolute")
+        .style("opacity",0)
+        .style("background-color","lightgray")
+        .style("border-radius","5px")
+        .style("border","1px solid black");
+
+    tooltip.append("div").attr("id","info1header")
+        .attr("class","header1");
+
+    tooltip.append("div").attr("id","info1")
+        .attr("class","header2");
+
+    tooltip.append("div").attr("id","info2header")
+        .attr("class","header1");
+
+    tooltip.append("div").attr("id","info2")
+        .attr("class","header2");
+
+}

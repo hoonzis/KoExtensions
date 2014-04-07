@@ -12,6 +12,8 @@
 <script type="text/javascript" src="../charts/barchart.js"></script>
 <script type="text/javascript" src="../charts/linechart.js"></script>
 <script type="text/javascript" src="../charts/piechart.js"></script>
+<link src="../styles/styles.css"></link>
+
 
 <script>
 
@@ -196,6 +198,7 @@ function transform2(car){
 var vm = new TestViewModels(carSales, lastWeek, lifeExpenses);
 
 ko.applyBindings(vm);
+initializeCharts();
 
 </script>
 
