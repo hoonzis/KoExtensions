@@ -113,6 +113,30 @@ function transformToLineChart(i){
     };
 }
 ```
+This binding can be usefull when the collection of lines changes due to user selections.
+
+###Chart options###
+All the charts have several common properties such as the dimensions and whether the legend should be shown.These as well as other can be passed in the chart binding in passing a 'chartOptions' object. Here is how the chartOptions object might look like:
+chartOptions: {
+	legend:true, 
+	style:'group', 
+	width:800, 
+	height: 300, 
+	xLabel:$root.getTimeUnitLabel, 
+	xUnitName: 'Quarters'
+	itemName: 'Company'
+}
+
+1. legend - true of false
+2. width & height - in pixels
+3. style - the style of the chart. For barchart: 'stack' or 'group'
+5. xUnitName - name of the x Axes such as 'Months', 'Quarters'
+6. xUnitFormat - function to format X-axis description values. You might want to pass in functions that format the months or quarters to their textual representation (eg. 1 -> Jan, 2 -> Feb, or 20121 -> Q1 2012)
+7. itemName - in case of multiple items, what does each item represent. For instance each each line in multiple line represents a company this could be "Company".
+
+###Cash-flow chart###
+
+
 ###The map binding###
 The map binding uses [google maps](https://developers.google.com/maps/documentation/javascript/) to viualize on or more ViewModel on the map. The developer has to specify which observables of the ViewModel hold the latitude and longitude properties.
 

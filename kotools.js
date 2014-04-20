@@ -67,7 +67,7 @@ ko.bindingHandlers.datepicker = {
 
 
 var defaultPieChartOptions = { legend: true, width: 200, height: 200 };
-var defaultBarChartOptions = { legend: true, width: 600, height: 200 };
+var defaultBarChartOptions = { legend: true, width: 600, height: 200, xUnitName : 'x', itemName: 'Item' };
 
 function setDefaultOptions(options, type) {
     var typeOptions;
@@ -156,9 +156,8 @@ function getBarChartDataFromAccessor(accessor) {
         options:setDefaultOptions(accessor.chartOptions, "bar"),
         xcoord: accessor.xcoord
     };
-    if(accessor.line !=null)
-        chartDat.line = accessor.line();
-    
+    if(accessor.line != null)
+        chartData.line = accessor.line();
     chartData.options.unitTransform = accessor.unitTransform;
     return chartData;
 }

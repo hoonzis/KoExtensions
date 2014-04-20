@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+ 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<meta http-equiv="content-type" content="text/html; charset=UTF8">
+<head>
+<title>Test Page</title>
+<script type="text/javascript" src="../libs/knockout-2.2.1.js"></script>
+<script type="text/javascript" src="../libs/d3.v3.min.js"></script>
+<script type="text/javascript" src="../tools.js"></script>
+<script type="text/javascript" src="../charting.js"></script>
+<script type="text/javascript" src="../kotools.js"></script>
+<script type="text/javascript" src="../charts/barchart.js"></script>
+<script type="text/javascript" src="../charts/linechart.js"></script>
+<script type="text/javascript" src="../charts/piechart.js"></script>
+<link src="../styles/styles.css"></link>
+
+
+<script>
+
+var testOptions = { legend: true, width:300, height:150}
+
+</script>
+</head>
+<body>
+	<h2>Cash-Flow Chart:</h2>
+	<h2>Monthly Sales</h2>
+	<div id="cashFlow" data-bind="barchart: lifeExpenses, xcoord:'month',line:expensesPerMonth,chartOptions:{legend:true, width:800,height:300,style:'stack',sameScaleLinesAndBars:true}">
+
+	</div>
+		
+</body>
+
+<script>
+
+var lifeExpenses = [
+	{
+		month: 'january',
+		rent: -500,
+		salary : 2200,
+		parties : -300,
+		phone: -100
+	},
+	{
+		month: 'february',
+		rent: -1000,
+		salary : 1500,
+		parties : -400,
+		phone: -80
+	},
+	{
+		month: 'marz',
+		rent: -800,
+		salary : 2500,
+		parties : -800,
+		phone: -120
+	},
+	{
+		month: 'april',
+		rent: -700,
+		salary: 2000,
+		parties: -200,
+		phone: -100
+	}
+]
+
+function TestViewModels (expenses){
+	self = this;
+	self.lifeExpenses = ko.observableArray([]);
+	self.expensesPerMonth = ko.observableArray([]);
+
+	var totalPerMonth = expenses.map(function(item){
+		var keys = Object.keys(item).filter(function(key){return key != 'month';});
+
+		var monthTotal =  
+		{		
+			x : item['month'],
+			y : d3.sum(keys, function(key) { return item[key];})
+		};
+
+		return monthTotal;
+	});
+
+
+	self.lifeExpenses(expenses);
+	self.expensesPerMonth(totalPerMonth);
+}
+
+var vm = new TestViewModels(lifeExpenses);
+
+ko.applyBindings(vm);
+initializeCharts();
+
+</script>
+
+</html>

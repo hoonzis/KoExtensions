@@ -19,33 +19,12 @@ function lineChart(data, element, options) {
 
     var color = d3.scale.category20();
 
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
-    
-    if (options.xLabel != null)
-        xAxis.tickFormat(options.xLabel);
-    
-    var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left");
-
-    var line = d3.svg.line()
-      .interpolate("linear")
-      .x(function(d) { return x(d.x) + x.rangeBand() / 2; })
-      .y(function(d) { return y(d.y); });
-
-    var svg = el.append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
+    //xKeys - not all the lines have neceseraly the same x values -> concat & filter
     var xKeys = [];
     data.map(function (i) {
-        var itemKeys = i.values.map(function(v) {
+        var itemKeys = i.values.map(function (v) {
             return v.x;
-        }).filter(function(v) {
+        }).filter(function (v) {
             return xKeys.indexOf(v) < 0;
         });
 
@@ -56,7 +35,7 @@ function lineChart(data, element, options) {
     y.domain([
         d3.min(data, function (c) {
             return d3.min(c.values, function (v) {
-                if(v.y < 0)
+                if (v.y < 0)
                     return v.y;
                 return 0;
             });
@@ -66,6 +45,50 @@ function lineChart(data, element, options) {
                 function (v) { return v.y; });
         })
     ]);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+    
+    if (options.xUnitFormat != null)
+        xAxis.tickFormat(options.xUnitFormat);
+    
+    var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left");
+
+    x.invert = function(xPos) {
+        var leftEdges = x.range();
+        var rangeWidth = x.rangeBand();
+        var j;
+        for (j = 0; xPos > (leftEdges[j] + rangeWidth) ; j++) {
+        }
+        return j;
+    };
+
+    var line = d3.svg.line()
+      .interpolate("linear")
+      .x(function(d) { return x(d.x) + x.rangeBand() / 2; })
+      .y(function(d) { return y(d.y); });
+
+    var zoomed = function () {
+        svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+        svg.select(".x.axis").call(xAxis);
+        svg.select(".y.axis").call(yAxis);
+    };
+
+    var zoom = d3.behavior.zoom()
+        .x(x)
+        .y(y)
+        .scaleExtent([1, 2])
+        .on("zoom", zoomed);
+
+    var svg = el.append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .call(zoom);
 
     var keys = data.map(function(item) { return item.x; });
     color.domain(keys);
@@ -77,14 +100,14 @@ function lineChart(data, element, options) {
       .call(xAxis);
 
     svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
+        .attr("class", "y axis")
+        .call(yAxis)
         .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Y - value");
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Y - value");
 
     var point = svg.selectAll(".point")
         .data(data)
@@ -108,48 +131,51 @@ function lineChart(data, element, options) {
     //need to add a color for each point 
     .data(function (d) { return d.values; });
 
-  lines.enter().append("circle")
-     .attr("cx", function (d) {
-         return x(d.x) + x.rangeBand() / 2;
-     })
-    .attr("cy", function (d) { return y(d.y); })
-    .attr("r", function (d) { return 6; })
-    .style("fill", function(d) { return d.color;})
-    .style("stroke-width", "5")
-    .style("stroke", function (d) { return d.color; })
-    .style("cursor", "pointer")
-    .on("mouseover", singlepoint_mouseover)
-    .on("click", singlepoint_mouseover)
-    .on("mouseout", singlepoint_mouseout);
-    
+  
+    var spMouseOut = function() {
+        d3.select(this).style("fill", "white");
+        point.style("opacity", 1);
+        hideTooltip();
+    }
+
+    var spMouseOver = function (d) {
+        var xLabel = d.xLabel != null ? d.xLabel : d.x;
+        var info = {};
+        info[options.itemName] = d.linename;
+        info[options.xUnitName] = xLabel;
+        info[d.name] = d.formattedValue;
+        showTooltip(info);
+        d3.select(this).style("fill", d.color);
+
+        point.style("opacity", function(item) {
+            if (item.x != d.linename)
+                return 0.1;
+            return 1;
+        });
+    }
+
   point.append("path")
       .attr("class", "line")
       .attr("d", function(d) { return line(d.values); })
       .style("stroke-width", 2)
       .style("stroke", function(d) { return color(d.x); })
-      .style("fill","none");
+      .style("fill", "none");
 
-    /*
-  point.append("text")
-      .datum(function(d) { return {name: d.x, value: d.values[d.values.length - 1]}; })
-      .attr("transform", function(d) { return "translate(" + x(d.value.x) + "," + y(d.value.y) + ")"; })
-      .attr("x", 3)
-      .attr("dy", ".35em")
-      .text(function(d) { return d.x; });*/
+  lines.enter().append("circle")
+       .attr("cx", function (d) {
+           return x(d.x) + x.rangeBand() / 2;
+       })
+      .attr("cy", function (d) { return y(d.y); })
+      .attr("r", function () { return 4; })
+      .style("fill","white")
+      .style("stroke-width", "2")
+      .style("stroke", function (d) { return d.color; })
+      .style("cursor", "pointer")
+      .on("mouseover", spMouseOver)
+      .on("click", spMouseOver)
+      .on("mouseout", spMouseOut);
 }
 
 
-function singlepoint_mouseout(d) {
-    d3.select(this).style("stroke", d.color);
-    hideTooltip();
-}
 
-function singlepoint_mouseover(d) {
-    var xLabel = d.xLabel != null ? d.xLabel : d.x;
-    var info = {
-        "Quarter": xLabel
-    };
-    info[d.name] = d.formattedValue;
-    showTooltip(info);
-    d3.select(this).style("stroke", 'black');
-}
+

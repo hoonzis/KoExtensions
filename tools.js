@@ -174,30 +174,22 @@ function isString(obj) {
 
 //returns a dense version of sparse two dimensional matrix
 function toDenseMatrix(arr) {
-    var deskNames = [];
-    var deskIndexes = [];
-    var index1 = 0;
-    var arrLength = Object.size(arr);
+    var keys = Object.keys(arr).map(function (i){return parseInt(i);});
 
-    var resultArr =  Array.apply(null, new Array(arrLength)).map(Number.prototype.valueOf,0);
-    for(var id1 in arr){
-        var arr2 = arr[id1];
-        if(deskIndexes[id1] == null){
-            deskNames[index1] = id1;
-            deskIndexes[id1] = index1;
-            index1++;
-        }
-        resultArr[deskIndexes[id1]] =  Array.apply(null, new Array(arrLength)).map(Number.prototype.valueOf,0);
-        for(id2 in arr2){
-            if(deskIndexes[id2] == null){
-                deskNames[index1] = id2;
-                deskIndexes[id2] = index1;
-                index1++;
-            }           
-            resultArr[deskIndexes[id1]][deskIndexes[id2]] = arr2[id2];
+    var minKey = d3.min(keys);
+    var maxKey = d3.max(keys);
+
+    var newarray = [];
+    for (var i = minKey; i <= maxKey; i++) {
+        newarray[i] = [];
+        for (var j = minKey; j <= maxKey; j++) {
+            if (arr[i] == null || arr[i][j] == null)
+                newarray[i][j] = 0;
+            else
+                newarray[i][j] = arr[i][j];
         }
     }
-    return { names: deskNames, matrix: resultArr};
+    return newarray;
 }
 
 String.prototype.endsWith = function (suffix) {
@@ -225,4 +217,20 @@ function convertAllProperties(obj) {
         obj[key] = value;
     }
     return obj;
+};
+
+var standardAsc = function (item1, item2) {
+    if (item1 > item2)
+        return 1;
+    if (item1 < item2)
+        return -1;
+    return 0;
+};
+
+var standardDesc = function (item1, item2) {
+    if (item1 < item2)
+        return 1;
+    if (item1 > item2)
+        return -1;
+    return 0;
 };

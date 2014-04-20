@@ -21,8 +21,8 @@ function d3barChart(data, element, options, xcoord, lineData) {
         .scale(x)
         .orient("bottom");
 
-    if (options.xLabel != null)
-        xAxis.tickFormat(options.xLabel);
+    if (options.xUnitFormat != null)
+        xAxis.tickFormat(options.xUnitFormat);
 
     var yAxis = d3.svg.axis()
         .scale(y)
@@ -40,25 +40,25 @@ function d3barChart(data, element, options, xcoord, lineData) {
     var arranged = [];
     data.forEach(function (d) {
 		var newD = {x: d[xcoord]};
-        var y0neg = 0;
-        var y0pos = 0;
+        var y0Neg = 0;
+        var y0Pos = 0;
         
         var values = [];
         color.domain().forEach(function (m) {
             if (d[m] == 0 || d[m] == null)
                 return;
             var xLabel = newD.x;
-            if (options.xLabel != null)
-                xLabel = options.xLabel(newD.x);
+            if (options.xUnitFormat != null)
+                xLabel = options.xUnitFormat(newD.x);
             var formattedValue = d[m];
             if (options.unitTransform != null)
                 formattedValue = options.unitTransform(d[m]);
 
             if (d[m] > 0)
-                values.push({ name: m, y0: y0pos, y1: y0pos += +d[m], val:d[m], x:newD.x, xLabel:xLabel, xUnitName:options.xUnitName, formattedValue:formattedValue});
+                values.push({ name: m, y0: y0Pos, y1: y0Pos += +d[m], val:d[m], x:newD.x, xLabel:xLabel, xUnitName:options.xUnitName, formattedValue:formattedValue});
             else {
-                var y1 = y0neg;
-                values.push({ name: m, y0: y0neg += d[m], y1: y1, val: d[m], x: newD.x, xLabel: xLabel, xUnitName: options.xUnitName, formattedValue:formattedValue});
+                var y1 = y0Neg;
+                values.push({ name: m, y0: y0Neg += d[m], y1: y1, val: d[m], x: newD.x, xLabel: xLabel, xUnitName: options.xUnitName, formattedValue:formattedValue});
             } 
         });
         newD.values = values;
@@ -111,6 +111,38 @@ function d3barChart(data, element, options, xcoord, lineData) {
     svg.append("g")
         .call(yAxis);
 
+    var onBarOver = function (d) {
+        d3.select(this).style("stroke", 'black');
+        var info = {};
+        info[options.xUnitName] = d.xLabel;
+        info[d.name] = d.formattedValue;
+        showTooltip(info);
+    }
+
+    var onPointOver = function (d) {
+        d3.select(this).style("fill", "blue");
+        var info = {};
+        var unitName = d.xUnitName;
+        if (unitName == null)
+            unitName = 'x';
+        info[unitName] = d.xLabel;
+        if (options.lineFormatter != null)
+            info[d.name] = options.lineFormatter(d.y);
+        else
+            info[d.name] = d.y;
+        showTooltip(info);
+    }
+
+    var onPointOut = function () {
+        d3.select(this).style("fill", "white");
+        hideTooltip();
+    }
+
+    var onBarOut = function () {
+        d3.select(this).style("stroke", 'none');
+        hideTooltip();
+    }
+
     var group = svg.selectAll(".xVal")
         .data(arranged)
       .enter().append("g")
@@ -124,8 +156,8 @@ function d3barChart(data, element, options, xcoord, lineData) {
             .attr("width", x.rangeBand())
             .attr("y", function (d) { return y(d.y1); })
             .attr("height", function (d) { return y(d.y0) - y(d.y1); })
-            .on("mouseover", bar_onmouseover)
-            .on("mouseout", bar_mouseout)
+            .on("mouseover", onBarOver)
+            .on("mouseout", onBarOut)
             .style("cursor", "pointer")
             .style("fill", function (d) {
                 return color(d.name);
@@ -148,8 +180,8 @@ function d3barChart(data, element, options, xcoord, lineData) {
              return height - y(d.val);
          })
         .style("cursor", "pointer")
-        .on("mouseover", bar_onmouseover)
-        .on("mouseout", bar_mouseout)
+        .on("mouseover", onBarOver)
+        .on("mouseout", onBarOut)
          .style("fill", function (d) { return color(d.name); });
     }
 
@@ -169,10 +201,18 @@ function d3barChart(data, element, options, xcoord, lineData) {
          return lineY(d.y);
     });
 
-    lineY.domain([
-        0,
-        d3.max(lineData, function (v) { return v.y; })
-    ]);
+    //in some cases it makes sense to use the same scale for both
+    //typically the cash-flow chart
+    //for other cases (line  volumne / units correlations a separate scale should be used for each)
+    if(!options.sameScaleLinesAndBars){
+        lineY.domain([
+            0,
+            d3.max(lineData, function (v) { return v.y; })
+        ]);
+    }else{
+        lineY.domain(y.domain());
+    }
+    
 
     var yAxisRight = d3.svg.axis()
         .scale(lineY)
@@ -182,6 +222,13 @@ function d3barChart(data, element, options, xcoord, lineData) {
         .call(yAxisRight)
         .attr("transform", "translate(" + width + " ,0)");
 
+    
+    svg.append("path")
+        .attr("d", line(lineData))
+        .style("stroke", "blue")
+        .style("stroke-width", 2)
+        .style("fill", "none");
+
     var circles = svg.selectAll("circle")
         .data(lineData)
         .enter()
@@ -189,51 +236,11 @@ function d3barChart(data, element, options, xcoord, lineData) {
 
     circles.attr("cx", function(d) { return x(d.x) + x.rangeBand() / 2; })
         .attr("cy", function(d) { return lineY(d.y); })
-        .attr("r", function(d) { return 5; })
-        .style("fill", "blue")
-        .style("stroke-width", 0)
+        .attr("r", function() { return 4; })
+        .style("fill", "white")
+        .style("stroke-width", 2)
         .style("stroke", "blue")
         .style("cursor", "pointer")
-        .on("mouseover", point_mouseOver)
-        .on("mouseout", point_mouseOut);
-
-    svg.append("path")
-        .attr("d", line(lineData))
-        .style("stroke", "blue")
-        .style("stroke-width", 2)
-        .style("fill", "none");
-}
-
-function bar_onmouseover(d) {
-    d3.select(this).style("stroke", 'black');
-    var info = {};
-    var unitName = d.xUnitName;
-    if(unitName == null)
-        unitName = 'x';
-    info[unitName] = d.xLabel;
-    info[d.name] = d.formattedValue;
-    showTooltip(info);
-}
-
-function point_mouseOver(d) {
-    d3.select(this).style("stroke-width", 6);
-    var info = {};
-    var unitName = d.xUnitName;
-    if(unitName == null)
-        unitName = 'x';
-    info[unitName] = d.xLabel;
-    //TODO: remove the reference to the global stats vm
-    var formatter = statsVM.values.formatters[statsVM.values.variable()];
-    info[d.name] = formatter(d.y);
-    showTooltip(info);
-}
-
-function point_mouseOut(d) {
-    d3.select(this).style("stroke-width", 0);
-    hideTooltip();
-}
-
-function bar_mouseout(d) {
-    d3.select(this).style("stroke", 'none');
-    hideTooltip();
+        .on("mouseover", onPointOver)
+        .on("mouseout", onPointOut);
 }
