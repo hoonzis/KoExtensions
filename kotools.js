@@ -77,14 +77,16 @@ function setDefaultOptions(options, type) {
     else
         typeOptions = defaultPieChartOptions;
 
+    var keys = Object.keys(typeOptions);
+
     if (options == null)
-        options = typeOptions;
+        return typeOptions;
 
-    if (options.height == null)
-        options.height = typeOptions.height;
-
-    if (options.width == null)
-        options.width = typeOptions.width;
+    for(var k in keys){
+        var key = keys[k];
+        if(options[key] == null)
+            options[key] = typeOptions[key];
+    }
 
     return options;
 }

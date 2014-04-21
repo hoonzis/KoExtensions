@@ -55,7 +55,8 @@ function lineChart(data, element, options) {
     
     var yAxis = d3.svg.axis()
       .scale(y)
-      .orient("left");
+      .tickSize(width)
+      .orient("right");
 
     x.invert = function(xPos) {
         var leftEdges = x.range();
@@ -72,9 +73,9 @@ function lineChart(data, element, options) {
       .y(function(d) { return y(d.y); });
 
     var zoomed = function () {
-        svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-        svg.select(".x.axis").call(xAxis);
-        svg.select(".y.axis").call(yAxis);
+        //svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+        //svg.select(".x.axis").call(xAxis);
+        //svg.select(".y.axis").call(yAxis);
     };
 
     var zoom = d3.behavior.zoom()
@@ -99,20 +100,22 @@ function lineChart(data, element, options) {
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis);
 
-    svg.append("g")
+    var gy = svg.append("g")
         .attr("class", "y axis")
-        .call(yAxis)
-        .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Y - value");
+        .call(yAxis);
+    
+    gy.selectAll("g").
+        filter(function (d) { return d; })
+        .classed("minor", true);
+
+    gy.selectAll("text")
+    .attr("x", 4)
+    .attr("dy", -4);
 
     var point = svg.selectAll(".point")
         .data(data)
         .enter().append("g")
-        .attr("class", "point")
+        //.attr("class", "point")
         .each(function (d) {d.values.forEach(
             function (item) {
                 item.color = color(d.x);
@@ -127,9 +130,8 @@ function lineChart(data, element, options) {
             });
         });
 
-        var lines = point.selectAll("circle")
-    //need to add a color for each point 
-    .data(function (d) { return d.values; });
+    var lines = point.selectAll("circle")
+        .data(function (d) { return d.values; });
 
   
     var spMouseOut = function() {
@@ -153,7 +155,7 @@ function lineChart(data, element, options) {
             return 1;
         });
     }
-
+  
   point.append("path")
       .attr("class", "line")
       .attr("d", function(d) { return line(d.values); })

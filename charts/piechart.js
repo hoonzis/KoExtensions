@@ -3,20 +3,25 @@ function d3pieChart(data, element,options) {
     var el = getElementAndCheckData(element, data);
     if (el == null)
         return;
-    
+
+    var color;
+    if (options.colors != null) {
+        color = options.colors;
+    } else {
+        color = d3.scale.category20();
+        var keys = data.map(function (item) { return item.x; });
+        color.domain(keys);
+    }
+   
+
     var width = options.width / 2;
     var height = options.height;
     var outerRadius = Math.min(width, height) / 2 - 3,
     innerRadius = outerRadius * .3,
-    color = d3.scale.category20(),
     donut = d3.layout.pie(),
     arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
-    
     donut.value(function (d) { return d.y; });
-    
-    var keys = data.map(function (item) { return item.x; });
     var max = d3.sum(data, function (item) { return item.y; });
-    color.domain(keys);
     showStandardLegend(el, data, function (i) { return i.x; }, color, options.legend, height, function (i) {
         if (options.unitTransform != null)
             return options.unitTransform(i.y);

@@ -78,11 +78,15 @@ function initializeCharts(){
 
     tooltip
         .attr("id","toolTip")
+        .style("width","150px")
         .style("position","absolute")
         .style("opacity",0)
         .style("background-color","lightgray")
         .style("border-radius","5px")
-        .style("border","1px solid black");
+        .style("border","1px solid black")
+        .append("div")
+        .style("margin","5px");
+
 
     tooltip.append("div").attr("id","info1header")
         .attr("class","header1");
