@@ -71,7 +71,7 @@ function transform2(car){
 }
 ```
 
-###The stacked-bar chart binding###
+###The bar chart binding###
 Enables visualization of one dimensional collection as a stacked-barchart. The binding assumes that the collection passed in contains the values to be shown in each column. It is obligatory to specify the name of the field which holds the "x" coordinate (the stacked column name).
 
 ![alt text][stackedbarchart]
@@ -135,7 +135,40 @@ chartOptions: {
 7. itemName - in case of multiple items, what does each item represent. For instance each each line in multiple line represents a company this could be "Company".
 
 ###Cash-flow chart###
+This chart might be usefull very often when depicting two different variables using bars and line in the same time. In this example the line is just a sum of all the bars, but these could be non-related variables.
 
+![alt text][cashflowchart]
+[cashflowchart]: http://hoonzis.github.com/KoExtensions/img/cashflowchart.PNG
+
+'''html
+<div id="cashFlow" data-bind="barchart: lifeExpenses, xcoord:'month',line:expensesPerMonth,chartOptions:{legend:true, width:800,height:300,style:'stack',sameScaleLinesAndBars:true}">
+function TestViewModels (expenses){
+	self = this;
+	self.lifeExpenses = ko.observableArray([]);
+	self.expensesPerMonth = ko.observableArray([]);
+
+	var totalPerMonth = expenses.map(function(item){
+		var keys = Object.keys(item).filter(function(key){return key != 'month';});
+
+		var monthTotal =  
+		{		
+			x : item['month'],
+			y : d3.sum(keys, function(key) { return item[key];})
+		};
+
+		return monthTotal;
+	});
+
+
+	self.lifeExpenses(expenses);
+	self.expensesPerMonth(totalPerMonth);
+}
+
+var vm = new TestViewModels(lifeExpenses);
+
+ko.applyBindings(vm);
+initializeCharts();
+'''
 
 ###The map binding###
 The map binding uses [google maps](https://developers.google.com/maps/documentation/javascript/) to viualize on or more ViewModel on the map. The developer has to specify which observables of the ViewModel hold the latitude and longitude properties.
