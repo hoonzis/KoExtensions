@@ -10,7 +10,7 @@ function d3barChart(data, element, options, xcoord, lineData) {
     height = options.height - margin.top - margin.bottom;
 
     var x = d3.scale.ordinal()
-        .rangeRoundBands([0, width], .1);
+        .rangeRoundBands([0, width], .3);
 
     var y = d3.scale.linear()
         .rangeRound([height, 0]);
@@ -26,7 +26,8 @@ function d3barChart(data, element, options, xcoord, lineData) {
 
     var yAxis = d3.svg.axis()
         .scale(y)
-        .orient("left");
+        .tickSize(width)
+        .orient("right");
 
     // not all the items do have the same set of properties, therefor scan them all and concatenate the result
     var keys = [];
@@ -105,14 +106,25 @@ function d3barChart(data, element, options, xcoord, lineData) {
 
 
     svg.append("g")
+        .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
 
-    svg.append("g")
+    var gy = svg.append("g")
+        .attr("class", "y axis")
         .call(yAxis);
+
+    gy.selectAll("g").
+       filter(function (d) { return d; })
+       .classed("minor", true);
+
+    gy.selectAll("text")
+    .attr("x", 4)
+    .attr("dy", -4);
 
     var onBarOver = function (d) {
         d3.select(this).style("stroke", 'black');
+        d3.select(this).style("opacity", 1);
         var info = {};
         info[options.xUnitName] = d.xLabel;
         info[d.name] = d.formattedValue;
@@ -140,6 +152,7 @@ function d3barChart(data, element, options, xcoord, lineData) {
 
     var onBarOut = function () {
         d3.select(this).style("stroke", 'none');
+        d3.select(this).style("opacity", 0.8);
         hideTooltip();
     }
 
@@ -158,6 +171,7 @@ function d3barChart(data, element, options, xcoord, lineData) {
             .attr("height", function (d) { return y(d.y0) - y(d.y1); })
             .on("mouseover", onBarOver)
             .on("mouseout", onBarOut)
+            .style("opacity",0.8)
             .style("cursor", "pointer")
             .style("fill", function (d) {
                 return color(d.name);

@@ -46,6 +46,7 @@ function d3pieChart(data, element,options) {
         .on("mouseover", arcMouseOver)
         .on("mouseout", arcMouseOut)
         .style("cursor", "pointer")
+        .style("opacity",0.7)
         .each(function(d) { 
             d.percentage = d.data.y / max;
             if (options.unitTransform != null) {
@@ -56,6 +57,7 @@ function d3pieChart(data, element,options) {
 
 function arcMouseOver(d) {
     d3.select(this).style("stroke", 'black');
+    d3.select(this).style("opacity", 1);
     var info = {};
     var value = d.formatted + " (" + (d.percentage * 100).toFixed(1) + "%)";
     info[d.data.x] = value;
@@ -64,6 +66,7 @@ function arcMouseOver(d) {
 
 function arcMouseOut() {
     d3.select(this).style("stroke", 'none');
+    d3.select(this).style("opacity", 0.7);
     hideTooltip();
 }
 
