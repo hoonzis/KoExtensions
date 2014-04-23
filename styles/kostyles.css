@@ -18,3 +18,17 @@ div.header2{
     margin-bottom: 4px;
     margin-left: 4px;
 }
+
+.axis path {
+  display: none;
+}
+
+.axis line {
+  shape-rendering: crispEdges;
+  stroke: #000;
+}
+
+.axis .minor line {
+  stroke: #777;
+  stroke-dasharray: 2,2;
+}
