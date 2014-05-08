@@ -152,6 +152,32 @@ ko.bindingHandlers.piechart = {
     }
 };
 
+function getHistogramDataFromAccessor(accesor) {
+    var chartData = {
+        data: accesor.histogram(),
+        options: setDefaultOptions(accesor.chartOptions, "histogram")
+    };
+    transformData(chartData);
+    return chartData;
+}
+
+ko.bindingHandlers.histogram = {
+    init: function (element, valueAccessor, allBindingsAccessor) {
+        var chartData = getHistogramDataFromAccessor(allBindingsAccessor());
+        element._chartData = chartData;
+        histogram(chartData.data, element, chartData.options);
+    },
+    update: function (element, valueAccessor, allBindingsAccessor) {
+        var chartData = getHistogramDataFromAccessor(allBindingsAccessor());
+      
+        if (!arraysAreEqual(chartData.data, element._chartData.data)) {
+            element.innerHTML = "";
+            histogram(chartData.data, element, chartData.options);
+            element._chartData = chartData;
+        }
+    }
+};
+
 function getBarChartDataFromAccessor(accessor) {
     var chartData = {
         data:accessor.barchart(),

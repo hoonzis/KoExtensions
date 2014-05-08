@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+ 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<meta http-equiv="content-type" content="text/html; charset=UTF8">
+<head>
+<title>KoExtensions- Histogram</title>
+<script type="text/javascript" src="../libs/knockout-2.2.1.js"></script>
+<script type="text/javascript" src="../libs/d3.v3.min.js"></script>
+<script type="text/javascript" src="../tools.js"></script>
+<script type="text/javascript" src="../charting.js"></script>
+<script type="text/javascript" src="../kotools.js"></script>
+<script type="text/javascript" src="../charts/histogramchart.js"></script>
+<link type="text/css" rel="stylesheet" href="../styles/kostyles.css"></link>
+
+</head>
+<body>
+	<h2>Histogram:</h2>
+	<div id="histogram" data-bind="histogram: data">
+
+	</div>
+</body>
+
+<script>
+var histogramData = [10,12,13];
+
+function TestViewModel (data){
+	self = this;
+	self.data = ko.observableArray(data);
+}
+var vm = new TestViewModel(histogramData);
+
+ko.applyBindings(vm);
+initializeCharts();
+
+</script>
+
+</html>
