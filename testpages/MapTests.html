@@ -36,7 +36,7 @@
             </div>
         </div>
 	
-        <div style="margin: 5px, float:left">
+        <div style="margin: 5px; float:left">
             <h3>Stations</h3>
             <table>
                 <thead>
@@ -49,8 +49,8 @@
                 <tbody data-bind="foreach:stations">
                     <tr>
                         <td><span data-bind="text:name"></span></td>
-                        <td><input data-bind="value:lat"></span></td>
-                        <td><input data-bind="value:lng"></span></td>
+                        <td><input data-bind="value:lat"/></td>
+                        <td><input data-bind="value:lng"/></td>
                     </tr>
                 </tbody>
             </table>
@@ -68,8 +68,8 @@
                 <tbody data-bind="foreach:points">
                     <tr>
                         <td><span data-bind="text:name"></span></td>
-                        <td><input data-bind="value:lat"></span></td>
-                        <td><input data-bind="value:lng"></span></td>
+                        <td><input data-bind="value:lat"/></td>
+                        <td><input data-bind="value:lng"/></td>
                     </tr>
                 </tbody>
             </table>
