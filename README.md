@@ -3,12 +3,15 @@ KoExtensions
 
 Additional binding and tools for KnockoutJS the package includes:
 
-1. Piechart binding (based on [D3JS](http://d3js.org/))
-2. Stacked-barchart binding (based on [D3JS](http://d3js.org/))
-3. Google maps binding
-4. Bootstrap DateTime picker binding
-5. FormattedValue binding - simply format the values as you need.
+1. Piechart binding
+2. Stacked/standard barchart binding
+3. Line chart binding
+4. Histogram chart with data probability distribution
+5. Google maps binding
+6. Bootstrap DateTime picker binding
+7. FormattedValue binding - simply format the values as you need.
 
+All charts are created with [D3JS](http://d3js.org/) and based on the examples.
 [Sample application](http://hoonzis.blogspot.fr/2013/03/sample-application-ravendb-knockoutjs.html)
 
 ###The pie-chart binding###
@@ -160,6 +163,32 @@ var vm = new TestViewModels(lifeExpenses);
 ko.applyBindings(vm);
 initializeCharts();
 ```
+
+###Histogram chart###
+Histogram show the distribution of values over the given range. This chart takes as input a single array of data. Several chart options can be passed to the chart. In order to analyze the distribution of the data and even detect the outliers in the data. More details about the method used by this chart can be found on this blog.
+
+![alt text][histogram]
+[histogram]: http://hoonzis.github.com/KoExtensions/img/histogram.png
+
+```html
+<div id="histogram" data-bind="histogram: data, chartOptions : {
+        tolerance : 10,
+        showProbabilityDistribution: true,min : -20,
+        expected: 'median',
+        useMAD: true,
+        showOutliers: true}"></div>
+```
+```javascript
+var exData = [3.9,3.8,3.9,2.7,2.8,1.9,2.7,3.5, 4.4, 2.8, 3.4, 8.6, 4.5, 3.5, 3.6, 3.8, 4.3, 4.5, 3.5,30,33,31]; 
+function TestViewModel() {
+    var self = this;
+    self.data = ko.observableArray(exData);
+}
+var vm = new TestViewModel();
+ko.applyBindings(vm);
+initializeCharts();
+```
+
 ###The map binding###
 The map binding uses [google maps](https://developers.google.com/maps/documentation/javascript/) to viualize on or more ViewModel on the map. The developer has to specify which observables of the ViewModel hold the latitude and longitude properties.
 

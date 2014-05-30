@@ -1,35 +1,71 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
- 
-<html xmlns="http://www.w3.org/1999/xhtml"> 
-<meta http-equiv="content-type" content="text/html; charset=UTF8">
-<head>
-    <title>KoExtensions- Histogram</title>
-    <script src="../Scripts/d3.min.js"></script>
-    <script src="../Scripts/knockout-3.1.0.debug.js"></script>
-    <script type="text/javascript" src="../tools.js"></script>
-    <script type="text/javascript" src="../charting.js"></script>
-    <script type="text/javascript" src="../kotools.js"></script>
-    <script type="text/javascript" src="../Charts/histogramchart.js"></script>
-    <link type="text/css" rel="stylesheet" href="../styles/kostyles.css"/>
-</head>
-<body>
-	<h2>Histogram</h2>
-    <div id="histogram" data-bind="histogram: data">
+<html>
+    <head>
+        <title>Histogram example</title>
+        <script type="text/javascript" src="/Scripts/d3.min.js"></script>
+        <script type="text/javascript" src="/Scripts/knockout-3.1.0.debug.js"></script>
+        <script type="text/javascript" src="/tools.js"></script>
+        <script type="text/javascript" src="/charting.js"></script>
+        <script type="text/javascript" src="/kotools.js"></script>
+        <script type="text/javascript" src="/Charts/histogramchart.js"></script>
+        <script type="text/javascript" src="/Charts/linechart.js"></script>
+        <link type="text/css" rel="stylesheet" href="/styles/kostyles.css" />
+    </head>
+    <body>
+    <h2>Detecting the outliers</h2>
+    <p>Data:</p>
+    <textarea rows="3" cols="90" class="form-control" data-bind="value: stringData"></textarea>
+    <input type="checkbox" data-bind="checked: showProbabilityDistribution">Show probability distribution</input>
+    <p>Tolerance</p>
+    <input type="number" data-bind="value:tolerance" />
+    <p>Use MAD</p>
+    <input type="checkbox" data-bind="checked: useMAD" />
+    <p>Min</p>
+    <input type="number" data-bind="value: min" />
+    <p>Expected</p>
+    <input type="radio" value="median" data-bind="checked: expected">Median</input>
+    <input type="radio" value="mean" data-bind="checked: expected">Mean</input>
+    <p>Show outliers</p>
+    <input type="checkbox" data-bind="checked: showOutliers" />
+    <div id="histogram" data-bind="histogram: data, chartOptions : chartOptions"></div>
+        <script>
+            var histogramDataExample = "3.9,3.8,3.9,2.7,2.8,1.9,2.7,3.5, 4.4, 2.8, 3.4, 8.6, 4.5, 3.5, 3.6, 3.8, 4.3, 4.5, 3.5,30,33,31";
 
-    </div>
-    <script type="text/javascript">
-        var histogramData = [10, 12, 13];
+            function TestViewModel() {
+                var self = this;
+                self.tolerance = ko.observable();
+                self.showProbabilityDistribution = ko.observable();
+                self.min = ko.observable();
+                self.expected = ko.observable();
+                self.useMAD = ko.observable();
+                self.showOutliers = ko.observable();
+                self.showProbabilityDistribution = ko.observable();
 
-        function TestViewModel(data) {
-            var self = this;
-            self.data = ko.observableArray(data);
-        }
-        var vm = new TestViewModel(histogramData);
+                self.stringData = ko.observable();
+                self.data = ko.computed(function () {
+                    if (self.stringData() == null)
+                        return [];
+                    return self.stringData().split(",").map(function (i) {
+                        return parseFloat(i);
+                    });
+                });
 
-        ko.applyBindings(vm);
-        initializeCharts();
+                self.stringData(histogramDataExample);
+                self.chartOptions = ko.computed(function () {
+                    return {
+                        tolerance: self.tolerance(),
+                        showProbabilityDistribution: self.showProbabilityDistribution(),
+                        min: tryConvertToNumber(self.min()),
+                        expected: self.expected(),
+                        useMAD: self.useMAD(),
+                        showOutliers: self.showOutliers(),
+                    }
+                });
+            }
 
-    </script>
+            var vm = new TestViewModel();
+
+            ko.applyBindings(vm);
+            initializeCharts();
+        </script>
 </body>
-
 </html>
