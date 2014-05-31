@@ -165,7 +165,7 @@ initializeCharts();
 ```
 
 ###Histogram chart###
-Histogram show the distribution of values over the given range. This chart takes as input a single array of data. Several chart options can be passed to the chart. In order to analyze the distribution of the data and even detect the outliers in the data. More details about the method used by this chart can be found on this blog.
+Histogram show the distribution of values over the given range. This chart takes as input a single array of data. Several chart options can be passed to the chart. In order to analyze the distribution of the data and even detect the outliers in the data. More details about the method used by this chart can be found on [my blog](http://hoonzis.blogspot.com/2014/05/detecting-extreme-values.html).You can as well check the [demo application](https://github.com/hoonzis/KoExtensions/blob/master/testpages/HistogramExample.html).
 
 ![alt text][histogram]
 [histogram]: http://hoonzis.github.com/KoExtensions/img/histogram.PNG
