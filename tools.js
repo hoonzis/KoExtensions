@@ -54,6 +54,16 @@ function isDate(d) {
     return Object.prototype.toString.call(d) == "[object Date]";
 }
 
+function isFunction(d) {
+    return Object.prototype.toString.call(d) == '[object Function]';
+}
+
+function evaluateObject(object){
+    if(isFunction(object)){
+        return object();
+    }
+    return object;
+}
 
 function parseDate(input) {
     if (input instanceof Date)
@@ -201,6 +211,9 @@ function diff(a1,a2) {
 };
 
 function tryConvertToNumber(orgValue) {
+    if(orgValue == null){
+        return null;
+    }
     var intValue = parseInt(orgValue);
     var decimalValue = parseFloat(orgValue);
     var value = intValue != null ? intValue : (decimalValue != null ? decimalValue : orgValue);

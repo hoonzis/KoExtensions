@@ -68,14 +68,22 @@ ko.bindingHandlers.datepicker = {
 
 var defaultPieChartOptions = { legend: true, width: 200, height: 200 };
 var defaultBarChartOptions = { legend: true, width: 600, height: 200, xUnitName : 'x', itemName: 'Item' };
+var defaultHistogramOptions = { legend: true, width: 600, height: 200 };
+var defaultLineChartOptions = { legend: true, width: 600, height: 200 };
 
 function setDefaultOptions(options, type) {
     var typeOptions;
 
     if (type == "bar")
         typeOptions = defaultBarChartOptions;
-    else
+    else if(type == "pie")
         typeOptions = defaultPieChartOptions;
+    else if(type == "histogram")
+        typeOptions = defaultHistogramOptions;
+    else if(type == "linechart")
+        typeOptions = defaultLineChartOptions;
+    else
+        typeOptions = defaultLineChartOptions;
 
     var keys = Object.keys(typeOptions);
 
@@ -153,9 +161,10 @@ ko.bindingHandlers.piechart = {
 };
 
 function getHistogramDataFromAccessor(accesor) {
+
     var chartData = {
         data: accesor.histogram(),
-        options: setDefaultOptions(accesor.chartOptions, "histogram")
+        options: setDefaultOptions(evaluateObject(accesor.chartOptions), "histogram")
     };
     transformData(chartData);
     return chartData;
