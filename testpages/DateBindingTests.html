@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+ 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head>
+    <title>Test Page</title>
+    <script src="../Scripts/jquery-1.9.0.js"></script>
+    <script src="../Scripts/bootstrap.js"></script>
+    <script src="../Scripts/bootstrap-datepicker.js"></script>
+    <script src="../Scripts/knockout-3.1.0.debug.js"></script>
+    <script type="text/javascript" src="../tools.js"></script>
+    <script type="text/javascript" src="../charting.js"></script>
+    <script type="text/javascript" src="../kotools.js"></script>
+    <link href="../Content/bootstrap.css" rel="stylesheet" />
+    <link href="../Content/bootstrap-theme.css" rel="stylesheet" />
+    <link href="../Content/bootstrap-datepicker.css" rel="stylesheet" />
+</head>
+<body>
+<br/>
+ <div class="container-fluid">
+    <div class="row-fluid"> 
+        <div class="span3">
+            <form class="well form-horizontal">
+                <div class="control-group">
+                    <label class="control-label">Destination</label>
+                    <div class="controls">
+                        <input type="text" data-bind="value:destination">
+                    </div>
+                </div>
+				
+				<div class="control-group">
+                    <label class="control-label">Start</label>
+                    <div class="controls">
+                        <input type="text" data-bind="datepicker:start">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">End</label>
+                    <div class="controls">
+                        <input type="text" data-bind="datepicker:end">
+                    </div>
+                </div>
+				
+				<div class="control-group">
+                    <label class="control-label">Duration</label>
+                    <div class="controls">
+                        <input type="text" data-bind="value:duration">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+
+<script>
+//taken from StackOverflow
+function daysBetween(first, second) {
+
+	if(first == null || second == null)
+		return null;
+		
+    // Copy date parts of the timestamps, discarding the time parts.
+    var one = new Date(first.getFullYear(), first.getMonth(), first.getDate());
+    var two = new Date(second.getFullYear(), second.getMonth(), second.getDate());
+
+    // Do the math.
+    var millisecondsPerDay = 1000 * 60 * 60 * 24;
+    var millisBetween = two.getTime() - one.getTime();
+    var days = millisBetween / millisecondsPerDay;
+
+    // Round down.
+    return Math.floor(days);
+}
+
+function VoyageViewModel(data){
+	self = this;
+	self.start = ko.observable();
+	self.end = ko.observable();
+	self.destination = ko.observable();
+	
+	self.duration = ko.computed(function(x) { return daysBetween(self.start(), self.end());},self);
+	
+	if(data!=null){
+		self.start(data.start);
+		self.end(data.end);
+		self.destination(data.destination);
+	}
+}
+
+var voyage = new VoyageViewModel({
+      "start": new Date(),
+      "end": null,
+      "destination" : "Paris"});
+
+ko.applyBindings(voyage);
+</script>
+</html>

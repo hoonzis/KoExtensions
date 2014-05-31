@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+ 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head>
+<title>Map Test Page</title>
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
+<script type="text/javascript" src="../libs/knockout-2.2.1.js"></script>
+<script type="text/javascript" src="../tools.js"></script>
+<script type="text/javascript" src="../kotools.js"></script>
+<style type="text/css">
+</style>
+</head>
+<body>
+	<b>Price:</b>
+    <span data-bind="formattedValue:price, currency:priceCurrency"></span>
+	<br/><b>Power:</b>
+	<span data-bind="formattedValue:power, currency:'kW'"></span>
+	<br/><b>Efficiency:</b>
+	<span data-bind="formattedValue:efficiency, currency:'%', transformation:toPercent"></span>
+	<br/><b>Consumption:</b>
+	<span data-bind="formattedValue:consumption100, currency:'l/100km'"></span>
+	<br/><b>Distance:</b>
+	<input data-bind="value: distance"/>
+	<br/><b>Total consumption:</b>
+	<span data-bind="formattedValue: totalConsumption, currency:'l'"><span>
+</body>
+<script>
+function toPercent(n) { return n*100}
+function CarViewModel() {
+	self = this;
+	self.efficiency = ko.observable(0.95);
+	self.price = ko.observable(1000000);
+	self.priceCurrency = ko.observable('EUR');
+	self.power = ko.observable(120);
+	self.consumption100 = ko.observable(7);
+	self.distance = ko.observable();
+	self.totalConsumption= ko.computed(function() {
+		return self.distance()*self.consumption100();
+	});
+}
+
+var vm = new CarViewModel();
+ko.applyBindings(vm);
+
+</script>
+
+</html>
