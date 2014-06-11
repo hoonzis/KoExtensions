@@ -47,10 +47,8 @@ ko.bindingHandlers.datepicker = {
     },
     update: function(element, valueAccessor)   {
         var widget = $(element).data("datepicker");
-         //when the view model is updated, update the widget
-        if (widget) {
+        if (widget != null) {
             var vmValue = ko.utils.unwrapObservable(valueAccessor());
-
             //if we have a string value - convert it first
             if (isString(vmValue)) {
                 vmValue = new Date(vmValue);
@@ -60,7 +58,7 @@ ko.bindingHandlers.datepicker = {
             if (!isValidDate(vmValue))
                 return;
 
-            widget.setValue(vmValue);
+            widget.setDates(vmValue);
         }
     }
 };
