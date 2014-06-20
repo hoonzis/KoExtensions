@@ -207,7 +207,7 @@
 
         //returns a dense version of sparse two dimensional matrix
         self.toDenseMatrix = function(arr) {
-            var keys = Object.keys(arr).map(function(item) { return self.parseInt(item); });
+            var keys = Object.keys(arr).map(function(item) { return parseInt(item); });
 
             var minKey = d3.min(keys);
             var maxKey = d3.max(keys);
