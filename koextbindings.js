@@ -180,6 +180,34 @@ ko.bindingHandlers.barchart = {
     }
 };
 
+function getScatterplotDataFromAccessor(accesor) {
+    var options = setDefaultOptions(accesor.chartOptions, "line");
+    var chartData = {
+        //transf: accesor.transformation,
+        data: accesor.linechart(),
+        options: options
+    };
+    chartData.options.unitTransform = accesor.unitTransform;
+    transformData(chartData);
+    return chartData;
+}
+
+ko.bindingHandlers.scatterplot = {
+    init: function (element, valueAccessor, allBindingsAccessor) {
+        //var chartData = getLineDataFromAccessor(allBindingsAccessor());
+        //element._chartData = chartData;
+        //lineChart(chartData.data, element, chartData.options);
+    },
+    update: function (element, valueAccessor, allBindingsAccessor) {
+        var chartData = getScatterPlotDataFromAccessor(allBindingsAccessor());
+        if (!arraysAreEqual(chartData.data, element._chartData.data)) {
+            element.innerHTML = "";
+            lineChart(chartData.data, element, chartData.options);
+            element._chartData = chartData;
+        }
+    }
+};
+
 function applyFormattedValue(fValue, element){
   //TODO: test if val is function  => observable then evaluate, test if it is a number before calling toCurrencyString
   if (fValue.val != null) {
