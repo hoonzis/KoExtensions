@@ -33,12 +33,12 @@
             var month2 = parseInt(item2.substring(4, item2.length));
 
             if (year1 == year2) {
-                return standardAsc(month1, month2);
+                return d3.ascending(month1, month2);
             } else
-                return standardAsc(year1, year2);
+                return d3.ascending(year1, year2);
         };
 
-        function monthsIncrementer(item) {
+        self.monthsIncrementer = function(item) {
             var year = parseInt(item.substring(0, 4));
             var month = parseInt(item.substring(4, item.length));
 
@@ -53,42 +53,16 @@
             return yyyy + (mm[1] ? mm : "0" + mm[0]);
         };
 
-        function fillInGaps(counter, last, items, comparer, incremenenter) {
-            var values = [];
-            items.forEach(function(qItem) {
-                //fill in the gaps - if not trades done in this period, put in 0
-                while (comparer(counter, qItem.name) < 0) {
-                    xLabel = stats.getTimeUnitLabel(counter);
-                    values.push({ linename: i.name, x: counter, xLabel: xLabel, y: 0, name: fVariableName, formattedValue: "-", xUnitName: stats.selectedTimeUnit });
-                    counter = incremenenter(counter);
-                }
-                xLabel = stats.getTimeUnitLabel(qItem.name);
-
-                var yValue = getProperty(variable, qItem);
-                var fValue = format != null ? format(yValue) : null;
-                values.push({ linename: i.name, x: qItem.name, xLabel: xLabel, y: yValue, name: fVariableName, formattedValue: fValue, xUnitName: stats.selectedTimeUnit });
-                counter = incremenenter(counter);
-            });
-
-            //fill in the rest of the line
-            while (comparer(counter, last) < 0) {
-                xLabel = stats.getTimeUnitLabel(counter);
-                values.push({ linename: i.name, x: counter, xLabel: xLabel, y: 0, name: fVariableName, formattedValue: "-", xUnitName: stats.selectedTimeUnit });
-                counter = incremenenter(counter);
-            }
-        }
-
         var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-        function getYearAndMonthLabel(i) {
+        self.getYearAndMonthLabel = function(i) {
             if (!isString(i))
                 return "";
             var month = monthNames[parseInt(i.substring(4, i.length)) - 1];
             return month;
         };
 
-
-        function getProperty(key, d) {
+        self.getProperty = function(key, d) {
             if (typeof (key) == "function") {
                 return key(d);
             } else {
@@ -101,12 +75,6 @@
                 if (predicate(data[i]))
                     return data[i];
             return null;
-        }
-
-        function positiveRounded(d) {
-            if (d > 0)
-                return Math.round(d);
-            return 0;
         }
 
         self.isString = function(x) {
@@ -132,9 +100,7 @@
             return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
         };
 
-        var notInMil = function(x) { return x.formatMoney(2) + " mil. €"; };
-
-        function parseDate(input) {
+        self.parseDate = function(input) {
             if (input instanceof Date)
                 return input;
 
@@ -166,7 +132,7 @@
         }
 
         //not efficient comparison of arrays
-        self.arraysAreEqual= function(ary1, ary2) {
+        self.arraysAreEqual = function(ary1, ary2) {
             if (ary1 == null && ary2 == null)
                 return true;
             if (ary1 == null || ary2 != null)
@@ -197,7 +163,7 @@
             return true;
         }
 
-        function toLength(val, length) {
+        self.toLength = function(val, length) {
             if (val.length >= length) {
                 return val.substring(0, length);
             }
@@ -216,7 +182,7 @@
             return formatted;
         }
 
-        self.toPercent = function(val){
+        self.toPercent = function(val) {
             if (val == null)
                 return 0;
             return val * 100;
@@ -231,27 +197,6 @@
             return size;
         };
 
-        function setOrAdd(arr, x, y, value) {
-            if (arr[x] == null)
-                arr[x] = [];
-            if (arr[x][y] == null || isNaN(arr[x][y]))
-                arr[x][y] = value;
-            else
-                arr[x][y] += value;
-        }
-
-        function set(arr, x, y, value) {
-            if (arr[x] == null)
-                arr[x] = [];
-            arr[x][y] = value;
-        }
-
-        function setOrAddSingle(arr, x, value) {
-            if (arr[x] == null)
-                arr[x] = value;
-            else
-                arr[x] += value;
-        }
 
         var objToString = Object.prototype.toString;
 
@@ -261,8 +206,8 @@
 
 
         //returns a dense version of sparse two dimensional matrix
-        function toDenseMatrix(arr) {
-            var keys = Object.keys(arr).map(function(i) { return parseInt(i); });
+        self.toDenseMatrix = function(arr) {
+            var keys = Object.keys(arr).map(function(item) { return self.parseInt(item); });
 
             var minKey = d3.min(keys);
             var maxKey = d3.max(keys);
@@ -284,7 +229,8 @@
             return this.indexOf(suffix, this.length - suffix.length) !== -1;
         };
 
-        function diff(a1, a2) {
+        //difference in 2 arrays
+        self.diff = function(a1, a2) {
             return a1.filter(function(i) { return a2.indexOf(i) < 0; });
         };
 
@@ -293,34 +239,6 @@
             var decimalValue = parseFloat(orgValue);
             var value = intValue != null ? intValue : (decimalValue != null ? decimalValue : orgValue);
             return value;
-        };
-
-
-        function convertAllProperties(obj) {
-            for (var key in obj) {
-                var orgValue = obj[key];
-                var intValue = parseInt(orgValue);
-                var decimalValue = parseFloat(orgValue);
-                var value = intValue != null ? intValue : (decimalValue != null ? decimalValue : orgValue);
-                obj[key] = value;
-            }
-            return obj;
-        };
-
-        var standardAsc = function(item1, item2) {
-            if (item1 > item2)
-                return 1;
-            if (item1 < item2)
-                return -1;
-            return 0;
-        };
-
-        var standardDesc = function(item1, item2) {
-            if (item1 < item2)
-                return 1;
-            if (item1 > item2)
-                return -1;
-            return 0;
         };
     }
 
