@@ -3,10 +3,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml"> 
 <head>
 <title>Map Test Page</title>
-<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
-<script type="text/javascript" src="../libs/knockout-2.2.1.js"></script>
-<script type="text/javascript" src="../tools.js"></script>
+<script type="text/javascript" src="../Scripts/knockout-3.1.0.debug.js"></script>
 <script type="text/javascript" src="../kotools.js"></script>
+<script type="text/javascript" src="../koextbindings.js"></script>
 <style type="text/css">
 </style>
 </head>
@@ -22,26 +21,25 @@
 	<br/><b>Distance:</b>
 	<input data-bind="value: distance"/>
 	<br/><b>Total consumption:</b>
-	<span data-bind="formattedValue: totalConsumption, currency:'l'"><span>
+    <span data-bind="formattedValue: totalConsumption, currency:'l'"></span>
+    <script type="text/javascript">
+        function toPercent(n) { return n * 100; }
+        function CarViewModel() {
+            var self = this;
+            self.efficiency = ko.observable(0.95);
+            self.price = ko.observable(1000000);
+            self.priceCurrency = ko.observable('EUR');
+            self.power = ko.observable(120);
+            self.consumption100 = ko.observable(7);
+            self.distance = ko.observable();
+            self.totalConsumption = ko.computed(function () {
+                return self.distance() * self.consumption100();
+            });
+        }
+
+        var vm = new CarViewModel();
+        ko.applyBindings(vm);
+
+    </script>
 </body>
-<script>
-function toPercent(n) { return n*100}
-function CarViewModel() {
-	self = this;
-	self.efficiency = ko.observable(0.95);
-	self.price = ko.observable(1000000);
-	self.priceCurrency = ko.observable('EUR');
-	self.power = ko.observable(120);
-	self.consumption100 = ko.observable(7);
-	self.distance = ko.observable();
-	self.totalConsumption= ko.computed(function() {
-		return self.distance()*self.consumption100();
-	});
-}
-
-var vm = new CarViewModel();
-ko.applyBindings(vm);
-
-</script>
-
 </html>

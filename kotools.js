@@ -1,252 +1,328 @@
-﻿markers = [];
+﻿var koTools = (function () {
+    function KoTools() {
 
-ko.bindingHandlers.map = {
-    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+        var self = this;
+        var today = new Date();
 
-        try {
-            var position = new google.maps.LatLng(allBindingsAccessor().latitude(), allBindingsAccessor().longitude());
-
-            var marker = new google.maps.Marker({
-                map: allBindingsAccessor().map,
-                position: position,
-                title: name
-            });
-
-            google.maps.event.addListener(marker, 'click', function () {
-                viewModel.select();
-            });
-
-            markers.push(marker);
-            viewModel._mapMarker = marker;
-
-            allBindingsAccessor().map.setCenter(position);
+        self.currentYear = today.getFullYear();
+        self.currentMonth = today.getMonth();
+        self.isEmpty = function(str) {
+            return (!str || 0 === str.length);
         }
-        catch (err) { }
-    },
-    update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
-        try{
-            var latlng = new google.maps.LatLng(allBindingsAccessor().latitude(), allBindingsAccessor().longitude());
-            viewModel._mapMarker.setPosition(latlng);
-        } catch (err) { }
-    }
-};
 
-ko.bindingHandlers.datepicker = {
-    init: function(element, valueAccessor, allBindingsAccessor) {
-      //initialize datepicker with some optional options
-      var options = allBindingsAccessor().datepickerOptions || {};
-      $(element).datepicker(options);
-      
-      //when a user changes the date, update the view model
-      ko.utils.registerEventHandler(element, "changeDate", function(event) {
-             var value = valueAccessor();
-             if (ko.isObservable(value)) {
-                 value(event.date);
-             }                
-      });
-    },
-    update: function(element, valueAccessor)   {
-        var widget = $(element).data("datepicker");
+        Date.prototype.toFormattedString = function() {
 
-        if (widget != null) {
-            var vmValue = ko.utils.unwrapObservable(valueAccessor());
+            var cDate = this.getDate();
+            var cMonth = this.getMonth() + 1; //Months are zero based
+            var cYear = this.getFullYear();
+            return cDate + "/" + cMonth + "/" + cYear;
+        }
 
-            //if we have a string value - convert it first
-            if (isString(vmValue)) {
-                vmValue = new Date(vmValue);
+        self.getQuarter = function(item) {
+            if (item.Year != null && item.Quarter != null) {
+                return "Q" + item.Quarter + item.Year;
+            }
+            return null;
+        };
+
+        self.monthsComparer = function(item1, item2) {
+            var year1 = parseInt(item1.substring(0, 4));
+            var month1 = parseInt(item1.substring(4, item1.length));
+
+            var year2 = parseInt(item2.substring(0, 4));
+            var month2 = parseInt(item2.substring(4, item2.length));
+
+            if (year1 == year2) {
+                return standardAsc(month1, month2);
+            } else
+                return standardAsc(year1, year2);
+        };
+
+        function monthsIncrementer(item) {
+            var year = parseInt(item.substring(0, 4));
+            var month = parseInt(item.substring(4, item.length));
+
+            if (month == 12) {
+                month = 1;
+                year++;
+            } else {
+                month++;
+            }
+            var yyyy = year.toString();
+            var mm = month.toString();
+            return yyyy + (mm[1] ? mm : "0" + mm[0]);
+        };
+
+        function fillInGaps(counter, last, items, comparer, incremenenter) {
+            var values = [];
+            items.forEach(function(qItem) {
+                //fill in the gaps - if not trades done in this period, put in 0
+                while (comparer(counter, qItem.name) < 0) {
+                    xLabel = stats.getTimeUnitLabel(counter);
+                    values.push({ linename: i.name, x: counter, xLabel: xLabel, y: 0, name: fVariableName, formattedValue: "-", xUnitName: stats.selectedTimeUnit });
+                    counter = incremenenter(counter);
+                }
+                xLabel = stats.getTimeUnitLabel(qItem.name);
+
+                var yValue = getProperty(variable, qItem);
+                var fValue = format != null ? format(yValue) : null;
+                values.push({ linename: i.name, x: qItem.name, xLabel: xLabel, y: yValue, name: fVariableName, formattedValue: fValue, xUnitName: stats.selectedTimeUnit });
+                counter = incremenenter(counter);
+            });
+
+            //fill in the rest of the line
+            while (comparer(counter, last) < 0) {
+                xLabel = stats.getTimeUnitLabel(counter);
+                values.push({ linename: i.name, x: counter, xLabel: xLabel, y: 0, name: fVariableName, formattedValue: "-", xUnitName: stats.selectedTimeUnit });
+                counter = incremenenter(counter);
+            }
+        }
+
+        var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        function getYearAndMonthLabel(i) {
+            if (!isString(i))
+                return "";
+            var month = monthNames[parseInt(i.substring(4, i.length)) - 1];
+            return month;
+        };
+
+
+        function getProperty(key, d) {
+            if (typeof (key) == "function") {
+                return key(d);
+            } else {
+                return d[key];
+            }
+        }
+
+        self.find = function(data, predicate) {
+            for (var i = 0; i < data.length; i++)
+                if (predicate(data[i]))
+                    return data[i];
+            return null;
+        }
+
+        function positiveRounded(d) {
+            if (d > 0)
+                return Math.round(d);
+            return 0;
+        }
+
+        self.isString = function(x) {
+            return typeof (x) == 'string';
+        }
+
+        self.isNumber = function(n) {
+            return !isNaN(parseFloat(n)) && isFinite(n);
+        }
+
+        self.isDate = function(d) {
+            return Object.prototype.toString.call(d) == "[object Date]";
+        }
+
+        Number.prototype.formatMoney = function(c, d, t) {
+            var n = this,
+                c = isNaN(c = Math.abs(c)) ? 2 : c,
+                d = d == undefined ? "." : d,
+                t = t == undefined ? "," : t,
+                s = n < 0 ? "-" : "",
+                i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+                j = (j = i.length) > 3 ? j % 3 : 0;
+            return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+        };
+
+        var notInMil = function(x) { return x.formatMoney(2) + " mil. €"; };
+
+        function parseDate(input) {
+            if (input instanceof Date)
+                return input;
+
+            //first get rid of the hour & etc...
+            var firstSpace = input.indexOf(" ");
+
+            if (firstSpace != -1) {
+                input = input.substring(0, firstSpace);
+                var separator = "/";
+                var parts = [];
+                if (input.indexOf("-") != -1) {
+                    separator = "-";
+                    parts = input.split(separator);
+                    if (parts.length == 3) {
+                        return new Date(parts[0], parts[1] - 1, parts[2]);
+                    } else if (input.indexOf("/") != -1) {
+                        return new Date(parts[2], parts[0] - 1, parts[1]);
+                    }
+                }
+            }
+            return new Date(Date.parse(input));
+        };
+
+        //verify that the date is valid => object is date-time and there is a meaningful value
+        self.isValidDate = function(d) {
+            if (!isDate(d))
+                return false;
+            return !isNaN(d.getTime());
+        }
+
+        //not efficient comparison of arrays
+        self.arraysAreEqual= function(ary1, ary2) {
+            if (ary1 == null && ary2 == null)
+                return true;
+            if (ary1 == null || ary2 != null)
+                return false;
+            if (ary1 != null && ary2 == null)
+                return false;
+            if (ary1.length != ary2.length)
+                return false;
+
+            if (typeof (ary1[0]) == 'object') {
+                for (obj1 in ary1) {
+                    var obj2 = ary[2];
+                    if (compare(obj1, obj2) == false)
+                        return false;
+                }
+                return true;
+            } else {
+                return (ary1.join('') == ary2.join(''));
+            }
+        }
+
+        self.compare = function(x, y) {
+            for (var propertyName in x) {
+                if (x[propertyName] !== y[propertyName]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function toLength(val, length) {
+            if (val.length >= length) {
+                return val.substring(0, length);
             }
 
-            //if the date is not valid - don't visualize it, or we would have a "NaN/NaN/NaN"
-            if (!isValidDate(vmValue))
-                return;
-
-            widget.setDates(vmValue);
+            var returnVal = "";
+            for (var i = 0; i < length; i++) {
+                returnVal += val[i % val.length];
+            }
+            return returnVal;
         }
-    }
-};
 
-
-var defaultPieChartOptions = { legend: true, width: 200, height: 200 };
-var defaultBarChartOptions = { legend: true, width: 600, height: 200, xUnitName : 'x', itemName: 'Item' };
-
-function setDefaultOptions(options, type) {
-    var typeOptions;
-
-    if (type == "bar")
-        typeOptions = defaultBarChartOptions;
-    else
-        typeOptions = defaultPieChartOptions;
-
-    var keys = Object.keys(typeOptions);
-
-    if (options == null)
-        return typeOptions;
-
-    for(var k in keys){
-        var key = keys[k];
-        if(options[key] == null)
-            options[key] = typeOptions[key];
-    }
-
-    return options;
-}
-
-function transformData(chartData){
-    if(chartData.transf!=null)
-        chartData.data = chartData.data.map(chartData.transf);
-}
-
-function getLineDataFromAccessor(accesor) {
-    var options = setDefaultOptions(accesor.chartOptions, "line");
-    var chartData = {
-        transf: accesor.transformation,
-        data: accesor.linechart(),
-        options:options
-    };
-    chartData.options.unitTransform = accesor.unitTransform;
-    transformData(chartData);
-    return chartData;
-}
-
-ko.bindingHandlers.linechart = {
-    init: function(element, valueAccessor, allBindingsAccessor) {
-        var chartData = getLineDataFromAccessor(allBindingsAccessor());
-        element._chartData = chartData;
-        lineChart(chartData.data, element, chartData.options);
-    },
-    update: function(element, valueAccessor,allBindingsAccessor) {
-        var chartData = getLineDataFromAccessor(allBindingsAccessor());
-        if(!koTools.arraysAreEqual(chartData.data, element._chartData.data)){
-            element.innerHTML = "";
-            lineChart(chartData.data, element, chartData.options);
-            element._chartData = chartData;
+        Number.prototype.toCurrencyString = function(cur, decSpaces) {
+            var formatted = this.toFixed(decSpaces).replace(/(\d)(?=(\d{3})+\b)/g, '$1 ');
+            if (cur != null)
+                formatted += ' ' + cur;
+            return formatted;
         }
-    }
-};
 
-function getPieDataFromAccessor(accesor) {
-    var chartData = {
-        transf: accesor.transformation,
-        data: accesor.piechart(),
-        options: setDefaultOptions(accesor.chartOptions, "pie")
-    };
-    chartData.options.unitTransform = accesor.unitTransform;
-    transformData(chartData);
-    return chartData;
-}
-
-ko.bindingHandlers.piechart = {
-    init: function (element, valueAccessor, allBindingsAccessor) {
-        var chartData = getPieDataFromAccessor(allBindingsAccessor());
-        element._chartData = chartData;
-        d3pieChart(chartData.data, element, chartData.options);
-    },
-    update: function (element, valueAccessor, allBindingsAccessor) {
-        var chartData = getPieDataFromAccessor(allBindingsAccessor());
-      
-        if (!koTools.arraysAreEqual(chartData.data, element._chartData.data)) {
-            element.innerHTML = "";
-            d3pieChart(chartData.data, element, chartData.options);
-            element._chartData = chartData;
+        self.toPercent = function(val){
+            if (val == null)
+                return 0;
+            return val * 100;
         }
-    }
-};
 
-function getBarChartDataFromAccessor(accessor) {
-    var chartData = {
-        data:accessor.barchart(),
-        options:setDefaultOptions(accessor.chartOptions, "bar"),
-        xcoord: accessor.xcoord
-    };
-    if(accessor.line != null)
-        chartData.line = accessor.line();
-    chartData.options.unitTransform = accessor.unitTransform;
-    return chartData;
-}
+        //Size of the object - equivalent of array length
+        Object.size = function(obj) {
+            var size = 0, key;
+            for (key in obj) {
+                if (obj.hasOwnProperty(key)) size++;
+            }
+            return size;
+        };
 
-ko.bindingHandlers.barchart = {
-    init: function (element, valueAccessor, allBindingsAccessor) {
-        var chartData = getBarChartDataFromAccessor(allBindingsAccessor());
-        element._chartData = chartData;
-        d3barChart(chartData.data, element, chartData.options, chartData.xcoord, chartData.line);
-    },
-    update: function (element, valueAccessor, allBindingsAccessor) {
-        var chartData = getBarChartDataFromAccessor(allBindingsAccessor());
-        if (!koTools.arraysAreEqual(chartData.data, element._chartData.data)) {
-            element.innerHTML = "";
-            element._chartData = chartData;
-            d3barChart(chartData.data, element, chartData.options, chartData.xcoord, chartData.line);
+        function setOrAdd(arr, x, y, value) {
+            if (arr[x] == null)
+                arr[x] = [];
+            if (arr[x][y] == null || isNaN(arr[x][y]))
+                arr[x][y] = value;
+            else
+                arr[x][y] += value;
         }
-    }
-};
 
-function applyFormattedValue(fValue, element){
-  //TODO: test if val is function  => observable then evaluate, test if it is a number before calling toCurrencyString
-  if (fValue.val != null) {
-      if (fValue.transf != null)
-        fValue.val = fValue.transf(fValue.val);
-      if(koTools.isNumber(fValue.val)){
-        element.innerHTML = fValue.val.toCurrencyString(fValue.currency, fValue.rounding);
-      }else{
-        element.innerHTML = fValue.val;
-      }
-  }
-}
-
-function getFormattedValueFromAccessor(accessor){
-  var fValue = {
-    currency: getValue(accessor.currency),
-    val : getValue(accessor.formattedValue),
-    transf : accessor.transformation,
-    rounding : getValue(accessor.rounding)
-  };
-  return fValue;
-}
-
-ko.bindingHandlers.formattedValue = {
-    init: function (element, valueAccessor, allBindingsAccessor) {
-        var fValue = getFormattedValueFromAccessor(allBindingsAccessor());
-        applyFormattedValue(fValue,element);
-    },
-    update: function (element, valueAccessor, allBindingsAccessor) {
-      var fValue = getFormattedValueFromAccessor(allBindingsAccessor());
-      applyFormattedValue(fValue,element);
-    }
-}
-
-ko.bindingHandlers.progress = {
-    init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-        var value = valueAccessor()();
-        if (value == null)
-            value = 0;
-        element.style.width = value + "%";
-        element.style.display = 'none';
-        element.style.display = 'block';
-    },
-    update: function (element, valueAccessor, allBindingsAccessor) {
-        var value = valueAccessor()();
-        if (value == null)
-            value = 0;
-        element.style.width = value + "%";
-        element.style.display = 'none';
-        element.style.display = 'block';
-    }
-};
-
-function getValue(val) {
-    if (val != null && typeof (val) == 'function')
-        val = val();
-    return val;
-};
-
-
-function clearArr(arr) {
-    if (arr) {
-        for (i in arr) {
-            arr[i].setMap(null);
+        function set(arr, x, y, value) {
+            if (arr[x] == null)
+                arr[x] = [];
+            arr[x][y] = value;
         }
-        arr.length = 0;
-    }
-}
 
-var originalData = [];
+        function setOrAddSingle(arr, x, value) {
+            if (arr[x] == null)
+                arr[x] = value;
+            else
+                arr[x] += value;
+        }
+
+        var objToString = Object.prototype.toString;
+
+        function isString(obj) {
+            return objToString.call(obj) == '[object String]';
+        }
+
+
+        //returns a dense version of sparse two dimensional matrix
+        function toDenseMatrix(arr) {
+            var keys = Object.keys(arr).map(function(i) { return parseInt(i); });
+
+            var minKey = d3.min(keys);
+            var maxKey = d3.max(keys);
+
+            var newarray = [];
+            for (var i = minKey; i <= maxKey; i++) {
+                newarray[i] = [];
+                for (var j = minKey; j <= maxKey; j++) {
+                    if (arr[i] == null || arr[i][j] == null)
+                        newarray[i][j] = 0;
+                    else
+                        newarray[i][j] = arr[i][j];
+                }
+            }
+            return newarray;
+        }
+
+        String.prototype.endsWith = function(suffix) {
+            return this.indexOf(suffix, this.length - suffix.length) !== -1;
+        };
+
+        function diff(a1, a2) {
+            return a1.filter(function(i) { return a2.indexOf(i) < 0; });
+        };
+
+        self.tryConvertToNumber = function(orgValue) {
+            var intValue = parseInt(orgValue);
+            var decimalValue = parseFloat(orgValue);
+            var value = intValue != null ? intValue : (decimalValue != null ? decimalValue : orgValue);
+            return value;
+        };
+
+
+        function convertAllProperties(obj) {
+            for (var key in obj) {
+                var orgValue = obj[key];
+                var intValue = parseInt(orgValue);
+                var decimalValue = parseFloat(orgValue);
+                var value = intValue != null ? intValue : (decimalValue != null ? decimalValue : orgValue);
+                obj[key] = value;
+            }
+            return obj;
+        };
+
+        var standardAsc = function(item1, item2) {
+            if (item1 > item2)
+                return 1;
+            if (item1 < item2)
+                return -1;
+            return 0;
+        };
+
+        var standardDesc = function(item1, item2) {
+            if (item1 < item2)
+                return 1;
+            if (item1 > item2)
+                return -1;
+            return 0;
+        };
+    }
+
+    return new KoTools();
+}());
