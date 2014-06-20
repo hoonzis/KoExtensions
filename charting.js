@@ -85,7 +85,8 @@ function initializeCharts(){
         .style("border-radius","5px")
         .style("border","1px solid black")
         .append("div")
-        .style("margin","5px");
+        .style("margin", "5px")
+        .style("z-index",100000);
 
 
     tooltip.append("div").attr("id","info1header")

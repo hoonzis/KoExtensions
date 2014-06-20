@@ -47,8 +47,10 @@ ko.bindingHandlers.datepicker = {
     },
     update: function(element, valueAccessor)   {
         var widget = $(element).data("datepicker");
+
         if (widget != null) {
             var vmValue = ko.utils.unwrapObservable(valueAccessor());
+
             //if we have a string value - convert it first
             if (isString(vmValue)) {
                 vmValue = new Date(vmValue);
@@ -66,22 +68,14 @@ ko.bindingHandlers.datepicker = {
 
 var defaultPieChartOptions = { legend: true, width: 200, height: 200 };
 var defaultBarChartOptions = { legend: true, width: 600, height: 200, xUnitName : 'x', itemName: 'Item' };
-var defaultHistogramOptions = { legend: true, width: 600, height: 200 };
-var defaultLineChartOptions = { legend: true, width: 600, height: 200 };
 
 function setDefaultOptions(options, type) {
     var typeOptions;
 
     if (type == "bar")
         typeOptions = defaultBarChartOptions;
-    else if(type == "pie")
-        typeOptions = defaultPieChartOptions;
-    else if(type == "histogram")
-        typeOptions = defaultHistogramOptions;
-    else if(type == "linechart")
-        typeOptions = defaultLineChartOptions;
     else
-        typeOptions = defaultLineChartOptions;
+        typeOptions = defaultPieChartOptions;
 
     var keys = Object.keys(typeOptions);
 
@@ -122,7 +116,7 @@ ko.bindingHandlers.linechart = {
     },
     update: function(element, valueAccessor,allBindingsAccessor) {
         var chartData = getLineDataFromAccessor(allBindingsAccessor());
-        if(!arraysAreEqual(chartData.data, element._chartData.data)){
+        if(!koTools.arraysAreEqual(chartData.data, element._chartData.data)){
             element.innerHTML = "";
             lineChart(chartData.data, element, chartData.options);
             element._chartData = chartData;
@@ -150,36 +144,9 @@ ko.bindingHandlers.piechart = {
     update: function (element, valueAccessor, allBindingsAccessor) {
         var chartData = getPieDataFromAccessor(allBindingsAccessor());
       
-        if (!arraysAreEqual(chartData.data, element._chartData.data)) {
+        if (!koTools.arraysAreEqual(chartData.data, element._chartData.data)) {
             element.innerHTML = "";
             d3pieChart(chartData.data, element, chartData.options);
-            element._chartData = chartData;
-        }
-    }
-};
-
-function getHistogramDataFromAccessor(accesor) {
-
-    var chartData = {
-        data: accesor.histogram(),
-        options: setDefaultOptions(evaluateObject(accesor.chartOptions), "histogram")
-    };
-    transformData(chartData);
-    return chartData;
-}
-
-ko.bindingHandlers.histogram = {
-    init: function (element, valueAccessor, allBindingsAccessor) {
-        var chartData = getHistogramDataFromAccessor(allBindingsAccessor());
-        element._chartData = chartData;
-        histogram(chartData.data, element, chartData.options);
-    },
-    update: function (element, valueAccessor, allBindingsAccessor) {
-        var chartData = getHistogramDataFromAccessor(allBindingsAccessor());
-      
-        if (!arraysAreEqual(chartData.data, element._chartData.data)) {
-            element.innerHTML = "";
-            histogram(chartData.data, element, chartData.options);
             element._chartData = chartData;
         }
     }
@@ -205,7 +172,7 @@ ko.bindingHandlers.barchart = {
     },
     update: function (element, valueAccessor, allBindingsAccessor) {
         var chartData = getBarChartDataFromAccessor(allBindingsAccessor());
-        if (!arraysAreEqual(chartData.data, element._chartData.data)) {
+        if (!koTools.arraysAreEqual(chartData.data, element._chartData.data)) {
             element.innerHTML = "";
             element._chartData = chartData;
             d3barChart(chartData.data, element, chartData.options, chartData.xcoord, chartData.line);
@@ -218,7 +185,7 @@ function applyFormattedValue(fValue, element){
   if (fValue.val != null) {
       if (fValue.transf != null)
         fValue.val = fValue.transf(fValue.val);
-      if(fValue.rounding!=null && isNumber(fValue.val)){
+      if(koTools.isNumber(fValue.val)){
         element.innerHTML = fValue.val.toCurrencyString(fValue.currency, fValue.rounding);
       }else{
         element.innerHTML = fValue.val;
