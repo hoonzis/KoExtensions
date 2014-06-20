@@ -288,7 +288,7 @@
             return a1.filter(function(i) { return a2.indexOf(i) < 0; });
         };
 
-        function tryConvertToNumber(orgValue) {
+        self.tryConvertToNumber = function(orgValue) {
             var intValue = parseInt(orgValue);
             var decimalValue = parseFloat(orgValue);
             var value = intValue != null ? intValue : (decimalValue != null ? decimalValue : orgValue);

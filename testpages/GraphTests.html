@@ -110,7 +110,7 @@
             self.name = ko.observable();
 
             self.totalSales = ko.computed(function () {
-                return sum(self.sales().map(function (item) {
+                return d3.sum(self.sales().map(function (item) {
                     return item.amount;
                 }));
             }, self);
