@@ -7,6 +7,10 @@
 *.sln.docstates
 Properties/*
 
+KoExtensions.sln
+KoExtensions.csproj
+packages/*
+
 # Build results
 
 [Dd]ebug/
