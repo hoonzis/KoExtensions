@@ -1,7 +1,6 @@
-//Takes as input collection of items [data]. Each item has two values [x] and [y].
-//[{x:1, receivedEtf:123, tradedEtf:100},{x:2, receivedEtf:200, tradedEtf:100}]
-//[{linename:receivedEtf, values:[x:q1, y:200]}]
-function scatterPlot(data, element, options) {
+//draw a scatterplot, expects an array of objects {x:10,y:50}
+//x axis is ordinary, y axis is linear
+function scatterplot(data, element, options) {
     var el = getElementAndCheckData(element, data);
     if (el == null)
         return;
@@ -22,7 +21,7 @@ function scatterPlot(data, element, options) {
     x.domain(xKeys);
 	
 	var yKeys = data.map(function(i) {return i.y;});
-    y.domain(yKeys);
+    y.domain([d3.min(yKeys),d3.max(yKeys)]);
 	
     var xAxis = d3.svg.axis()
         .scale(x)
@@ -40,10 +39,7 @@ function scatterPlot(data, element, options) {
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        .call(zoom);
-
-	showStandardLegend(el,keys, function(i) { return i; },color,options.legend,height);
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
   
     svg.append("g")
       .attr("class", "x axis")
@@ -72,7 +68,7 @@ function scatterPlot(data, element, options) {
        })
       .attr("cy", function (d) { return y(d.y); })
       .attr("r", function () { return 4; })
-      .style("fill","white")
+      .style("fill","black")
       .style("stroke-width", "2")
       .style("stroke", function (d) { return d.color; })
       .style("cursor", "pointer");

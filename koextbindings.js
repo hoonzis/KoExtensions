@@ -179,12 +179,12 @@ ko.bindingHandlers.barchart = {
         }
     }
 };
-
+ 
 function getScatterplotDataFromAccessor(accesor) {
     var options = setDefaultOptions(accesor.chartOptions, "line");
     var chartData = {
         //transf: accesor.transformation,
-        data: accesor.linechart(),
+        data: accesor.scatterplot(),
         options: options
     };
     chartData.options.unitTransform = accesor.unitTransform;
@@ -199,10 +199,10 @@ ko.bindingHandlers.scatterplot = {
         //lineChart(chartData.data, element, chartData.options);
     },
     update: function (element, valueAccessor, allBindingsAccessor) {
-        var chartData = getScatterPlotDataFromAccessor(allBindingsAccessor());
-        if (!arraysAreEqual(chartData.data, element._chartData.data)) {
+        var chartData = getScatterplotDataFromAccessor(allBindingsAccessor());
+        if (element._chartData == null || !koTools.arraysAreEqual(chartData.data, element._chartData.data)) {
             element.innerHTML = "";
-            lineChart(chartData.data, element, chartData.options);
+            scatterplot(chartData.data, element, chartData.options);
             element._chartData = chartData;
         }
     }
