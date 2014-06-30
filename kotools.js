@@ -126,7 +126,7 @@
 
         //verify that the date is valid => object is date-time and there is a meaningful value
         self.isValidDate = function(d) {
-            if (!isDate(d))
+            if (!self.isDate(d))
                 return false;
             return !isNaN(d.getTime());
         }
