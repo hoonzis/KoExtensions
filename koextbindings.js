@@ -52,7 +52,7 @@ ko.bindingHandlers.datepicker = {
             var vmValue = ko.utils.unwrapObservable(valueAccessor());
 
             //if we have a string value - convert it first
-            if (isString(vmValue)) {
+            if (koTools.isString(vmValue)) {
                 vmValue = new Date(vmValue);
             }
 
@@ -193,11 +193,6 @@ function getScatterplotDataFromAccessor(accesor) {
 }
 
 ko.bindingHandlers.scatterplot = {
-    init: function (element, valueAccessor, allBindingsAccessor) {
-        //var chartData = getLineDataFromAccessor(allBindingsAccessor());
-        //element._chartData = chartData;
-        //lineChart(chartData.data, element, chartData.options);
-    },
     update: function (element, valueAccessor, allBindingsAccessor) {
         var chartData = getScatterplotDataFromAccessor(allBindingsAccessor());
         if (element._chartData == null || !koTools.arraysAreEqual(chartData.data, element._chartData.data)) {
@@ -232,10 +227,6 @@ function getFormattedValueFromAccessor(accessor){
 }
 
 ko.bindingHandlers.formattedValue = {
-    init: function (element, valueAccessor, allBindingsAccessor) {
-        var fValue = getFormattedValueFromAccessor(allBindingsAccessor());
-        applyFormattedValue(fValue,element);
-    },
     update: function (element, valueAccessor, allBindingsAccessor) {
       var fValue = getFormattedValueFromAccessor(allBindingsAccessor());
       applyFormattedValue(fValue,element);
@@ -243,14 +234,6 @@ ko.bindingHandlers.formattedValue = {
 }
 
 ko.bindingHandlers.progress = {
-    init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-        var value = valueAccessor()();
-        if (value == null)
-            value = 0;
-        element.style.width = value + "%";
-        element.style.display = 'none';
-        element.style.display = 'block';
-    },
     update: function (element, valueAccessor, allBindingsAccessor) {
         var value = valueAccessor()();
         if (value == null)
