@@ -57,7 +57,7 @@ ko.bindingHandlers.datepicker = {
             }
 
             //if the date is not valid - don't visualize it, or we would have a "NaN/NaN/NaN"
-            if (!isValidDate(vmValue))
+            if (!koTools.isValidDate(vmValue))
                 return;
 
             widget.setDates(vmValue);
