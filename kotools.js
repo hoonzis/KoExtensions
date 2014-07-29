@@ -53,6 +53,20 @@
             return yyyy + (mm[1] ? mm : "0" + mm[0]);
         };
 
+        self.quartersComparer = function (item1, item2) {
+            var q1 = item1.substring(1, 2);
+            var year1 = item1.substring(2, 6);
+
+            var q2 = item2.substring(1, 2);
+            var year2 = item2.substring(2, 6);
+
+            if (year1 == year2) {
+                return d3.ascending(q1, q2);
+            } else
+                return d3.ascending(year1, year2);
+
+        };
+
         var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
         self.getYearAndMonthLabel = function(i) {
