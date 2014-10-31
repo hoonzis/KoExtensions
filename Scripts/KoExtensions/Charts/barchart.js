@@ -1,7 +1,7 @@
 //accepts and array of objects. one property of each object is used as the x-coordinate (determined by the xcoord parameter)
 //the rest of the properties is stacked to the chart
-function d3barChart(data, element, options, xcoord, lineData) {
-    var el = getElementAndCheckData(element,data);
+function drawBarChart(data, element, options, xcoord, lineData,charting) {
+    var el = charting.getElementAndCheckData(element,data);
     if (el == null)
         return;
 
@@ -68,7 +68,7 @@ function d3barChart(data, element, options, xcoord, lineData) {
         arranged.push(newD);
     });
 	
-    showStandardLegend(el,keys, function(item) { return item; },color,options.legend,height);
+    charting.showStandardLegend(el,keys, function(item) { return item; },color,options.legend,height);
 
     var svg = el.append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -128,7 +128,7 @@ function d3barChart(data, element, options, xcoord, lineData) {
         var info = {};
         info[options.xUnitName] = d.xLabel;
         info[d.name] = d.formattedValue;
-        showTooltip(info);
+        charting.showTooltip(info);
     }
 
     var onPointOver = function (d) {
@@ -142,18 +142,18 @@ function d3barChart(data, element, options, xcoord, lineData) {
             info[d.name] = options.lineFormatter(d.y);
         else
             info[d.name] = d.y;
-        showTooltip(info);
+        charting.showTooltip(info);
     }
 
     var onPointOut = function () {
         d3.select(this).style("fill", "white");
-        hideTooltip();
+        charting.hideTooltip();
     }
 
     var onBarOut = function () {
         d3.select(this).style("stroke", 'none');
         d3.select(this).style("opacity", 0.8);
-        hideTooltip();
+        charting.hideTooltip();
     }
 
     var group = svg.selectAll(".xVal")

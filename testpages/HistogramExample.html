@@ -1,13 +1,7 @@
 <html>
     <head>
         <title>Histogram example</title>
-        <script type="text/javascript" src="../Scripts/d3.min.js"></script>
-        <script type="text/javascript" src="../Scripts/knockout-3.1.0.debug.js"></script>
-        <script type="text/javascript" src="../kotools.js"></script>
-        <script type="text/javascript" src="../charting.js"></script>
-        <script type="text/javascript" src="../koextbindings.js"></script>
-        <script type="text/javascript" src="../Charts/histogramchart.js"></script>
-        <script type="text/javascript" src="../Charts/linechart.js"></script>
+        <script src="../Scripts/require.js"></script>
         <link type="text/css" rel="stylesheet" href="../styles/kostyles.css" />
     </head>
     <body>
@@ -23,49 +17,55 @@
     <input type="number" data-bind="value: min" />
     <p>Expected</p>
     <input type="radio" value="median" data-bind="checked: expected">Median</input>
-    <input type="radio" value="mean" data-bind="checked: expected">Mean</input>
+        <input type="radio" title="Mean" value="mean" data-bind="checked: expected"/>
     <p>Show outliers</p>
     <input type="checkbox" data-bind="checked: showOutliers" />
     <div id="histogram" data-bind="histogram: data, chartOptions : chartOptions"></div>
         <script>
-            var histogramDataExample = "3.9,3.8,3.9,2.7,2.8,1.9,2.7,3.5, 4.4, 2.8, 3.4, 8.6, 4.5, 3.5, 3.6, 3.8, 4.3, 4.5, 3.5,30,33,31";
+            require.config({
+                baseUrl: "/Scripts",
+                urlArgs: "bust=2" + (new Date()).getTime()
+            });
 
-            function TestViewModel() {
-                var self = this;
-                self.tolerance = ko.observable();
-                self.showProbabilityDistribution = ko.observable();
-                self.min = ko.observable();
-                self.expected = ko.observable();
-                self.useMAD = ko.observable();
-                self.showOutliers = ko.observable();
-                self.showProbabilityDistribution = ko.observable();
+            require(['knockout-3.2.0.debug','KoExtensions/koextbindings','KoExtensions/Charts/histogramchart'], function(ko) {
+                var histogramDataExample = "3.9,3.8,3.9,2.7,2.8,1.9,2.7,3.5, 4.4, 2.8, 3.4, 8.6, 4.5, 3.5, 3.6, 3.8, 4.3, 4.5, 3.5,30,33,31";
 
-                self.stringData = ko.observable();
-                self.data = ko.computed(function () {
-                    if (self.stringData() == null)
-                        return [];
-                    return self.stringData().split(",").map(function (i) {
-                        return parseFloat(i);
+                function TestViewModel() {
+                    var self = this;
+                    self.tolerance = ko.observable();
+                    self.showProbabilityDistribution = ko.observable();
+                    self.min = ko.observable();
+                    self.expected = ko.observable();
+                    self.useMAD = ko.observable();
+                    self.showOutliers = ko.observable();
+                    self.showProbabilityDistribution = ko.observable();
+
+                    self.stringData = ko.observable();
+                    self.data = ko.computed(function() {
+                        if (self.stringData() == null)
+                            return [];
+                        return self.stringData().split(",").map(function(i) {
+                            return parseFloat(i);
+                        });
                     });
-                });
 
-                self.stringData(histogramDataExample);
-                self.chartOptions = ko.computed(function () {
-                    return {
-                        tolerance: self.tolerance(),
-                        showProbabilityDistribution: self.showProbabilityDistribution(),
-                        min: koTools.tryConvertToNumber(self.min()),
-                        expected: self.expected(),
-                        useMAD: self.useMAD(),
-                        showOutliers: self.showOutliers(),
-                    }
-                });
-            }
+                    self.stringData(histogramDataExample);
+                    self.chartOptions = ko.computed(function() {
+                        return {
+                            tolerance: self.tolerance(),
+                            showProbabilityDistribution: self.showProbabilityDistribution(),
+                            min: koTools.tryConvertToNumber(self.min()),
+                            expected: self.expected(),
+                            useMAD: self.useMAD(),
+                            showOutliers: self.showOutliers(),
+                        }
+                    });
+                }
 
-            var vm = new TestViewModel();
+                var vm = new TestViewModel();
 
-            ko.applyBindings(vm);
-            initializeCharts();
+                ko.applyBindings(vm);
+            });
         </script>
 </body>
 </html>

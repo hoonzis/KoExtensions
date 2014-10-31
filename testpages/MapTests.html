@@ -4,9 +4,7 @@
     <head>
         <title>Map Test Page</title>
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
-        <script src="../Scripts/knockout-3.1.0.debug.js"></script>
-        <script type="text/javascript" src="../kotools.js"></script>
-        <script type="text/javascript" src="../koextbindings.js"></script>
+        <script src="../Scripts/require.js"></script>
         <style type="text/css">
             html { height: 100% }
 
@@ -77,6 +75,11 @@
         <script>
             var map = null;
 
+            require.config({
+                baseUrl: "/Scripts",
+                urlArgs: "bust=2" + (new Date()).getTime()
+            });
+
             function initialize() {
                 try {
                     var myOptions = {
@@ -89,87 +92,87 @@
                 }
             }
 
-            initialize();
-            var stationsData = {
-                "stations": [
-                    {
-                        "lat": 55.16,
-                        "lng": 55.335,
-                        "name": "Station 1"
-                    },
-                    {
-                        "lat": 55.25,
-                        "lng": 55.34,
-                        "name": "Station 2"
-                    },
-                    {
-                        "lat": 55.23,
-                        "lng": 55.345,
-                        "name": "Station 3"
+            require(['knockout-3.2.0.debug', 'KoExtensions/koextbindings'], function(ko) {
+                initialize();
+                var stationsData = {
+                    "stations": [
+                        {
+                            "lat": 55.16,
+                            "lng": 55.335,
+                            "name": "Station 1"
+                        },
+                        {
+                            "lat": 55.25,
+                            "lng": 55.34,
+                            "name": "Station 2"
+                        },
+                        {
+                            "lat": 55.23,
+                            "lng": 55.345,
+                            "name": "Station 3"
+                        }
+                    ],
+                    "points": [
+                        {
+                            "lat": 55.172,
+                            "lng": 55.142,
+                            "name": "Point 1"
+                        },
+                        {
+                            "lat": 55.274,
+                            "lng": 55.154,
+                            "name": "Point 2"
+                        },
+                        {
+                            "lat": 55.278,
+                            "lng": 55.148,
+                            "name": "Point 3"
+                        }
+                    ]
+                };
+
+                function StationViewModel(data) {
+                    var self = this;
+                    self.lat = ko.observable();
+                    self.lng = ko.observable();
+                    self.name = ko.observable();
+                    self.selected = ko.observable();
+
+                    if (data != null) {
+                        self.lat(data.lat);
+                        self.lng(data.lng);
+                        self.name(data.name);
                     }
-                ],
-                "points": [
-                    {
-                        "lat": 55.172,
-                        "lng": 55.142,
-                        "name": "Point 1"
-                    },
-                    {
-                        "lat": 55.274,
-                        "lng": 55.154,
-                        "name": "Point 2"
-                    },
-                    {
-                        "lat": 55.278,
-                        "lng": 55.148,
-                        "name": "Point 3"
+                }
+
+                function PointViewModel(data) {
+                    var self = this;
+                    self.lat = ko.observable();
+                    self.lng = ko.observable();
+                    self.name = ko.observable();
+                    self.selected = ko.observable();
+
+                    if (data != null) {
+                        self.lat(data.lat);
+                        self.lng(data.lng);
+                        self.name(data.name);
                     }
-                ]
-            };
-
-            function StationViewModel(data) {
-                var self = this;
-                self.lat = ko.observable();
-                self.lng = ko.observable();
-                self.name = ko.observable();
-                self.selected = ko.observable();
-
-                if (data != null) {
-                    self.lat(data.lat);
-                    self.lng(data.lng);
-                    self.name(data.name);
                 }
-            }
 
-            function PointViewModel(data) {
-                var self = this;
-                self.lat = ko.observable();
-                self.lng = ko.observable();
-                self.name = ko.observable();
-                self.selected = ko.observable();
+                function StationListViewModel(json) {
+                    var self = this;
+                    self.stations = ko.observableArray([]);
+                    self.points = ko.observableArray([]);
 
-                if (data != null) {
-                    self.lat(data.lat);
-                    self.lng(data.lng);
-                    self.name(data.name);
+                    if (json != null) {
+                        self.stations(json.stations.map(function (x) { return new StationViewModel(x); }));
+                        self.points(json.points.map(function (x) { return new PointViewModel(x); }));
+                    }
                 }
-            }
 
-            function StationListViewModel(json) {
-                var self = this;
-                self.stations = ko.observableArray([]);
-                self.points = ko.observableArray([]);
-
-                if (json != null) {
-                    self.stations(json.stations.map(function(x) { return new StationViewModel(x); }));
-                    self.points(json.points.map(function(x) { return new PointViewModel(x); }));
-                }
-            }
-
-            var vm = new StationListViewModel(stationsData);
-
-            ko.applyBindings(vm);
-
+                var vm = new StationListViewModel(stationsData);
+                ko.applyBindings(vm);
+            });
         </script>
     </body>
 

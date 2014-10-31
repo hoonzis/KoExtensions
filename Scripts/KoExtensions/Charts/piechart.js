@@ -1,6 +1,6 @@
 //Takes as input collection of items [data]. Each item has two values [x] and [y].
-function d3pieChart(data, element,options) {
-    var el = getElementAndCheckData(element, data);
+function drawPieChart(data, element,options,charting) {
+    var el = charting.getElementAndCheckData(element, data);
     if (el == null)
         return;
 
@@ -22,7 +22,7 @@ function d3pieChart(data, element,options) {
     arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
     donut.value(function (d) { return d.y; });
     var max = d3.sum(data, function (item) { return item.y; });
-    showStandardLegend(el, data, function (i) { return i.x; }, color, options.legend, height, function (i) {
+    charting.showStandardLegend(el, data, function (i) { return i.x; }, color, options.legend, height, function (i) {
         if (options.unitTransform != null)
             return options.unitTransform(i.y);
         return i.y;
@@ -61,12 +61,12 @@ function arcMouseOver(d) {
     var info = {};
     var value = d.formatted + " (" + (d.percentage * 100).toFixed(1) + "%)";
     info[d.data.x] = value;
-    showTooltip(info);
+    charting.showTooltip(info);
 }
 
 function arcMouseOut() {
     d3.select(this).style("stroke", 'none');
     d3.select(this).style("opacity", 0.7);
-    hideTooltip();
+    charting.hideTooltip();
 }
 

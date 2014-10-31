@@ -1,22 +1,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
- 
 <html xmlns="http://www.w3.org/1999/xhtml"> 
-<meta http-equiv="content-type" content="text/html; charset=UTF8">
-<head>
-    <title>Test Page</title>
-    <script src="../Scripts/knockout-3.1.0.debug.js"></script>
-    <script src="../Scripts/d3.min.js"></script>
-    <script type="text/javascript" src="../kotools.js"></script>
-    <script type="text/javascript" src="../charting.js"></script>
-    <script type="text/javascript" src="../koextbindings.js"></script>
-    <script type="text/javascript" src="../Charts/barchart.js"></script>
-    <script type="text/javascript" src="../Charts/linechart.js"></script>
-    <script type="text/javascript" src="../Charts/piechart.js"></script>
-    <link type="text/css" rel="stylesheet" href="../styles/kostyles.css"/>
-</head>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF8">
+        <title>Charting Test Page</title>
+        <script src="../Scripts/require.js"></script>
+        <link type="text/css" rel="stylesheet" href="../styles/kostyles.css" />
+    </head>
 <body>
 	<h2>Last Week Sales:</h2>
-	<div id="carsChart" data-bind="piechart: cars, transformation:transformToChart, chartOptions:testOptions">
+	<div id="carsChart" data-bind="piechart: cars, transformation:transformToChart">
 
 	</div>
 
@@ -44,127 +36,135 @@
 			</div>
 	 	</div> 
 	 <!-- /ko -->
-    <script>
+        <script>
 
-        var testOptions = { legend: true, width: 300, height: 150 }; //TODO: get rid of identity function if not needed
-        function identity(item) {
-            return item;
-        };
-
-        var carSales = [
-            {
-                month: 'january',
-                peugot: 100,
-                audit: 200,
-                bmw: 300
-            },
-            {
-                month: 'february',
-                peugot: 50,
-                audit: 110,
-                bmw: 80
-            },
-            {
-                month: 'marz',
-                peugot: 120,
-                audit: 230,
-                bmw: 115
-            },
-            {
-                month: 'april',
-                peugot: 80,
-                audit: 120,
-                bmw: 75
+            window.document.onload = function (e) {
+                initialize();
             }
-        ];
-        var lastWeek = [
-            {
-                name: "peugot",
-                sales: [
-                    { model: 'model1', amount: 100 },
-                    { model: 'model2', amount: 200 },
-                    { model: 'model3', amount: 300 }
-                ]
-            },
-            {
-                name: "audi",
-                sales: [
-                    { model: 'a3', amount: 200 },
-                    { model: 'qutro', amount: 300 },
-                    { model: 'a8', amount: 100 }
-                ]
-            },
-            {
-                name: "bmw",
-                sales: [
-                    { model: 'model5', amount: 200 },
-                    { model: 'model8', amount: 100 },
-                    { model: 'model3', amount: 150 }
-                ]
-            }
-        ];
 
-        function CarViewModel(data) {
-            var self = this;
-            self.sales = ko.observableArray([]);
-            self.name = ko.observable();
-
-            self.totalSales = ko.computed(function () {
-                return d3.sum(self.sales().map(function (item) {
-                    return item.amount;
-                }));
-            }, self);
-
-            if (data != null) {
-                self.sales(data.sales);
-                self.name(data.name);
-            }
-        }
-
-        function TestViewModels(data, lastWeek) {
-            var self = this;
-            self.cars = ko.observableArray([]);
-            self.salesPerMonth = ko.observableArray([]);
-            self.carSales = ko.observableArray([]);
-
-            self.carSales(data);
-
-            var keys = d3.keys(data[0]).filter(function (i) { return i != 'month'; });
-            var perMonth = keys.map(function (key) {
-                return {
-                    linename: key,
-                    data: data
-                };
+            require.config({
+                baseUrl: "/Scripts",
+                urlArgs: "bust=2" + (new Date()).getTime()
             });
 
-            self.salesPerMonth(perMonth);
+            require(['knockout-3.2.0.debug', 'KoExtensions/koextbindings', 'KoExtensions/Charts/linechart', 'KoExtensions/Charts/piechart', 'KoExtensions/Charts/barchart'], function (ko) {
 
-            var carsVMs = lastWeek.map(function (x) { return new CarViewModel(x); });
-            self.cars(carsVMs);
-        }
+                var carSales = [
+                    {
+                        month: 'january',
+                        peugot: 100,
+                        audit: 200,
+                        bmw: 300
+                    },
+                    {
+                        month: 'february',
+                        peugot: 50,
+                        audit: 110,
+                        bmw: 80
+                    },
+                    {
+                        month: 'marz',
+                        peugot: 120,
+                        audit: 230,
+                        bmw: 115
+                    },
+                    {
+                        month: 'april',
+                        peugot: 80,
+                        audit: 120,
+                        bmw: 75
+                    }
+                ];
+                var lastWeek = [
+                    {
+                        name: "peugot",
+                        sales: [
+                            { model: 'model1', amount: 100 },
+                            { model: 'model2', amount: 200 },
+                            { model: 'model3', amount: 300 }
+                        ]
+                    },
+                    {
+                        name: "audi",
+                        sales: [
+                            { model: 'a3', amount: 200 },
+                            { model: 'qutro', amount: 300 },
+                            { model: 'a8', amount: 100 }
+                        ]
+                    },
+                    {
+                        name: "bmw",
+                        sales: [
+                            { model: 'model5', amount: 200 },
+                            { model: 'model8', amount: 100 },
+                            { model: 'model3', amount: 150 }
+                        ]
+                    }
+                ];
 
-        function transformToLineChart(i) {
+                function CarViewModel(data) {
+                    var self = this;
+                    self.sales = ko.observableArray([]);
+                    self.name = ko.observable();
 
-            return {
-                x: i.linename,
-                values: i.data.map(function (item) {
-                    return { x: item.month, y: item[i.linename] };
-                })
-            };
-        }
+                    self.totalSales = ko.computed(function() {
+                        return d3.sum(self.sales().map(function(item) {
+                            return item.amount;
+                        }));
+                    }, self);
 
-        function transformToChart(car) {
-            return { x: car.name(), y: car.totalSales() };
-        }
+                    if (data != null) {
+                        self.sales(data.sales);
+                        self.name(data.name);
+                    }
 
-        function transform2(car) {
-            return { x: car.model, y: car.amount };
-        }
+                    self.transform2 = function (car) {
+                        return { x: car.model, y: car.amount };
+                    }
 
-        var vm = new TestViewModels(carSales, lastWeek);
+                }
 
-        ko.applyBindings(vm);
-        initializeCharts();
+                function TestViewModels(data, lastWeekData) {
+                    var self = this;
+
+                    self.transformToLineChart = function(i) {
+
+                        return {
+                            x: i.linename,
+                            values: i.data.map(function (item) {
+                                return { x: item.month, y: item[i.linename] };
+                            })
+                        };
+                    }
+
+                    self.transformToChart = function(car) {
+                        return { x: car.name(), y: car.totalSales() };
+                    }
+                    
+                    self.cars = ko.observableArray([]);
+                    self.salesPerMonth = ko.observableArray([]);
+                    self.carSales = ko.observableArray([]);
+
+                    self.carSales(data);
+
+                    var keys = d3.keys(data[0]).filter(function(i) { return i != 'month'; });
+                    var perMonth = keys.map(function(key) {
+                        return {
+                            linename: key,
+                            data: data
+                        };
+                    });
+
+                    self.salesPerMonth(perMonth);
+
+                    var carsVMs = lastWeekData.map(function(x) { return new CarViewModel(x); });
+                    self.cars(carsVMs);
+                }
+
+                var vm = new TestViewModels(carSales, lastWeek);
+
+                ko.applyBindings(vm);
+            });
 
     </script>
 </body>

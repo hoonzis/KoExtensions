@@ -53,20 +53,6 @@
             return yyyy + (mm[1] ? mm : "0" + mm[0]);
         };
 
-        self.quartersComparer = function (item1, item2) {
-            var q1 = item1.substring(1, 2);
-            var year1 = item1.substring(2, 6);
-
-            var q2 = item2.substring(1, 2);
-            var year2 = item2.substring(2, 6);
-
-            if (year1 == year2) {
-                return d3.ascending(q1, q2);
-            } else
-                return d3.ascending(year1, year2);
-
-        };
-
         var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
         self.getYearAndMonthLabel = function(i) {
@@ -97,6 +83,10 @@
 
         self.isNumber = function(n) {
             return !isNaN(parseFloat(n)) && isFinite(n);
+        }
+
+        self.isValidNumber = function(n) {
+            return n != null && !isNaN(n);
         }
 
         self.isDate = function(d) {
@@ -143,29 +133,6 @@
             if (!self.isDate(d))
                 return false;
             return !isNaN(d.getTime());
-        }
-
-        //not efficient comparison of arrays
-        self.arraysAreEqual = function(ary1, ary2) {
-            if (ary1 == null && ary2 == null)
-                return true;
-            if (ary1 == null || ary2 != null)
-                return false;
-            if (ary1 != null && ary2 == null)
-                return false;
-            if (ary1.length != ary2.length)
-                return false;
-
-            if (typeof (ary1[0]) == 'object') {
-                for (obj1 in ary1) {
-                    var obj2 = ary[2];
-                    if (compare(obj1, obj2) == false)
-                        return false;
-                }
-                return true;
-            } else {
-                return (ary1.join('') == ary2.join(''));
-            }
         }
 
         self.compare = function(x, y) {
@@ -254,6 +221,62 @@
             var value = intValue != null ? intValue : (decimalValue != null ? decimalValue : orgValue);
             return value;
         };
+
+        self.toBoolean = function (string) {
+            if (string == null)
+                return false;
+            switch (string.toLowerCase()) {
+                case "true": case "yes": case "1": return true;
+                case "false": case "no": case "0": case null: return false;
+                default: return Boolean(string);
+            }
+        }
+
+        self.transpose = function(a, xcoord) {
+            if (a == null)
+                return null;
+            if (a.length == 0)
+                return [];
+
+            var keys = d3.keys(a[0]).filter(function (k) { return k != xcoord; });
+
+            var horizontalKeys = d3.keys(a);
+            var result = [];
+
+            for (k in keys) {
+                var key = keys[k];
+                var newItem = new Object();
+                newItem.name = key;
+                horizontalKeys.map(function (hKey) {
+                    newItem[a[hKey][xcoord]] = a[hKey][key];
+                });
+                result.push(newItem);
+            }
+            return result;
+        }
+
+        self.dateToFrenchString = function (date) {
+            var month = date.getMonth() + 1;
+            return date.getDate() + "/" + month + "/" + date.getFullYear();
+        };
+
+        self.dateToUSString = function (date) {
+            var month = date.getMonth() + 1;
+            return month + "/" + date.getDate() + "/" + date.getFullYear();
+        };
+
+        self.getYearAndMonth = function (date) {
+            var yyyy = date.getFullYear().toString();
+            var mm = (date.getMonth() + 1).toString();
+            return yyyy + (mm[1] ? mm : "0" + mm[0]);
+        };
+
+        self.splitMonthAndYear = function(monthAndYear) {
+            return {
+                year: self.tryConvertToNumber(monthAndYear.substring(0, 4)),
+                month: self.tryConvertToNumber(monthAndYear.substring(4, 6))
+            };
+        }
     }
 
     return new KoTools();

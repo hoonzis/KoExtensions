@@ -1,9 +1,9 @@
 //Takes as input collection of items [data]. Each item has two values [x] and [y].
 //[{x:1, receivedEtf:123, tradedEtf:100},{x:2, receivedEtf:200, tradedEtf:100}]
 //[{linename:receivedEtf, values:[x:q1, y:200]}]
-function lineChart(data, element, options) {
+function drawLineChart(data, element, options,charting) {
 
-    var el = getElementAndCheckData(element, data);
+    var el = charting.getElementAndCheckData(element, data);
     if (el == null)
         return;
 
@@ -18,6 +18,11 @@ function lineChart(data, element, options) {
       .range([height, 0]);
 
     var color = d3.scale.category20();
+
+    var getColor = function(l) {
+        if (l.color == null) return color(l.x);
+        return l.color;
+    }
 
     //xKeys - not all the lines have neceseraly the same x values -> concat & filter
     var xKeys = [];
@@ -93,7 +98,7 @@ function lineChart(data, element, options) {
 
     var keys = data.map(function(item) { return item.x; });
     color.domain(keys);
-    showStandardLegend(el,keys, function(i) { return i; },color,options.legend,height);
+    charting.showStandardLegend(el,keys, function(i) { return i; },color,options.legend,height);
   
     svg.append("g")
       .attr("class", "x axis")
@@ -118,7 +123,7 @@ function lineChart(data, element, options) {
         //.attr("class", "point")
         .each(function (d) {d.values.forEach(
             function (item) {
-                item.color = color(d.x);
+                item.color = getColor(d);
                 if(item.formattedValue!= null)
                     return;
                 if(item.name == null)
@@ -131,13 +136,15 @@ function lineChart(data, element, options) {
         });
 
     var lines = point.selectAll("circle")
-        .data(function (d) { return d.values; });
+        .data(function (d) {
+            return d.values;
+        });
 
   
     var spMouseOut = function() {
         d3.select(this).style("fill", "white");
         point.style("opacity", 1);
-        hideTooltip();
+        charting.hideTooltip();
     }
 
     var spMouseOver = function (d) {
@@ -146,21 +153,25 @@ function lineChart(data, element, options) {
         info[options.itemName] = d.linename;
         info[options.xUnitName] = xLabel;
         info[d.name] = d.formattedValue;
-        showTooltip(info);
+        charting.showTooltip(info);
         d3.select(this).style("fill", d.color);
 
         point.style("opacity", function(item) {
             if (item.x != d.linename)
-                return 0.1;
+                return 0.4;
             return 1;
         });
     }
   
   point.append("path")
       .attr("class", "line")
-      .attr("d", function(d) { return line(d.values); })
+      .attr("d", function (d) {
+          return line(d.values);
+      })
       .style("stroke-width", 2)
-      .style("stroke", function(d) { return color(d.x); })
+      .style("stroke", function (d) {
+          return d.color;
+      })
       .style("fill", "none");
 
   lines.enter().append("circle")

@@ -1,5 +1,5 @@
-function histogram(data, element, options) {
-    var el = getElementAndCheckData(element,data);
+function drawHistogram(data, element, options,charting) {
+    var el = charting.getElementAndCheckData(element,data);
     if (el == null)
         return;
 
@@ -12,7 +12,7 @@ function histogram(data, element, options) {
         .frequency(false)
         .bins(80)(data);
 
-    var minX = options.min != null ? options.min : d3.min(histogramData, function (d) { return d.x; });
+    var minX = koTools.isValidNumber(options.min) ? options.min : d3.min(histogramData, function (d) { return d.x; });
     
     var x = d3.scale.linear()
         .domain([
@@ -68,8 +68,8 @@ function histogram(data, element, options) {
   
     if(options.showProbabilityDistribution){
 
-        var min = options.min != null ? options.min : d3.min(data);
-        var max = options.max != null ? options.max : d3.max(data);
+        var min = koTools.isValidNumber(options.min) ? options.min : d3.min(data);
+        var max = koTools.isValidNumber(options.max) ? options.max : d3.max(data);
         var total = d3.sum(data);
         
         var step = (max - min)/500;
@@ -107,8 +107,8 @@ function histogram(data, element, options) {
         var color = d3.scale.category20();
 
         y.domain([
-            d3.min(probData,function(i){return i.y;}),
-            d3.max(probData, function(i){return i.y})
+            d3.min(probData,function(d){return d.y;}),
+            d3.max(probData, function(d) { return d.y; })
         ]);
 
         var minX =d3.min(probData,function(i){return i.x;});
