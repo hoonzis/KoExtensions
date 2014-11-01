@@ -60,8 +60,15 @@ define(['d3', './kotools'], function (d3l) {
             d3.select("#info" + i + "header").text(key);
             if (info[key] != null)
                 d3.select("#info" + i).text(info[key]);
+
+            //make sure this one is shown
+            d3.select("#info" + i + "header").style("display", "block");
+            d3.select("#info" + i).style("display", "block");
+
             i++;
         }
+
+        //hide empty ones
         for (var j = 5; j >= i; j--) {
             d3.select("#info" + j + "header").style("display", "none");
             d3.select("#info" + j).style("display", "none");

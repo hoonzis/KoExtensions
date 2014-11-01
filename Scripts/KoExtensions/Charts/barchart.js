@@ -39,13 +39,16 @@ function drawBarChart(data, element, options, xcoord, lineData,charting) {
 
 	//runs overs all the data. copies the result to a new array
     var arranged = [];
+    var arrangedByX = {};
     data.forEach(function (d) {
 		var newD = {x: d[xcoord]};
         var y0Neg = 0;
         var y0Pos = 0;
         
+        
         var values = [];
         color.domain().forEach(function (m) {
+            
             if (d[m] == 0 || d[m] == null)
                 return;
             var xLabel = newD.x;
@@ -55,17 +58,19 @@ function drawBarChart(data, element, options, xcoord, lineData,charting) {
             if (options.unitTransform != null)
                 formattedValue = options.unitTransform(d[m]);
 
-            if (d[m] > 0)
-                values.push({ name: m, y0: y0Pos, y1: y0Pos += +d[m], val:d[m], x:newD.x, xLabel:xLabel, xUnitName:options.xUnitName, formattedValue:formattedValue});
-            else {
+            if (d[m] > 0) {
+                values.push({ name: m, y0: y0Pos, y1: y0Pos += +d[m], val: d[m], x: newD.x, xLabel: xLabel, xUnitName: options.xUnitName, formattedValue: formattedValue });
+            } else {
                 var y1 = y0Neg;
-                values.push({ name: m, y0: y0Neg += d[m], y1: y1, val: d[m], x: newD.x, xLabel: xLabel, xUnitName: options.xUnitName, formattedValue:formattedValue});
-            } 
+                values.push({ name: m, y0: y0Neg += d[m], y1: y1, val: d[m], x: newD.x, xLabel: xLabel, xUnitName: options.xUnitName, formattedValue: formattedValue });
+            }
         });
+
         newD.values = values;
         newD.totalPositive = d3.max(newD.values, function (v) { return v.y1; });
         newD.totalNegative = d3.min(newD.values, function (v) { return v.y0; });
         arranged.push(newD);
+        arrangedByX[newD.x] = newD;
     });
 	
     charting.showStandardLegend(el,keys, function(item) { return item; },color,options.legend,height);
@@ -123,11 +128,15 @@ function drawBarChart(data, element, options, xcoord, lineData,charting) {
     .attr("dy", -4);
 
     var onBarOver = function (d) {
+        var column = arrangedByX[d.x];
+
         d3.select(this).style("stroke", 'black');
         d3.select(this).style("opacity", 1);
         var info = {};
         info[options.xUnitName] = d.xLabel;
         info[d.name] = d.formattedValue;
+        if (column.totalNegative == 0)
+            info[d.name] += " (" + koTools.toPercent(d.val / column.totalPositive) + ")";
         charting.showTooltip(info);
     }
 

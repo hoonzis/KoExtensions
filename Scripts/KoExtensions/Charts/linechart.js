@@ -150,7 +150,6 @@ function drawLineChart(data, element, options,charting) {
     var spMouseOver = function (d) {
         var xLabel = d.xLabel != null ? d.xLabel : d.x;
         var info = {};
-        info[options.itemName] = d.linename;
         info[options.xUnitName] = xLabel;
         info[d.name] = d.formattedValue;
         charting.showTooltip(info);
@@ -170,7 +169,7 @@ function drawLineChart(data, element, options,charting) {
       })
       .style("stroke-width", 2)
       .style("stroke", function (d) {
-          return d.color;
+          return getColor(d);
       })
       .style("fill", "none");
 

@@ -166,7 +166,7 @@
         self.toPercent = function(val) {
             if (val == null)
                 return 0;
-            return val * 100;
+            return (val * 100).toFixed(1) + " %";
         }
 
         //Size of the object - equivalent of array length

@@ -2,12 +2,8 @@
  
 <html xmlns="http://www.w3.org/1999/xhtml"> 
 <head>
-<title>Map Test Page</title>
-<script type="text/javascript" src="../Scripts/knockout-3.1.0.debug.js"></script>
-<script type="text/javascript" src="../kotools.js"></script>
-<script type="text/javascript" src="../koextbindings.js"></script>
-<style type="text/css">
-</style>
+    <title>Map Test Page</title>
+    <script src="../Scripts/require.js"></script>
 </head>
 <body>
 	<b>Price:</b>
@@ -15,7 +11,7 @@
 	<br/><b>Power:</b>
 	<span data-bind="formattedValue:power, currency:'kW'"></span>
 	<br/><b>Efficiency:</b>
-	<span data-bind="formattedValue:efficiency, currency:'%', transformation:toPercent"></span>
+	<span data-bind="formattedValue:efficiency, currency:'%', transformation:koTools.toPercent"></span>
 	<br/><b>Consumption:</b>
 	<span data-bind="formattedValue:consumption100, currency:'l/100km'"></span>
 	<br/><b>Distance:</b>
@@ -23,22 +19,29 @@
 	<br/><b>Total consumption:</b>
     <span data-bind="formattedValue: totalConsumption, currency:'l'"></span>
     <script type="text/javascript">
-        function toPercent(n) { return n * 100; }
-        function CarViewModel() {
-            var self = this;
-            self.efficiency = ko.observable(0.95);
-            self.price = ko.observable(1000000);
-            self.priceCurrency = ko.observable('EUR');
-            self.power = ko.observable(120);
-            self.consumption100 = ko.observable(7);
-            self.distance = ko.observable();
-            self.totalConsumption = ko.computed(function () {
-                return self.distance() * self.consumption100();
-            });
-        }
+        require.config({
+            baseUrl: "/Scripts",
+            urlArgs: "bust=2" + (new Date()).getTime()
+        });
 
-        var vm = new CarViewModel();
-        ko.applyBindings(vm);
+        require(['knockout-3.2.0.debug', 'KoExtensions/koextbindings'], function(ko) {
+            
+            function CarViewModel() {
+                var self = this;
+                self.efficiency = ko.observable(0.95);
+                self.price = ko.observable(1000000);
+                self.priceCurrency = ko.observable('EUR');
+                self.power = ko.observable(120);
+                self.consumption100 = ko.observable(7);
+                self.distance = ko.observable();
+                self.totalConsumption = ko.computed(function() {
+                    return self.distance() * self.consumption100();
+                });
+            }
+
+            var vm = new CarViewModel();
+            ko.applyBindings(vm);
+        });
 
     </script>
 </body>

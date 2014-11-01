@@ -70,6 +70,7 @@
     var defaultOptions = [];
     defaultOptions['bar'] = { legend: true, width: 600, height: 200, xUnitName: 'x', itemName: 'Item' };
     defaultOptions['pie'] = { legend: true, width: 200, height: 200 };
+    defaultOptions['line'] = { legend: true, width: 200, height: 200, xUnitName: 'x'};
     defaultOptions['def'] = { legend: true, width: 200, height: 200 };
     defaultOptions['eventDrops'] = { legend: false, width: 1200, height: 500, eventSize: 10, eventColor: 'black', start: new Date(2000,1),end: new Date(),eventDate: function(x) { return x; }};
    
@@ -110,7 +111,8 @@
         return chartData;
     }
 
-    ko.bindingHandlers.linechart = {
+    ko.bindingHandlers.
+        linechart = {
         update: function (element, valueAccessor, allBindingsAccessor) {
             var chartData = getLineDataFromAccessor(allBindingsAccessor());
 
