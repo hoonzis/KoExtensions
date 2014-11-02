@@ -129,7 +129,9 @@ define(['./util/configurable', './eventLine', './delimiter'], function(configura
                         config.eventHover(el);
                     });
                 }
-                var bullScale = d3.scale.log().domain([min, max]).range([1, 25]);
+                var bullScale = config.scale == "log" ? d3.scale.log() : d3.scale.linear();
+                bullScale.domain([min, max]).range([1, 25]);
+
                 xScale.range([0, graphWidth]).domain([config.start, config.end]);
 
                 zoom.x(xScale);
