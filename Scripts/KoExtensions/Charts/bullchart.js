@@ -1,34 +1,35 @@
-function drawBubbleChart(historyData, elname, xValues, bulls) {
-// Chart dimensions.
+function drawBubbleChart(data, element, options, charting) {
+    var el = charting.getElementAndCheckData(element, data);
+    if (el == null)
+        return;
+
     var margin = { top: 60, right: 30, bottom: 70, left: 40 },
         width = 960 - margin.right,
         height = 500 - margin.top - margin.bottom;
 
-    var maxY = d3.max(historyData, function (d) { return d.deals; });
-    var maxAvgDeal = d3.max(historyData, function (d) { return d.avgDealSize; });
-    var maxNotional = d3.max(historyData, function (d) { return d.notional; });
+    var maxY = d3.max(data, options.bubbleVertical);
+    var horizontalValues = data.map(options.bubbleHorizontal);
 
-    var avgDeals = historyData.map(function(d) { return d.avgDealSize; });
-    avgDeals.sort(d3.ascending);
-    maxAvgDeal = d3.quantile(avgDeals, 0.95);
+    var bubbleSizes = data.map(options.bubbleSize);
+    bubbleSizes.sort(d3.ascending);
+    var maxBubbleSize = d3.quantile(bubbleSizes, 0.95);
 
-    var xScale = d3.scale.ordinal().domain(xValues).rangeRoundBands([0, width], .1);
-    var yScale = d3.scale.sqrt().domain([0, maxY]).range([height, 0]),
-        radiusScale = d3.scale.pow().exponent(.4).domain([0, maxNotional]).range([0, 60]).clamp(true),
-        colorScale = d3.scale.category20().domain(bulls);
+    var xScale = d3.scale.ordinal().domain(horizontalValues).rangeRoundBands([0, width], .1);
+    var yScale = d3.scale.sqrt().domain([0, maxY]).range([height, 0]);
+    var radiusScale = d3.scale.pow().exponent(.4).domain([0, maxBubbleSize]).range([0, 60]).clamp(true);
+
+    var colors = koTools.distinct(data, options.bubbleColor);
+    var colorScale = d3.scale.category20().domain(colors);
 
     var xAxis = d3.svg.axis().scale(xScale).orient("bottom"),
         yAxis = d3.svg.axis().scale(yScale).tickSize(width).orient("right");
 
-    //TODO: JF - pass the quarter details as parameter
-    xAxis.tickFormat(statsVM.getQuarterLabel);
+    if (options.xUnitFormat != null)
+        xAxis.tickFormat(options.xUnitFormat);
 
-    var svgElem = d3.select("#" + elname);
-    svgElem.innerHTML = "";
+    charting.showStandardLegend(el, colors, function (i) { return i; }, colorScale, true, height);
 
-    showStandardLegend(svgElem, bulls, function (i) { return i; }, colorScale, true, height);
-
-    var svg = svgElem.append("svg")
+    var svg = el.append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
     .append("g")
@@ -67,35 +68,37 @@ function drawBubbleChart(historyData, elname, xValues, bulls) {
         .style("font-size", "15px")
         .text("# of deals")
         .attr("transform", "translate(" + width + "," + 40 + ")rotate(-90)");
-	
+
+
+    var bubblenodeMouseout = function() {
+        charting.hideTooltip();
+    };
+
+    var bubblenodeMouseover = function(d) {
+        var avgDealSize = statsVM.values.formatters["Traded Notional"](d.avgDealSize);
+        var totalNotional = statsVM.values.formatters["Traded Notional"](d.notional);
+        var info = {
+            "Strategy:": d.strategyType,
+            "Avg deal size": avgDealSize,
+            "# Deals": d.deals,
+            "Total Notional:": totalNotional
+        };
+        charting.showTooltip(info);
+    }
+
     svg.append("g")
         .attr("class", "dots")
     .selectAll(".dot")
-        .data(historyData)
+        .data(data)
     .enter().append("circle")
         .attr("class", "dot")
-        .style("fill", function(d) { return colorScale(d.strategyType); })
+        .style("fill", function(d) { return colorScale(options.bubbleColor(d)); })
         .style("opacity", 0.8)
-        .attr("cx", function (d) { return xScale(d.quarter) + xScale.rangeBand() / 2; })
-        .attr("cy", function(d) { return yScale(d.deals); })
-        .attr("r", function (d) { return radiusScale(d.notional); })
-        .on("mouseover", bubblenode_mouseover)
-        .on("click", bubblenode_mouseover)
-        .on("mouseout", bubblenode_mouseout);
+        .attr("cx", function (d) { return xScale(options.bubbleHorizontal(d)) + xScale.rangeBand() / 2; })
+        .attr("cy", function(d) { return yScale(options.bubbleVertical(d)); })
+        .attr("r", function (d) { return radiusScale(options.bubbleSize(d)); })
+        .on("mouseover", bubblenodeMouseover)
+        .on("click", bubblenodeMouseover)
+        .on("mouseout", bubblenodeMouseout);
 }
 
-function bubblenode_mouseout(d) {
-    hideTooltip();
-}
-
-function bubblenode_mouseover(d) {
-    var avgDealSize = statsVM.values.formatters["Traded Notional"](d.avgDealSize);
-    var totalNotional = statsVM.values.formatters["Traded Notional"](d.notional);
-    var info = {
-        "Strategy:":d.strategyType,
-        "Avg deal size": avgDealSize,
-        "# Deals": d.deals,
-        "Total Notional:": totalNotional
-    };
-    showTooltip(info);
-}

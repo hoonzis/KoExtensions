@@ -277,6 +277,11 @@
                 month: self.tryConvertToNumber(monthAndYear.substring(4, 6))
             };
         }
+
+        self.distinct = function(data, mapper) {
+            var mapped = data.map(mapper);
+            return mapped.filter(function (v, i) { return mapped.indexOf(v) == i; });
+        }
     }
 
     return new KoTools();

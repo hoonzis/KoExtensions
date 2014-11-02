@@ -72,7 +72,15 @@
     defaultOptions['pie'] = { legend: true, width: 200, height: 200 };
     defaultOptions['line'] = { legend: true, width: 200, height: 200, xUnitName: 'x'};
     defaultOptions['def'] = { legend: true, width: 200, height: 200 };
-    defaultOptions['eventDrops'] = { legend: false, width: 1200, height: 500, eventSize: 10, eventColor: 'black', start: new Date(2000,1),end: new Date(),eventDate: function(x) { return x; }};
+    defaultOptions['eventDrops'] = {
+        legend: false, width: 1200, height: 500, eventSize: 10,
+        eventColor: 'black',
+        start: new Date(2000, 1),
+        end: new Date(),
+        eventDate: function(x) {
+            return x; 
+        }
+    };
    
     function setDefaultOptions(options, type) {
         var typeOptions = defaultOptions[type];
@@ -231,6 +239,15 @@
                 var options = setDefaultOptions(ko.unwrap(allBindingsAccessor().chartOptions), 'scatterplot');
                 element.innerHTML = "";
                 drawScatterPlot(data, element, options, charting);
+            }
+        };
+
+        ko.bindingHandlers.bubblechart = {
+            update: function (element, valueAccessor, allBindingsAccessor) {
+                var data = ko.unwrap(valueAccessor());
+                var options = setDefaultOptions(ko.unwrap(allBindingsAccessor().chartOptions), 'bubble');
+                element.innerHTML = "";
+                drawBubbleChart(data, element, options, charting);
             }
         };
 
