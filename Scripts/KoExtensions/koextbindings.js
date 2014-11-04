@@ -1,5 +1,7 @@
-﻿define(['knockout-3.2.0.debug', './charting', './kotools', './Charts/linechart', './EventDrops/eventDrops'],
-    function (ko, charting, kotools, linechart, eventDrops) {
+﻿define(['./charting', './kotools', './EventDrops/eventDrops'],
+    function (charting, kotools, eventDrops) {
+        if (ko == null)
+            throw "knockout has to be loaded before koextensions";
         charting.initializeCharts();
         var markers = [];
         ko.bindingHandlers.map = {

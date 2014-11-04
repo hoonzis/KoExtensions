@@ -77,24 +77,11 @@ function drawLineChart(data, element, options,charting) {
       .x(function(d) { return x(d.x) + x.rangeBand() / 2; })
       .y(function(d) { return y(d.y); });
 
-    var zoomed = function () {
-        //svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-        //svg.select(".x.axis").call(xAxis);
-        //svg.select(".y.axis").call(yAxis);
-    };
-
-    var zoom = d3.behavior.zoom()
-        .x(x)
-        .y(y)
-        .scaleExtent([1, 2])
-        .on("zoom", zoomed);
-
     var svg = el.append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        .call(zoom);
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var keys = data.map(function(item) { return item.x; });
     color.domain(keys);
