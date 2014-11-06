@@ -5,11 +5,23 @@ function drawPieChart(data, element,options,charting) {
         return;
 
     var color;
+
+    //for a piechart only positive values make sense
+    data = data.filter(function (i) {
+        return i.y > 0;
+    });
+
+    if (data.length == 0)
+        return;
+
+    //TODO: why is the color scale passed as paramter
     if (options.colors != null) {
         color = options.colors;
     } else {
         color = d3.scale.category20();
-        var keys = data.map(function (item) { return item.x; });
+        var keys = data.map(function (item) {
+            return item.x;
+        });
         color.domain(keys);
     }
    
