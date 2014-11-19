@@ -1,7 +1,9 @@
-function drawChordChart(data,elname){
+function drawChordChart(data,elname,charting){
     var el = d3.select("#" + elname);
     var htmlEL = document.getElementById(elname);
     htmlEL.innerHTML = "";
+
+    var formatter = statsVM.values.formatters["Traded Notional"];
 
     //get the name of the item by id
     var descGetter = function (item) {
@@ -84,7 +86,7 @@ function drawChordChart(data,elname){
 
     function fade(opacity) {
         return function (g, i) {
-            var notional = statsVM.values.formatters["Traded Notional"](g.value);
+            var notional = formatter(g.value);
 			svg.selectAll(".chord")
 				.filter(function(d) {
 					return d.target.index != i && d.source.index != i;
@@ -95,12 +97,12 @@ function drawChordChart(data,elname){
             var info = {
                 "Traded Notional": notional,
             };
-			showTooltip(info);
+			charting.showTooltip(info);
         };
     }
 
     function chord_mouse_over(g,i) {
-        var notional = data.values.formatters["Traded Notional"](g.source.value);
+        var notional = formatter(g.source.value);
         var a1 = data.namesByIndex[g.source.index];
         var a2 = data.namesByIndex[g.source.subindex];
         var title = a1 + " - " + a2;
@@ -115,7 +117,7 @@ function drawChordChart(data,elname){
 			.transition()
 			.style("opacity", 0.1);
 
-        showTooltip(info);
+        charting.showTooltip(info);
     }
 
     function chord_mouse_out(g, i) {
@@ -124,6 +126,6 @@ function drawChordChart(data,elname){
             .transition()
 			.style("opacity", 1);
 
-        hideTooltip();
+        charting.hideTooltip();
     }
 }

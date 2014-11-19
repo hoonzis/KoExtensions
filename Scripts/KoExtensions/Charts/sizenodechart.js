@@ -272,11 +272,11 @@ function node_onMouseOver(d) {
         "Traded RFQs": d["tradedRfqs"],
         "Traded Notional": d["tradedNotional"].toFixed(2) + "mil. €"
     };
-    showTooltip(info);
+    charting.showTooltip(info);
 }
 
 function node_onMouseOut(d) {
-    hideTooltip();
+    charting.hideTooltip();
 }
 
 // Toggle children.

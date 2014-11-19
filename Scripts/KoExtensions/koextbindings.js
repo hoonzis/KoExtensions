@@ -1,7 +1,9 @@
-﻿define(['./charting', './kotools', './EventDrops/eventDrops'],
-    function (charting, kotools, eventDrops) {
+﻿var charting = null;
+define(['./charting', './kotools', './EventDrops/eventDrops'],
+    function (ch, kotools, eventDrops) {
         if (ko == null)
             throw "knockout has to be loaded before koextensions";
+        charting = ch;
         charting.initializeCharts();
         var markers = [];
         ko.bindingHandlers.map = {
