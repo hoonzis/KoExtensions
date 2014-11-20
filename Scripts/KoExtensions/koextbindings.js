@@ -219,7 +219,10 @@ define(['./charting', './kotools', './EventDrops/eventDrops'],
                     })
                     .eventSize(chartData.options.eventSize)
                     .eventDate(chartData.options.eventDate)
-                    .eventHover(chartData.options.eventHover);
+                    .eventHover(chartData.options.eventHover)
+                    .minPercentile(chartData.options.minPercentile)
+                    .maxPercentile(chartData.options.maxPercentile)
+                    .scale(chartData.options.scale);
 
                 d3.select(element)
                     .datum(chartData.data)

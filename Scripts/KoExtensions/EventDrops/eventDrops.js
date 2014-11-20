@@ -29,8 +29,11 @@ define(['./util/configurable', './eventLine', './delimiter'], function(configura
         },
         eventColor: 'black',
         eventSize: 5,
-        eventDate: function (d) { return d.date; }
-    };
+        eventDate: function(d) { return d.date; },
+        minPercentile: null,
+        maxPercentile: null,
+        scale: d3.scale.linear
+};
 
     var drops = function eventDrops(config) {
         var xScale = d3.time.scale();
@@ -46,6 +49,8 @@ define(['./util/configurable', './eventLine', './delimiter'], function(configura
             var min;
             var max;
 
+            var rowHeight = 100;
+
             selection.each(function(data) {
                 var zoom = d3.behavior.zoom().center(null).on("zoom", updateZoom);
 
@@ -53,7 +58,7 @@ define(['./util/configurable', './eventLine', './delimiter'], function(configura
                     zoom.on("zoomend", redrawDelimiter);
                 }
                 var graphWidth = config.width - config.margin.right - config.margin.left;
-                var graphHeight = data.length * 40;
+                var graphHeight = data.length * rowHeight;
                 var height = graphHeight + config.margin.top + config.margin.bottom;
 
                 d3.select(this).select('svg').remove();
@@ -64,16 +69,25 @@ define(['./util/configurable', './eventLine', './delimiter'], function(configura
                     .attr('height', height);
 
                 var graph = svg.append('g')
-                    .attr('transform', 'translate(0, 25)');
+                    .attr('transform', 'translate(0, 60)');
 
                 var yDomain = [];
                 var yRange = [];
 
                 
 
-                data.forEach(function(event, index) {
-                    var dMin = d3.min(event.dates, config.eventSize);
-                    var dMax = d3.max(event.dates, config.eventSize);
+                data.forEach(function (event, index) {
+
+                    var values = event.dates.map(config.eventSize);
+                    var dMin, dMax;
+                    
+                    if (config.minPercentile == null && config.maxPercentile == null) {
+                        dMax = d3.max(values);
+                        dMin = d3.min(values);
+                    } else {
+                        dMin = d3.quantile(values, config.minPercentile);
+                        dMax = d3.quantile(values,config.maxPercentile);
+                    }
 
                     if (dMin < min || min == null)
                         min = dMin;
@@ -82,7 +96,7 @@ define(['./util/configurable', './eventLine', './delimiter'], function(configura
                         max = dMax;
 
                     yDomain.push(event.name);
-                    yRange.push(index * 40);
+                    yRange.push(index * rowHeight);
                 });
 
                 
@@ -129,8 +143,10 @@ define(['./util/configurable', './eventLine', './delimiter'], function(configura
                         config.eventHover(el);
                     });
                 }
-                var bullScale = config.scale == "log" ? d3.scale.log() : d3.scale.linear();
-                bullScale.domain([min, max]).range([1, 25]);
+                var bullScale = config.scale();
+
+                //the scale is used to get the perimeter, 4 pixels to leave 2 pixels at each side
+                bullScale.domain([min, max]).range([1, rowHeight/2 - 4]);
 
                 xScale.range([0, graphWidth]).domain([config.start, config.end]);
 
@@ -155,7 +171,7 @@ define(['./util/configurable', './eventLine', './delimiter'], function(configura
                         .classed('delimiter', true)
                         .attr('width', graphWidth)
                         .attr('height', 10)
-                        .attr('transform', 'translate(' + config.margin.left + ', ' + (config.margin.top - 45) + ')')
+                        .attr('transform', 'translate(' + config.margin.left + ', ' + (config.margin.top - rowHeight) + ')')
                         .call(delimiter({
                             xScale: xScale,
                             dateFormat: config.locale ? config.locale.timeFormat("%d %B %Y") : d3.time.format("%d %B %Y")
@@ -182,7 +198,7 @@ define(['./util/configurable', './eventLine', './delimiter'], function(configura
                         config.axisFormat(xAxis);
                     }
 
-                    var y = (where == 'bottom' ? parseInt(graphHeight) : 0) + config.margin.top - 40;
+                    var y = (where == 'bottom' ? parseInt(graphHeight) : 0) + config.margin.top - rowHeight;
 
                     graph.select('.x-axis.' + where).remove();
                     var xAxisEl = graph
@@ -211,7 +227,7 @@ define(['./util/configurable', './eventLine', './delimiter'], function(configura
                     var graphBody = graph
                         .append('g')
                         .classed('graph-body', true)
-                        .attr('transform', 'translate(' + config.margin.left + ', ' + (config.margin.top - 15) + ')');
+                        .attr('transform', 'translate(' + config.margin.left + ', ' + (config.margin.top - 40) + ')');
 
                     var lines = graphBody.selectAll('g').data(data);
 

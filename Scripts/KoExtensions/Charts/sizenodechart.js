@@ -267,10 +267,11 @@ function getStrokeWidth (d,i) {
 	return (isNaN(ret) ? 4 : ret);
 }
 
+//todo: this should use the standard formatter
 function node_onMouseOver(d) {
     var info = {
         "Traded RFQs": d["tradedRfqs"],
-        "Traded Notional": d["tradedNotional"].toFixed(2) + "mil. €"
+        "Traded Notional": d["tradedNotional"].toFixed(2) + " mil. €"
     };
     charting.showTooltip(info);
 }
