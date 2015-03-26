@@ -13,10 +13,10 @@
 
         require.config({
             baseUrl: "/Scripts",
-            urlArgs: "bust=2"// + (new Date()).getTime()
+            urlArgs: "bust=2" + (new Date()).getTime()
         });
 
-        require(['knockout-3.2.0.debug', 'KoExtensions/koextbindings', 'KoExtensions/Charts/linechart', 'KoExtensions/Charts/piechart', 'KoExtensions/Charts/barchart'], function(ko) {
+        require(['KoExtensions/koextbindings'], function() {
 
             function createRundomSales(country) {
                 var event = {};
@@ -24,7 +24,7 @@
 
                 event.name = country;
                 event.dates = [];
-                
+
                 var endTime = Date.now();
                 var oneMonth = 30 * 24 * 60 * 60 * 1000;
                 var startTime = endTime - oneMonth;
@@ -60,9 +60,9 @@
                 self.carSales(createSales());
 
                 self.carSalesOptions = {
-                    eventColor: function (d) { return d.carMark; },
-                    eventSize: function (d) { return d.price; },
-                    eventDate: function (d) { return d.timestamp; },
+                    eventColor: function(d) { return d.carMark; },
+                    eventSize: function(d) { return d.price; },
+                    eventDate: function(d) { return d.timestamp; },
                     start: new Date(2014, 8, 1)
                 };
             }
@@ -71,7 +71,6 @@
 
             ko.applyBindings(vm);
         });
-
     </script>
 </body>
 </html>

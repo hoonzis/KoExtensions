@@ -9,11 +9,11 @@
     <body>
         <script type="text/javascript">
             require.config({
-                baseUrl: "/Scripts",
+                baseUrl: "../Scripts",
                 urlArgs: "bust=2" + (new Date()).getTime()
             });
 
-            require(['knockout-3.2.0.debug', 'KoExtensions/koextbindings', 'KoExtensions/Charts/barchart'], function(ko) {
+            require(['KoExtensions/koextbindings', 'KoExtensions/Charts/barchart'], function() {
 
                 var lifeExpenses = [
                     {

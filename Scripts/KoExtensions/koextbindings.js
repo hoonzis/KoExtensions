@@ -1,8 +1,9 @@
 ﻿var charting = null;
-define(['./charting', './kotools', './EventDrops/eventDrops'],
-    function (ch, kotools, eventDrops) {
+var ko;
+define(['knockout-3.2.0.debug','./charting', './kotools', './EventDrops/eventDrops'],
+    function (kol,ch, kotools, eventDrops) {
         if (ko == null)
-            throw "knockout has to be loaded before koextensions";
+            ko = kol;
         charting = ch;
         charting.initializeCharts();
         var markers = [];

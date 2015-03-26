@@ -15,32 +15,24 @@
         <div class="row"> 
             <div class="col-md-3">
                 <form class="well form-horizontal">
-                    <div class="control-group">
+                    <div class="form-group">
                         <label class="control-label">Destination</label>
-                        <div class="controls">
-                            <input type="text" data-bind="value:destination">
-                        </div>
+                        <input type="text" data-bind="value:destination">
                     </div>
 				
-                    <div class="control-group">
+                    <div class="form-group">
                         <label class="control-label">Start</label>
-                        <div class="controls">
-                            <input type="text" data-bind="datepicker:start">
-                        </div>
+                        <input type="text" data-bind="datepicker:start">
                     </div>
 
-                    <div class="control-group">
+                    <div class="form-group">
                         <label class="control-label">End</label>
-                        <div class="controls">
-                            <input type="text" data-bind="datepicker:end">
-                        </div>
+                        <input type="text" data-bind="datepicker:end">
                     </div>
 				
-                    <div class="control-group">
+                    <div class="form-group">
                         <label class="control-label">Duration</label>
-                        <div class="controls">
-                            <input type="text" data-bind="value:duration">
-                        </div>
+                        <input type="text" data-bind="value:duration">
                     </div>
                 </form>
             </div>
@@ -54,7 +46,7 @@
     });
 
     //jquery has to be loaded before bootstrap datepicker
-    require(['knockout-3.2.0.debug', 'KoExtensions/koextbindings', 'jquery-2.1.1'], function(ko) {
+    require(['KoExtensions/koextbindings', 'jquery-2.1.1'], function() {
         require(['bootstrap', 'bootstrap-datepicker'], function() {
             //taken from StackOverflow
             function daysBetween(first, second) {

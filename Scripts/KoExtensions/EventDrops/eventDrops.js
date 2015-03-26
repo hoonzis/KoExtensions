@@ -1,4 +1,8 @@
-define(['./util/configurable', './eventLine', './delimiter'], function(configurable, eventLine, delimiter) {
+var d3;
+define(['d3', './util/configurable', './eventLine', './delimiter'], function (d3l, configurable, eventLine, delimiter) {
+    if (d3 == null)
+        d3 = d3l;
+
     var defaultConfig = {
         start: new Date(0),
         end: new Date(),
