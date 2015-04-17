@@ -8,70 +8,77 @@
     </head>
     <body>
         <script type="text/javascript">
+            var ko;
+            var d3;
+
             require.config({
                 baseUrl: "../Scripts",
                 urlArgs: "bust=2" + (new Date()).getTime()
             });
 
-            require(['KoExtensions/koextbindings', 'KoExtensions/Charts/barchart'], function() {
+            require(['knockout-3.2.0', 'd3'], function(kol, d3l) {
+                ko = kol;
+                d3 = d3l;
+                require(['KoExtensions/koextbindings', 'KoExtensions/Charts/barchart'], function() {
 
-                var lifeExpenses = [
-                    {
-                        month: 'january',
-                        rent: -500,
-                        salary: 2200,
-                        parties: -300,
-                        phone: -100
-                    },
-                    {
-                        month: 'february',
-                        rent: -1000,
-                        salary: 1500,
-                        parties: -400,
-                        phone: -80
-                    },
-                    {
-                        month: 'marz',
-                        rent: -800,
-                        salary: 2500,
-                        parties: -800,
-                        phone: -120
-                    },
-                    {
-                        month: 'april',
-                        rent: -700,
-                        salary: 2000,
-                        parties: -200,
-                        phone: -100
-                    }
-                ];
-
-                function TestViewModels(expenses) {
-                    var self = this;
-                    self.lifeExpenses = ko.observableArray([]);
-                    self.expensesPerMonth = ko.observableArray([]);
-
-                    var totalPerMonth = expenses.map(function(item) {
-                        var keys = Object.keys(item).filter(function(key) { return key != 'month'; });
-
-                        var monthTotal =
+                    var lifeExpenses = [
                         {
-                            x: item['month'],
-                            y: d3.sum(keys, function(key) { return item[key]; })
-                        };
+                            month: 'january',
+                            rent: -500,
+                            salary: 2200,
+                            parties: -300,
+                            phone: -100
+                        },
+                        {
+                            month: 'february',
+                            rent: -1000,
+                            salary: 1500,
+                            parties: -400,
+                            phone: -80
+                        },
+                        {
+                            month: 'marz',
+                            rent: -800,
+                            salary: 2500,
+                            parties: -800,
+                            phone: -120
+                        },
+                        {
+                            month: 'april',
+                            rent: -700,
+                            salary: 2000,
+                            parties: -200,
+                            phone: -100
+                        }
+                    ];
 
-                        return monthTotal;
-                    });
+                    function TestViewModels(expenses) {
+                        var self = this;
+                        self.lifeExpenses = ko.observableArray([]);
+                        self.expensesPerMonth = ko.observableArray([]);
+
+                        var totalPerMonth = expenses.map(function(item) {
+                            var keys = Object.keys(item).filter(function(key) { return key != 'month'; });
+
+                            var monthTotal =
+                            {
+                                x: item['month'],
+                                y: d3.sum(keys, function(key) { return item[key]; })
+                            };
+
+                            return monthTotal;
+                        });
 
 
-                    self.lifeExpenses(expenses);
-                    self.expensesPerMonth(totalPerMonth);
-                }
+                        self.lifeExpenses(expenses);
+                        self.expensesPerMonth(totalPerMonth);
+                    }
 
-                var vm = new TestViewModels(lifeExpenses);
+                    var vm = new TestViewModels(lifeExpenses);
 
-                ko.applyBindings(vm);
+                    ko.applyBindings(vm);
 
+                });
             });
         </script>
 

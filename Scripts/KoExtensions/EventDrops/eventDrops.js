@@ -1,7 +1,6 @@
-var d3;
-define(['d3', './util/configurable', './eventLine', './delimiter'], function (d3l, configurable, eventLine, delimiter) {
+define(['./util/configurable', './eventLine', './delimiter'], function (d3l, configurable, eventLine, delimiter) {
     if (d3 == null)
-        d3 = d3l;
+        throw "Event drops expect d3 variable globaly defined";
 
     var defaultConfig = {
         start: new Date(0),

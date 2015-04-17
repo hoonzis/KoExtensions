@@ -24,23 +24,27 @@
             urlArgs: "bust=2" + (new Date()).getTime()
         });
 
-        require(['KoExtensions/koextbindings'], function() {
-            
-            function CarViewModel() {
-                var self = this;
-                self.efficiency = ko.observable(0.95);
-                self.price = ko.observable(1000000);
-                self.priceCurrency = ko.observable('EUR');
-                self.power = ko.observable(120);
-                self.consumption100 = ko.observable(7);
-                self.distance = ko.observable();
-                self.totalConsumption = ko.computed(function() {
-                    return self.distance() * self.consumption100();
-                });
-            }
+        require(['knockout-3.2.0', 'd3'], function(kol, d3l) {
+            ko = kol;
+            d3 = d3l;
+            require(['KoExtensions/koextbindings'], function() {
 
-            var vm = new CarViewModel();
-            ko.applyBindings(vm);
+                function CarViewModel() {
+                    var self = this;
+                    self.efficiency = ko.observable(0.95);
+                    self.price = ko.observable(1000000);
+                    self.priceCurrency = ko.observable('EUR');
+                    self.power = ko.observable(120);
+                    self.consumption100 = ko.observable(7);
+                    self.distance = ko.observable();
+                    self.totalConsumption = ko.computed(function() {
+                        return self.distance() * self.consumption100();
+                    });
+                }
+
+                var vm = new CarViewModel();
+                ko.applyBindings(vm);
+            });
         });
 
     </script>

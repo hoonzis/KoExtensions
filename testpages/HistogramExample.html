@@ -27,44 +27,49 @@
                 urlArgs: "bust=2" + (new Date()).getTime()
             });
 
-            require(['KoExtensions/koextbindings','KoExtensions/Charts/histogramchart'], function() {
-                var histogramDataExample = "3.9,3.8,3.9,2.7,2.8,1.9,2.7,3.5, 4.4, 2.8, 3.4, 8.6, 4.5, 3.5, 3.6, 3.8, 4.3, 4.5, 3.5,30,33,31";
 
-                function TestViewModel() {
-                    var self = this;
-                    self.tolerance = ko.observable();
-                    self.showProbabilityDistribution = ko.observable();
-                    self.min = ko.observable();
-                    self.expected = ko.observable();
-                    self.useMAD = ko.observable();
-                    self.showOutliers = ko.observable();
-                    self.showProbabilityDistribution = ko.observable();
+            require(['knockout-3.2.0', 'd3'], function(kol, d3l) {
+                ko = kol;
+                d3 = d3l;
+                require(['KoExtensions/koextbindings', 'KoExtensions/Charts/histogramchart'], function() {
+                    var histogramDataExample = "3.9,3.8,3.9,2.7,2.8,1.9,2.7,3.5, 4.4, 2.8, 3.4, 8.6, 4.5, 3.5, 3.6, 3.8, 4.3, 4.5, 3.5,30,33,31";
 
-                    self.stringData = ko.observable();
-                    self.data = ko.computed(function() {
-                        if (self.stringData() == null)
-                            return [];
-                        return self.stringData().split(",").map(function(i) {
-                            return parseFloat(i);
+                    function TestViewModel() {
+                        var self = this;
+                        self.tolerance = ko.observable();
+                        self.showProbabilityDistribution = ko.observable();
+                        self.min = ko.observable();
+                        self.expected = ko.observable();
+                        self.useMAD = ko.observable();
+                        self.showOutliers = ko.observable();
+                        self.showProbabilityDistribution = ko.observable();
+
+                        self.stringData = ko.observable();
+                        self.data = ko.computed(function() {
+                            if (self.stringData() == null)
+                                return [];
+                            return self.stringData().split(",").map(function(i) {
+                                return parseFloat(i);
+                            });
                         });
-                    });
 
-                    self.stringData(histogramDataExample);
-                    self.chartOptions = ko.computed(function() {
-                        return {
-                            tolerance: self.tolerance(),
-                            showProbabilityDistribution: self.showProbabilityDistribution(),
-                            min: koTools.tryConvertToNumber(self.min()),
-                            expected: self.expected(),
-                            useMAD: self.useMAD(),
-                            showOutliers: self.showOutliers(),
-                        }
-                    });
-                }
+                        self.stringData(histogramDataExample);
+                        self.chartOptions = ko.computed(function() {
+                            return {
+                                tolerance: self.tolerance(),
+                                showProbabilityDistribution: self.showProbabilityDistribution(),
+                                min: koTools.tryConvertToNumber(self.min()),
+                                expected: self.expected(),
+                                useMAD: self.useMAD(),
+                                showOutliers: self.showOutliers(),
+                            }
+                        });
+                    }
 
-                var vm = new TestViewModel();
+                    var vm = new TestViewModel();
 
-                ko.applyBindings(vm);
+                    ko.applyBindings(vm);
+                });
             });
         </script>
 </body>

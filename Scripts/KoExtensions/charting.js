@@ -1,8 +1,8 @@
 ﻿var d3;
-define(['d3', './kotools'], function (d3l) {
+define(['./kotools'], function () {
 
     if (d3 == null)
-        d3 = d3l;
+        throw "KoExtensions charting module depends on globaly defined d3 variable";
 
     var charting = {};
 

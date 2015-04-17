@@ -25,17 +25,28 @@
             return null;
         };
 
-        self.monthsComparer = function(item1, item2) {
-            var year1 = parseInt(item1.substring(0, 4));
-            var month1 = parseInt(item1.substring(4, item1.length));
+        self.getMonth = function (item) {
+            if (item.Year != null && item.Month != null) {
+                return item.Year + '' + item.Month;
+            }
+            return null;
+        };
 
-            var year2 = parseInt(item2.substring(0, 4));
-            var month2 = parseInt(item2.substring(4, item2.length));
+        self.monthsComparer = function (item1, item2) {
+            if (koTools.isString(item1)) {
+                var year1 = parseInt(item1.substring(0, 4));
+                var month1 = parseInt(item1.substring(4, item1.length));
 
-            if (year1 == year2) {
-                return d3.ascending(month1, month2);
-            } else
-                return d3.ascending(year1, year2);
+                var year2 = parseInt(item2.substring(0, 4));
+                var month2 = parseInt(item2.substring(4, item2.length));
+
+                if (year1 == year2) {
+                    return d3.ascending(month1, month2);
+                } else
+                    return d3.ascending(year1, year2);
+            } else {
+                return d3.ascending(item1, item2);
+            }
         };
 
         self.monthsIncrementer = function(item) {

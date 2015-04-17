@@ -1,9 +1,9 @@
 ﻿var charting = null;
 var ko;
-define(['knockout-3.2.0.debug','./charting', './kotools', './EventDrops/eventDrops'],
-    function (kol,ch, kotools, eventDrops) {
+define(['./charting', './kotools', './EventDrops/eventDrops'],
+    function (ch, kotools, eventDrops) {
         if (ko == null)
-            ko = kol;
+            throw "Ko extensions depend on globally defined knockout ko variable";
         charting = ch;
         charting.initializeCharts();
         var markers = [];

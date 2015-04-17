@@ -46,49 +46,54 @@
     });
 
     //jquery has to be loaded before bootstrap datepicker
-    require(['KoExtensions/koextbindings', 'jquery-2.1.1'], function() {
-        require(['bootstrap', 'bootstrap-datepicker'], function() {
-            //taken from StackOverflow
-            function daysBetween(first, second) {
 
-                if (first == null || second == null)
-                    return null;
+    require(['knockout-3.2.0', 'd3'], function(kol, d3l) {
+        ko = kol;
+        d3 = d3l;
+        require(['KoExtensions/koextbindings', 'jquery-2.1.1'], function() {
+            require(['bootstrap', 'bootstrap-datepicker'], function() {
+                //taken from StackOverflow
+                function daysBetween(first, second) {
 
-                // Copy date parts of the timestamps, discarding the time parts.
-                var one = new Date(first.getFullYear(), first.getMonth(), first.getDate());
-                var two = new Date(second.getFullYear(), second.getMonth(), second.getDate());
+                    if (first == null || second == null)
+                        return null;
 
-                // Do the math.
-                var millisecondsPerDay = 1000 * 60 * 60 * 24;
-                var millisBetween = two.getTime() - one.getTime();
-                var days = millisBetween / millisecondsPerDay;
+                    // Copy date parts of the timestamps, discarding the time parts.
+                    var one = new Date(first.getFullYear(), first.getMonth(), first.getDate());
+                    var two = new Date(second.getFullYear(), second.getMonth(), second.getDate());
 
-                // Round down.
-                return Math.floor(days);
-            }
+                    // Do the math.
+                    var millisecondsPerDay = 1000 * 60 * 60 * 24;
+                    var millisBetween = two.getTime() - one.getTime();
+                    var days = millisBetween / millisecondsPerDay;
 
-            function VoyageViewModel(data) {
-                var self = this;
-                self.start = ko.observable();
-                self.end = ko.observable();
-                self.destination = ko.observable();
-
-                self.duration = ko.computed(function() { return daysBetween(self.start(), self.end()); }, self);
-
-                if (data != null) {
-                    self.start(data.start);
-                    self.end(data.end);
-                    self.destination(data.destination);
+                    // Round down.
+                    return Math.floor(days);
                 }
-            }
 
-            var voyage = new VoyageViewModel({
-                "start": new Date(),
-                "end": null,
-                "destination": "Paris"
+                function VoyageViewModel(data) {
+                    var self = this;
+                    self.start = ko.observable();
+                    self.end = ko.observable();
+                    self.destination = ko.observable();
+
+                    self.duration = ko.computed(function() { return daysBetween(self.start(), self.end()); }, self);
+
+                    if (data != null) {
+                        self.start(data.start);
+                        self.end(data.end);
+                        self.destination(data.destination);
+                    }
+                }
+
+                var voyage = new VoyageViewModel({
+                    "start": new Date(),
+                    "end": null,
+                    "destination": "Paris"
+                });
+
+                ko.applyBindings(voyage);
             });
-
-            ko.applyBindings(voyage);
         });
     });
     </script>
