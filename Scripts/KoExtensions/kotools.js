@@ -1,4 +1,5 @@
-﻿var koTools = (function () {
+﻿"use strict";
+define(function() {
     function KoTools() {
 
         var self = this;
@@ -25,14 +26,14 @@
             return null;
         };
 
-        self.getMonth = function (item) {
+        self.getMonth = function(item) {
             if (item.Year != null && item.Month != null) {
                 return item.Year + '' + item.Month;
             }
             return null;
         };
 
-        self.monthsComparer = function (item1, item2) {
+        self.monthsComparer = function(item1, item2) {
             if (koTools.isString(item1)) {
                 var year1 = parseInt(item1.substring(0, 4));
                 var month1 = parseInt(item1.substring(4, item1.length));
@@ -64,7 +65,7 @@
             return yyyy + (mm[1] ? mm : "0" + mm[0]);
         };
 
-        self.quartersComparer = function (item1, item2) {
+        self.quartersComparer = function(item1, item2) {
             var q1 = item1.substring(1, 2);
             var year1 = item1.substring(2, 6);
 
@@ -247,13 +248,21 @@
             return value;
         };
 
-        self.toBoolean = function (string) {
+        self.toBoolean = function(string) {
             if (string == null)
                 return false;
             switch (string.toLowerCase()) {
-                case "true": case "yes": case "1": return true;
-                case "false": case "no": case "0": case null: return false;
-                default: return Boolean(string);
+            case "true":
+            case "yes":
+            case "1":
+                return true;
+            case "false":
+            case "no":
+            case "0":
+            case null:
+                return false;
+            default:
+                return Boolean(string);
             }
         }
 
@@ -263,7 +272,7 @@
             if (a.length == 0)
                 return [];
 
-            var keys = d3.keys(a[0]).filter(function (k) { return k != xcoord; });
+            var keys = d3.keys(a[0]).filter(function(k) { return k != xcoord; });
 
             var horizontalKeys = d3.keys(a);
             var result = [];
@@ -272,7 +281,7 @@
                 var key = keys[k];
                 var newItem = new Object();
                 newItem.name = key;
-                horizontalKeys.map(function (hKey) {
+                horizontalKeys.map(function(hKey) {
                     newItem[a[hKey][xcoord]] = a[hKey][key];
                 });
                 result.push(newItem);
@@ -280,17 +289,17 @@
             return result;
         }
 
-        self.dateToFrenchString = function (date) {
+        self.dateToFrenchString = function(date) {
             var month = date.getMonth() + 1;
             return date.getDate() + "/" + month + "/" + date.getFullYear();
         };
 
-        self.dateToUSString = function (date) {
+        self.dateToUSString = function(date) {
             var month = date.getMonth() + 1;
             return month + "/" + date.getDate() + "/" + date.getFullYear();
         };
 
-        self.getYearAndMonth = function (date) {
+        self.getYearAndMonth = function(date) {
             var yyyy = date.getFullYear().toString();
             var mm = (date.getMonth() + 1).toString();
             return yyyy + (mm[1] ? mm : "0" + mm[0]);
@@ -305,9 +314,19 @@
 
         self.distinct = function(data, mapper) {
             var mapped = data.map(mapper);
-            return mapped.filter(function (v, i) { return mapped.indexOf(v) == i; });
+            return mapped.filter(function(v, i) { return mapped.indexOf(v) == i; });
         }
-    }
+
+        self.normalizeSeries = function(data) {
+            for (var i = 0; i < data.length; i++) {
+                var baseValue = data[i][0];
+                for (var j = 0; j < data[i].length; j++) {
+                    data[i][j] = (data[i][j] / baseValue) * 100;
+                }
+            }
+            return data;
+        }
+    };
 
     return new KoTools();
-}());
+});
