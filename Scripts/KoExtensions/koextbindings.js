@@ -1,9 +1,10 @@
 ﻿var charting = null;
-var ko;
+var koTools;
 define(['./charting', './kotools', './EventDrops/eventDrops'],
     function (ch, kotools, eventDrops) {
         if (ko == null)
             throw "Ko extensions depend on globally defined knockout ko variable";
+        koTools = kotools;
         charting = ch;
         charting.initializeCharts();
         var markers = [];
@@ -59,12 +60,12 @@ define(['./charting', './kotools', './EventDrops/eventDrops'],
                 var vmValue = ko.utils.unwrapObservable(valueAccessor());
 
                 //if we have a string value - convert it first
-                if (koTools.isString(vmValue)) {
+                if (kotools.isString(vmValue)) {
                     vmValue = new Date(vmValue);
                 }
 
                 //if the date is not valid - don't visualize it, or we would have a "NaN/NaN/NaN"
-                if (!koTools.isValidDate(vmValue))
+                if (!kotools.isValidDate(vmValue))
                     return;
 
                 widget.setDates(vmValue);
@@ -110,6 +111,14 @@ define(['./charting', './kotools', './EventDrops/eventDrops'],
     function transformData(chartData) {
         if (chartData.transf != null)
             chartData.data = chartData.data.map(chartData.transf);
+        if (chartData.options.normalizeSeries) {
+            chartData.data = kotools.normalizeSeries(chartData.data);
+        }
+
+        chartData.data = koTools.convertAllSeriesToXYPairs(chartData.data);
+
+
+        
     }
 
     function getLineDataFromAccessor(accesor) {
@@ -266,7 +275,7 @@ define(['./charting', './kotools', './EventDrops/eventDrops'],
             if (fValue.val != null) {
                 if (fValue.transf != null)
                     fValue.val = fValue.transf(fValue.val);
-                if (koTools.isNumber(fValue.val)) {
+                if (kotools.isNumber(fValue.val)) {
                     element.innerHTML = fValue.val.toCurrencyString(fValue.currency, fValue.rounding);
                 } else {
                     element.innerHTML = fValue.val;

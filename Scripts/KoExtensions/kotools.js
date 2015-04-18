@@ -319,9 +319,29 @@ define(function() {
 
         self.normalizeSeries = function(data) {
             for (var i = 0; i < data.length; i++) {
-                var baseValue = data[i][0];
-                for (var j = 0; j < data[i].length; j++) {
-                    data[i][j] = (data[i][j] / baseValue) * 100;
+
+                var baseValue = data[i].values[0];
+                if (self.isNumber(baseValue)) {
+                    for (var j = 0; j < data[i].values.length; j++) {
+                        data[i].values[j] = (data[i].values[j] / baseValue) * 100;
+                    }
+                }
+            }
+            return data;
+        }
+
+        self.convertSeriesToXYPairs = function(data) {
+            var converted = [];
+            for (var i = 0; i < data.length; i++) {
+                converted.push({ x: i, y: data[i] });
+            }
+            return converted;
+        }
+
+        self.convertAllSeriesToXYPairs = function(data) {
+            for (var i = 0; i < data.length; i++) {
+                if (self.isNumber(data[i].values[0])) {
+                    data[i].values = self.convertSeriesToXYPairs(data[i].values);
                 }
             }
             return data;
