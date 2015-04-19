@@ -8,16 +8,16 @@
     <h2>Detecting the outliers</h2>
     <p>Data:</p>
     <textarea rows="3" cols="90" class="form-control" data-bind="value: stringData"></textarea>
-    <input type="checkbox" data-bind="checked: showProbabilityDistribution">Show probability distribution</input>
+        <input type="checkbox" data-bind="checked: showProbabilityDistribution"/>Show probability distribution
     <p>Tolerance</p>
     <input type="number" data-bind="value:tolerance" />
     <p>Use MAD</p>
     <input type="checkbox" data-bind="checked: useMAD" />
-    <p>Min</p>
+    <p>Minimum:</p>
     <input type="number" data-bind="value: min" />
-    <p>Expected</p>
-    <input type="radio" value="median" data-bind="checked: expected">Median</input>
-        <input type="radio" title="Mean" value="mean" data-bind="checked: expected"/>
+    <p>Expected:</p>
+        <input type="radio" value="median" data-bind="checked: expected"/>Median
+        <input type="radio" title="Mean" value="mean" data-bind="checked: expected"/>Mean
     <p>Show outliers</p>
     <input type="checkbox" data-bind="checked: showOutliers" />
     <div id="histogram" data-bind="histogram: data, chartOptions : chartOptions"></div>

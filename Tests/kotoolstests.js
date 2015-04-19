@@ -41,6 +41,17 @@ define(
                 equal(res[0].y, 1000);
                 equal(res[2].x,2);
             });
+
+            test("convertAllSeriesToXYPairs, will ignore if no values property is available", function () {
+                var data = [
+                   [1000, 500, 100] ,
+                   { x:"test" }
+                ];
+                var res = koTools.convertAllSeriesToXYPairs(data);
+
+                equal(res[0][0], 1000);
+                equal(res[1].x, "test");
+            });
         };
         return { run: run }
     }
