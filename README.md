@@ -1,5 +1,6 @@
 KoExtensions
 ============
+[![Build Status](https://travis-ci.org/hoonzis/KoExtensions.svg?branch=master)](https://travis-ci.org/hoonzis/KoExtensions)
 
 Additional binding and tools for KnockoutJS, the package includes:
 
