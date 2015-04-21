@@ -52,6 +52,21 @@ define(
                 equal(res[0][0], 1000);
                 equal(res[1].x, "test");
             });
+
+            test("Enlarge text by copying", function () {
+                var value = koTools.toLength("test", 8);
+                equal(value, "testtest", "Should be 8 characters!");
+            });
+
+            test("String is string", function () {
+                var v = "0.05";
+                equal(koTools.isString(v), true, 'Is string');
+            });
+
+            test("Int is not string", function () {
+                var v = 0.05;
+                equal(koTools.isString(v), false, 'Is not string');
+            });
         };
         return { run: run }
     }
