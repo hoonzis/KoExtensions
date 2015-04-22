@@ -8,8 +8,13 @@ function drawLineChart(data, element, options,charting) {
         return;
 
     var margin = {top: 20, right: 80, bottom: 30, left: 50};
-    var width = 960 - margin.left - margin.right;
+    var width = options.width = null ? (960 - margin.left - margin.right) : options.width;
     var height = 500 - margin.top - margin.bottom;
+
+    data.forEach(function (singleLine) {
+        if (singleLine.values == null)
+            throw "Each line needs to have values property containing tuples of x and y values";
+    });
 
     var x = d3.scale.ordinal()
         .rangeRoundBands([0, width], .1);

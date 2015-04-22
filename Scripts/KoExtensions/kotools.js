@@ -317,13 +317,42 @@ define(function() {
             return mapped.filter(function(v, i) { return mapped.indexOf(v) == i; });
         }
 
-        self.normalizeSeries = function(data) {
+        self.normalizeSeries = function (data) {
+            if (data == null) {
+                return null;
+            }
+
+            if (data.length == 0) {
+                return data;
+            }
+
+
+            if (data[0].values != null) {
+                var testBaseValue = data[0].values[0];
+                if (!self.isNumber(testBaseValue)) {
+                    var onlyValues = data.map(function(serie) {
+                        return serie.values;
+                    });
+
+                    var minCommonKey = self.minCommonValue(onlyValues, function (item) {
+                        return item.x;
+                    });
+                }}
+
             for (var i = 0; i < data.length; i++) {
                 if (data[i].values != null) {
                     var baseValue = data[i].values[0];
                     if (self.isNumber(baseValue)) {
                         for (var j = 0; j < data[i].values.length; j++) {
                             data[i].values[j] = (data[i].values[j] / baseValue) * 100;
+                        }
+                    } else if (minCommonKey != null) {                   
+                        baseValue = self.find(data[i].values, function (item) {
+                            return item.x == minCommonKey;
+                        }).y;
+
+                        for (var j = 0; j < data[i].values.length; j++) {
+                            data[i].values[j].y = (data[i].values[j].y / baseValue) * 100;
                         }
                     }
                 }
@@ -339,15 +368,43 @@ define(function() {
             return converted;
         }
 
-        self.convertAllSeriesToXYPairs = function(data) {
+        self.convertAllSeriesToXYPairs = function (data) {
+            if (data == null) {
+                return null;
+            }
             for (var i = 0; i < data.length; i++) {
-                if (data[i].values != null) {
+                if (data[i] != null && data[i].values != null) {
                     if (self.isNumber(data[i].values[0])) {
                         data[i].values = self.convertSeriesToXYPairs(data[i].values);
                     }
                 }
             }
             return data;
+        }
+
+        self.minCommonValue = function (data, accessor) {
+            var commonValues = {};
+            for (var i = 0; i < data.length; i++) {
+                for (var j = 0; j < data[i].length; j++) {
+                    var newValue = accessor != null ? accessor(data[i][j]) : data[i][j];
+                    if (commonValues[newValue] == null) {
+                        commonValues[newValue] = 1;
+                    } else {
+                        commonValues[newValue] += 1;
+                    }
+                }
+            }
+
+            var max = 0;
+            var maxKey = null;
+            for (var k in commonValues) {
+                if (commonValues[k] > max) {
+                    max = commonValues[k];
+                    maxKey = k;
+                }
+            }
+
+            return maxKey;
         }
     };
 
