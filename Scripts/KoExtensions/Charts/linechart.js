@@ -7,20 +7,18 @@ function drawLineChart(data, element, options,charting) {
     if (el == null)
         return;
 
-    var margin = {top: 20, right: 80, bottom: 30, left: 50};
-    var width = options.width = null ? (960 - margin.left - margin.right) : options.width;
-    var height = 500 - margin.top - margin.bottom;
-
+    var dims = charting.getDimensions(options);
+    
     data.forEach(function (singleLine) {
         if (singleLine.values == null)
             throw "Each line needs to have values property containing tuples of x and y values";
     });
 
     var x = d3.scale.ordinal()
-        .rangeRoundBands([0, width], .1);
+        .rangeRoundBands([0, dims.width], .1);
 
     var y = d3.scale.linear()
-      .range([height, 0]);
+      .range([dims.height, 0]);
 
     var color = d3.scale.category20();
 
@@ -65,7 +63,7 @@ function drawLineChart(data, element, options,charting) {
     
     var yAxis = d3.svg.axis()
       .scale(y)
-      .tickSize(width)
+      .tickSize(dims.width)
       .orient("right");
 
     x.invert = function(xPos) {
@@ -82,19 +80,15 @@ function drawLineChart(data, element, options,charting) {
       .x(function(d) { return x(d.x) + x.rangeBand() / 2; })
       .y(function(d) { return y(d.y); });
 
-    var svg = el.append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var svg = charting.appendContainer(el, dims);
 
     var keys = data.map(function(item) { return item.x; });
     color.domain(keys);
-    charting.showStandardLegend(el,keys, function(i) { return i; },color,options.legend,height);
+    charting.showStandardLegend(el,keys, function(i) { return i; },color,options.legend,dims.height);
   
     svg.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
+      .attr("transform", "translate(0," + dims.height + ")")
       .call(xAxis);
 
     var gy = svg.append("g")
@@ -112,7 +106,6 @@ function drawLineChart(data, element, options,charting) {
     var point = svg.selectAll(".point")
         .data(data)
         .enter().append("g")
-        //.attr("class", "point")
         .each(function (d) {d.values.forEach(
             function (item) {
                 item.color = getColor(d);

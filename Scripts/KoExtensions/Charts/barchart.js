@@ -5,15 +5,13 @@ function drawBarChart(data, element, options, xcoord, lineData,charting) {
     if (el == null)
         return;
 
-    var margin = {top: 20, right: 40, bottom: 30, left: 40},
-    width = options.width - margin.left - margin.right,
-    height = options.height - margin.top - margin.bottom;
-
+    var dims = charting.getDimensions(options);
+    
     var x = d3.scale.ordinal()
-        .rangeRoundBands([0, width], .3);
+        .rangeRoundBands([0, dims.width], .3);
 
     var y = d3.scale.linear()
-        .rangeRound([height, 0]);
+        .rangeRound([dims.height, 0]);
 
     var color = d3.scale.category20();
 
@@ -26,7 +24,7 @@ function drawBarChart(data, element, options, xcoord, lineData,charting) {
 
     var yAxis = d3.svg.axis()
         .scale(y)
-        .tickSize(width)
+        .tickSize(dims.width)
         .orient("right");
 
     // not all the items do have the same set of properties, therefor scan them all and concatenate the result
@@ -73,13 +71,9 @@ function drawBarChart(data, element, options, xcoord, lineData,charting) {
         arrangedByX[newD.x] = newD;
     });
 	
-    charting.showStandardLegend(el,keys, function(item) { return item; },color,options.legend,height);
+    charting.showStandardLegend(el,keys, function(item) { return item; },color,options.legend,dims.height);
 
-    var svg = el.append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var svg = charting.appendContainer(el, dims);
 
     var xKeys = arranged.map(function(d) { return d.x; });
     x.domain(xKeys);
@@ -112,7 +106,7 @@ function drawBarChart(data, element, options, xcoord, lineData,charting) {
 
     svg.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
+        .attr("transform", "translate(0," + dims.height + ")")
         .call(xAxis);
 
     var gy = svg.append("g")
@@ -200,7 +194,7 @@ function drawBarChart(data, element, options, xcoord, lineData,charting) {
              return y(d.val);
          })
          .attr("height", function (d) {
-             return height - y(d.val);
+             return dims.height - y(d.val);
          })
         .style("cursor", "pointer")
         .on("mouseover", onBarOver)
@@ -213,7 +207,7 @@ function drawBarChart(data, element, options, xcoord, lineData,charting) {
         return;
     
     var lineY = d3.scale.linear()
-        .range([height, 0]);
+        .range([dims.height, 0]);
 
     var line = d3.svg.line()
      .interpolate("linear")
@@ -243,7 +237,7 @@ function drawBarChart(data, element, options, xcoord, lineData,charting) {
 
     svg.append("g")
         .call(yAxisRight)
-        .attr("transform", "translate(" + width + " ,0)");
+        .attr("transform", "translate(" + dims.width + " ,0)");
 
     
     svg.append("path")

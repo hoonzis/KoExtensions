@@ -117,5 +117,26 @@ define(['./kotools'], function () {
             .attr("class", "header2");
 
     };
+
+    charting.getDimensions = function (options) {
+        var margin = { top: 20, right: 80, bottom: 30, left: 50 };
+        var width = options.width == null ? (960 - margin.left - margin.right) : options.width;
+        var height = options.height == null ? (500 - margin.top - margin.bottom) : options.height;
+        return {
+            width: width,
+            height: height,
+            margin: margin
+        };
+    };
+    
+    charting.appendContainer = function(el, dims) {
+        var svg = el.append("svg")
+        .attr("width", dims.width + dims.margin.left + dims.margin.right)
+        .attr("height", dims.height + dims.margin.top + dims.margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + dims.margin.left + "," + dims.margin.top + ")");
+
+        return svg;
+    }
     return charting;
 });

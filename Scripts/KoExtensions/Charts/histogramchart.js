@@ -3,11 +3,8 @@ function drawHistogram(data, element, options,charting) {
     if (el == null)
         return;
 
-    var margin = {top: 20, right: 40, bottom: 30, left: 40},
-    width = options.width - margin.left - margin.right,
-    height = options.height - margin.top - margin.bottom;
-
-
+    var dims = charting.getDimensions(options);
+    
     var histogramData = d3.layout.histogram()
         .frequency(false)
         .bins(80)(data);
@@ -19,27 +16,23 @@ function drawHistogram(data, element, options,charting) {
             minX,
             d3.max(histogramData, function(d) { return d.x; })
         ])
-        .range([0, width]);
+        .range([0, dims.width]);
     var columnWidth = x(minX + histogramData[0].dx) - 1;
 
     var y = d3.scale.linear()
         .domain([0, d3.max(histogramData, function(d) { return d.y; })])
-        .range([height, 0]);
+        .range([dims.height, 0]);
 
     var yAxis = d3.svg.axis()
         .scale(y)
-        .tickSize(width)
+        .tickSize(dims.width)
         .orient("right");
 
     var xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom");
 
-    var svg = el.append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var svg = charting.appendContainer(el, dims);
 
     var bar = svg.selectAll(".bar")
         .data(histogramData)
@@ -53,18 +46,26 @@ function drawHistogram(data, element, options,charting) {
         .attr("x", 1)
         .attr("width",columnWidth)
         .attr("height", function(d) {
-             return height - y(d.y);
+             return dims.height - y(d.y);
     });
 
     svg.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
+        .attr("transform", "translate(0," + dims.height + ")")
         .call(xAxis);
 
-        var line = d3.svg.line()
-      .interpolate("linear")
-      .x(function(d) { return x(d.x) + x.rangeBand() / 2; })
-      .y(function(d) { return y(d.y); });
+    var gy = svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+
+    gy.selectAll("g").
+       filter(function (d) { return d; })
+       .classed("minor", true);
+
+    var line = d3.svg.line()
+        .interpolate("linear")
+        .x(function (d) { return x(d.x) + x.rangeBand() / 2; })
+        .y(function (d) { return y(d.y); });
   
     if(options.showProbabilityDistribution){
 
@@ -102,9 +103,7 @@ function drawHistogram(data, element, options,charting) {
         }
 
         var y = d3.scale.linear()
-          .range([height, 0]);
-
-        var color = d3.scale.category20();
+          .range([dims.height, 0]);
 
         y.domain([
             d3.min(probData,function(d){return d.y;}),
@@ -112,14 +111,14 @@ function drawHistogram(data, element, options,charting) {
         ]);
 
         var minX =d3.min(probData,function(i){return i.x;});
-        var maxX =d3.max(probData, function(i){return i.x});
+        var maxX =d3.max(probData, function(i) { return i.x; });
 
         x.domain([
             minX,
             maxX 
         ]);
 
-        var line = d3.svg.line()
+        var lineFunction = d3.svg.line()
           .interpolate("linear")
           .x(function(d) { 
             return x(d.x); 
@@ -130,7 +129,7 @@ function drawHistogram(data, element, options,charting) {
 
         svg.append("path")
           .attr("class", "line")
-          .attr("d", line(probData))
+          .attr("d", lineFunction(probData))
           .style("stroke-width", 2)
           .style("stroke", "red")
           .style("fill", "none");
@@ -139,13 +138,13 @@ function drawHistogram(data, element, options,charting) {
             data.forEach(function(el){
                 var elDist = Math.abs(el - expected);
 
-                if(elDist > variance*options.tolerance){
-                    var rectangle = svg.append("circle")
-                    .attr("cx", x(el)+2)
-                    .attr("cy", height)
-                    .attr("r", 4)
-                    .attr("fill","green")
-                    .attr("opacity",0.8);
+                if (elDist > variance * options.tolerance) {
+                    svg.append("circle")
+                        .attr("cx", x(el) + 2)
+                        .attr("cy", height)
+                        .attr("r", 4)
+                        .attr("fill", "green")
+                        .attr("opacity", 0.8);
                 }
             });
         }
