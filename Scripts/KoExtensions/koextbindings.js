@@ -89,6 +89,7 @@ define(['./charting', './kotools', './EventDrops/eventDrops'],
     };
    
     function setDefaultOptions(options, type) {
+
         var typeOptions = defaultOptions[type];
 
         if (typeOptions == null)

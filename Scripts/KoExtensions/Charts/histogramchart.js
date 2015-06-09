@@ -49,10 +49,19 @@ function drawHistogram(data, element, options,charting) {
              return dims.height - y(d.y);
     });
 
-    svg.append("g")
+    var xAxisEl = svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + dims.height + ")")
         .call(xAxis);
+
+    if (options.xAxisVerticalText == true) {
+        xAxisEl.selectAll("text")
+            .attr("y", 0)
+            .attr("x", 9)
+            .attr("dy", ".35em")
+            .attr("transform", "rotate(90)")
+            .style("text-anchor", "start");
+    }
 
     var gy = svg.append("g")
         .attr("class", "y axis")
