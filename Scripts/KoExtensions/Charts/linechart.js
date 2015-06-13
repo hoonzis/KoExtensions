@@ -7,7 +7,7 @@ function drawLineChart(data, element, options,charting) {
     if (el == null)
         return;
 
-    var dims = charting.getDimensions(options);
+    var dims = charting.getDimensions(options,el);
     
     data.forEach(function (singleLine) {
         if (singleLine.values == null)
