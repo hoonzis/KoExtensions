@@ -3,7 +3,7 @@ function drawHistogram(data, element, options,charting) {
     if (el == null)
         return;
 
-    var dims = charting.getDimensions(options);
+    var dims = charting.getDimensions(options,el);
     
     var histogramData = d3.layout.histogram()
         .frequency(false)
@@ -28,10 +28,6 @@ function drawHistogram(data, element, options,charting) {
         .tickSize(dims.width)
         .orient("right");
 
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
-
     var svg = charting.appendContainer(el, dims);
 
     var bar = svg.selectAll(".bar")
@@ -49,20 +45,8 @@ function drawHistogram(data, element, options,charting) {
              return dims.height - y(d.y);
     });
 
-    var xAxisEl = svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + dims.height + ")")
-        .call(xAxis);
-
-    if (options.xAxisVerticalText == true) {
-        xAxisEl.selectAll("text")
-            .attr("y", 0)
-            .attr("x", 9)
-            .attr("dy", ".35em")
-            .attr("transform", "rotate(90)")
-            .style("text-anchor", "start");
-    }
-
+    charting.createXAxis(svg,options,x,dims);
+    
     var gy = svg.append("g")
         .attr("class", "y axis")
         .call(yAxis);

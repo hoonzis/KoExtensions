@@ -15,13 +15,7 @@ function drawBarChart(data, element, options, xcoord, lineData,charting) {
 
     var color = d3.scale.category20();
 
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
-
-    if (options.xUnitFormat != null)
-        xAxis.tickFormat(options.xUnitFormat);
-
+    
     var yAxis = d3.svg.axis()
         .scale(y)
         .tickSize(dims.width)
@@ -103,11 +97,7 @@ function drawBarChart(data, element, options, xcoord, lineData,charting) {
     var x1 = d3.scale.ordinal();
     x1.domain(keys).rangeRoundBands([0, x.rangeBand()]);
 
-
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + dims.height + ")")
-        .call(xAxis);
+    charting.createXAxis(svg, options, x, dims);
 
     var gy = svg.append("g")
         .attr("class", "y axis")

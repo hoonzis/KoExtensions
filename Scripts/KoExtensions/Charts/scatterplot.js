@@ -6,9 +6,7 @@ function drawScatterPlot(data, element, options, charting) {
     if (el == null)
         return;
 
-    var margin = {top: 20, right: 80, bottom: 30, left: 50};
-    var width = 960 - margin.left - margin.right;
-    var height = 500 - margin.top - margin.bottom;
+    var dims = charting.getDimensions(options, el);
 
     var x = d3.scale.ordinal()
         .rangeRoundBands([0, width], .1);
@@ -24,13 +22,6 @@ function drawScatterPlot(data, element, options, charting) {
 	var yKeys = data.map(function(i) {return i.y;});
     y.domain(yKeys);
 	
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
-    
-    if (options.xUnitFormat != null)
-        xAxis.tickFormat(options.xUnitFormat);
-    
     var yAxis = d3.svg.axis()
       .scale(y)
       .tickSize(width)
@@ -43,11 +34,8 @@ function drawScatterPlot(data, element, options, charting) {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	charting.showStandardLegend(el,keys, function(i) { return i; },color,options.legend,height);
-  
-    svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
+
+    charting.createXAxis(svg, options, x, dims);
 
     var gy = svg.append("g")
         .attr("class", "y axis")
