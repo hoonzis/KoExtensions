@@ -30,7 +30,7 @@
 	 <!-- ko foreach: cars -->
 	 	<div style="float:left;margin-right:10px">
 		 	<h3 data-bind="text:name"></h3>
-			<div data-bind="piechart: sales">
+			<div data-bind="piechart: salesChart">
 
 			</div>
 	 	</div> 
@@ -120,7 +120,7 @@
                             self.name(data.name);
                         }
 
-                        var salesChart = ko.computed(function () {
+                        self.salesChart = ko.computed(function () {
                             return self.sales().map(function (car) {
                                 return { x: car.model, y: car.amount };
                             });
