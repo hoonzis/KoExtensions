@@ -4,6 +4,14 @@ function drawPieChart(data, element,options,charting) {
     if (el == null)
         return;
 
+    var defaultOptions = {
+        legend: true,
+        width: 200,
+        height: 200
+    };
+
+    options = koTools.setDefaultOptions(defaultOptions, options);
+
     var color;
 
     //for a piechart only positive values make sense

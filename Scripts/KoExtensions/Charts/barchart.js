@@ -1,10 +1,21 @@
 //accepts and array of objects. one property of each object is used as the x-coordinate (determined by the xcoord parameter)
 //the rest of the properties is stacked to the chart
-function drawBarChart(data, element, options, xcoord, lineData,charting) {
+function drawBarChart(data, element, options, xcoord, lineData, charting) {
+    options = koTools.setDefaultOptions(defaultOptions, options);
+
     var el = charting.getElementAndCheckData(element,data);
     if (el == null)
         return;
 
+    var defaultOptions = {
+        legend: true,
+        width: 600,
+        height: 200,
+        xUnitName: 'x',
+        itemName: 'Item'
+    };
+    
+    options = koTools.setDefaultOptions(defaultOptions, options);
     var dims = charting.getDimensions(options);
     
     var x = d3.scale.ordinal()

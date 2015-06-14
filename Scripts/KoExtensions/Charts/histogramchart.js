@@ -1,13 +1,20 @@
-function drawHistogram(data, element, options,charting) {
+function drawHistogram(data, element, options, charting) {
+    var defaultOptions = {
+        bins: 80,
+        width: 500
+    };
+
     var el = charting.getElementAndCheckData(element,data);
     if (el == null)
         return;
+
+    options = koTools.setDefaultOptions(defaultOptions, options);
 
     var dims = charting.getDimensions(options);
     
     var histogramData = d3.layout.histogram()
         .frequency(false)
-        .bins(80)(data);
+        .bins(options.bins)(data);
 
     var minX = koTools.isValidNumber(options.min) ? options.min : d3.min(histogramData, function (d) { return d.x; });
     

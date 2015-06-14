@@ -406,6 +406,14 @@ define(function() {
 
             return maxKey;
         }
+
+        self.setDefaultOptions = function (defaultConfig, config) {
+            config = config || {};
+            for (var key in defaultConfig) {
+                config[key] = config[key] || defaultConfig[key];
+            }
+            return config;
+        }
     };
 
     return new KoTools();

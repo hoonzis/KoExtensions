@@ -111,6 +111,23 @@ define(
 
 
             });
+
+            test("default options setter sets all values specified in default options", function () {
+                var defaultOptions = {
+                    start: 10,
+                    mapper: function (x) { return x*2;}
+                }
+
+                var testOptions = {
+                    hello: 5
+                }
+
+                var res = koTools.setDefaultOptions(defaultOptions, testOptions);
+
+                equal(res.start, 10);
+                equal(res.hello, 5);
+                equal(res.mapper(2), 4);
+            });
         };
         return { run: run }
     }

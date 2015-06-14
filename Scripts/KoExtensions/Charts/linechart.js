@@ -2,11 +2,18 @@
 //[{x:1, receivedEtf:123, tradedEtf:100},{x:2, receivedEtf:200, tradedEtf:100}]
 //[{linename:receivedEtf, values:[x:q1, y:200]}]
 function drawLineChart(data, element, options,charting) {
-
     var el = charting.getElementAndCheckData(element, data);
     if (el == null)
         return;
 
+    var defaultOptions = {
+        legend: true,
+        width: 200,
+        height: 200,
+        xUnitName: 'x'
+    }
+
+    options = koTools.setDefaultOptions(defaultOptions, options);
     var dims = charting.getDimensions(options);
     
     data.forEach(function (singleLine) {

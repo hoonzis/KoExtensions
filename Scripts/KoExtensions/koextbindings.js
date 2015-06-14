@@ -73,41 +73,6 @@ define(['./charting', './kotools', './EventDrops/eventDrops'],
         }
     };
 
-    var defaultOptions = [];
-    defaultOptions['bar'] = { legend: true, width: 600, height: 200, xUnitName: 'x', itemName: 'Item' };
-    defaultOptions['pie'] = { legend: true, width: 200, height: 200 };
-    defaultOptions['line'] = { legend: true, width: 200, height: 200, xUnitName: 'x'};
-    defaultOptions['def'] = { legend: true, width: 200, height: 200 };
-    defaultOptions['eventDrops'] = {
-        legend: false, width: 1200, height: 500, eventSize: 10,
-        eventColor: 'black',
-        start: new Date(2000, 1),
-        end: new Date(),
-        eventDate: function(x) {
-            return x; 
-        }
-    };
-   
-    function setDefaultOptions(options, type) {
-        var typeOptions = defaultOptions[type];
-
-        if (typeOptions == null)
-            typeOptions = defaultOptions['def'];
-
-        if (options == null)
-            return typeOptions;
-
-        var keys = d3.keys(typeOptions);
-
-        for (var k in keys) {
-            var key = keys[k];
-            if (options[key] == null)
-                options[key] = typeOptions[key];
-        }
-
-        return options;
-    }
-
     function transformData(chartData) {
         if (chartData.transf != null)
             chartData.data = chartData.data.map(chartData.transf);
@@ -115,10 +80,7 @@ define(['./charting', './kotools', './EventDrops/eventDrops'],
             chartData.data = kotools.normalizeSeries(chartData.data);
         }
 
-        chartData.data = koTools.convertAllSeriesToXYPairs(chartData.data);
-
-
-        
+        chartData.data = koTools.convertAllSeriesToXYPairs(chartData.data);        
     }
 
     function getLineDataFromAccessor(accesor) {
@@ -181,11 +143,6 @@ define(['./charting', './kotools', './EventDrops/eventDrops'],
         return chartData;
     };
 
-    
-    function isValidUpdate(storedData, chartData) {
-        return chartData.data != null && chartData.data.length != 0;
-    }
-
     ko.bindingHandlers.barchart = {
         update: function (element, valueAccessor, allBindingsAccessor) {
             var chartData = getBarChartDataFromAccessor(allBindingsAccessor());
@@ -203,7 +160,7 @@ define(['./charting', './kotools', './EventDrops/eventDrops'],
 
             var chartData = {
                 data: ko.unwrap(allBindingsAccessor().eventDrops),
-                options: setDefaultOptions(allBindingsAccessor().chartOptions, "eventDrops"),
+                options: ko.onwrap(allBindingsAccessor().chartOptions)
             };
 
             //if the eventColor was specified, need to get all possible colors to create a scale
@@ -244,8 +201,7 @@ define(['./charting', './kotools', './EventDrops/eventDrops'],
         ko.bindingHandlers.histogram = {
             update: function (element, valueAccessor, allBindingsAccessor) {
                 var data = ko.unwrap(valueAccessor());
-                var options = setDefaultOptions(ko.unwrap(allBindingsAccessor().chartOptions), 'histogram');
-                element.innerHTML = "";
+                var options = ko.unwrap(allBindingsAccessor().chartOptions);
                 drawHistogram(data, element, options,charting);
             }
         };
@@ -253,7 +209,7 @@ define(['./charting', './kotools', './EventDrops/eventDrops'],
         ko.bindingHandlers.scatterplot = {
             update: function (element, valueAccessor, allBindingsAccessor) {
                 var data = ko.unwrap(valueAccessor());
-                var options = setDefaultOptions(ko.unwrap(allBindingsAccessor().chartOptions), 'scatterplot');
+                var options = ko.unwrap(allBindingsAccessor().chartOptions);
                 element.innerHTML = "";
                 drawScatterPlot(data, element, options, charting);
             }
@@ -262,8 +218,7 @@ define(['./charting', './kotools', './EventDrops/eventDrops'],
         ko.bindingHandlers.bubblechart = {
             update: function (element, valueAccessor, allBindingsAccessor) {
                 var data = ko.unwrap(valueAccessor());
-                var options = setDefaultOptions(ko.unwrap(allBindingsAccessor().chartOptions), 'bubble');
-                element.innerHTML = "";
+                var options = ko.unwrap(allBindingsAccessor().chartOptions);
                 drawBubbleChart(data, element, options, charting);
             }
         };
