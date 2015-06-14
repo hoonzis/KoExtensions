@@ -4,7 +4,7 @@ define(
     function (koTools) {
         var run = function () {
             test("isValidDate returns true if object is date and has meaningful value", function () {
-                var res = koTools.isValidDate(new Date("12/20/2012"));
+                var res = koTools.isValidDate(new Date("12/12/2012"));
                 ok(res);
             });
 
