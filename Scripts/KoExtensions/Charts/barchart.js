@@ -1,8 +1,7 @@
-//accepts and array of objects. one property of each object is used as the x-coordinate (determined by the xcoord parameter)
+//accepts and array of objects. one property of each object is used as the x-coordinate 
+//(determined by the xcoord option, which by default is set to 'x')
 //the rest of the properties is stacked to the chart
-function drawBarChart(data, element, options, xcoord, lineData, charting) {
-    options = koTools.setDefaultOptions(defaultOptions, options);
-
+function drawBarChart(data, element, options, lineData, charting) {
     var el = charting.getElementAndCheckData(element,data);
     if (el == null)
         return;
@@ -12,11 +11,13 @@ function drawBarChart(data, element, options, xcoord, lineData, charting) {
         width: 600,
         height: 200,
         xUnitName: 'x',
-        itemName: 'Item'
+        itemName: 'Item',
+        xcoord: 'x'
     };
     
     options = koTools.setDefaultOptions(defaultOptions, options);
-    var dims = charting.getDimensions(options);
+    var xcoord = options.xcoord;
+    var dims = charting.getDimensions(options,el);
     
     var x = d3.scale.ordinal()
         .rangeRoundBands([0, dims.width], .3);
@@ -26,13 +27,7 @@ function drawBarChart(data, element, options, xcoord, lineData, charting) {
 
     var color = d3.scale.category20();
 
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
-
-    if (options.xUnitFormat != null)
-        xAxis.tickFormat(options.xUnitFormat);
-
+    
     var yAxis = d3.svg.axis()
         .scale(y)
         .tickSize(dims.width)
@@ -114,11 +109,7 @@ function drawBarChart(data, element, options, xcoord, lineData, charting) {
     var x1 = d3.scale.ordinal();
     x1.domain(keys).rangeRoundBands([0, x.rangeBand()]);
 
-
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + dims.height + ")")
-        .call(xAxis);
+    charting.createXAxis(svg, options, x, dims);
 
     var gy = svg.append("g")
         .attr("class", "y axis")

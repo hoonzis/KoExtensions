@@ -8,22 +8,21 @@
     </head>
 <body>
 	<h2>Last Week Sales:</h2>
-	<div id="carsChart" data-bind="piechart: cars, transformation:transformToChart">
-
+	<div id="carsChart" data-bind="piechart: carsChart">
 	</div>
 
 	<h2>Monthly Sales</h2>
-	<div id="monthlySales" data-bind="barchart: carSales, xcoord:'month',chartOptions:{legend:true, width:800,height:300,style:'stack'}">
+    <div id="monthlySales" data-bind="barchart: carSales, chartOptions:{legend:true, width:800,height:300,style:'stack',xcoord:'month'}">
 
-	</div>
+    </div>
 
 	<h2>Monthly Sales</h2>
-	<div id="monthlySales2" data-bind="barchart: carSales, xcoord:'month',chartOptions:{legend:true, width:800,height:300,style:'bar'}">
+	<div id="monthlySales2" data-bind="barchart: carSales,chartOptions:{legend:true, width:800,height:300,style:'bar',xcoord:'month'}">
 
 	</div>
 
 	<h2>Sales Per Month</h2>
-	<div id="lineChart" data-bind="linechart: salesPerMonth, transformation:transformToLineChart, chartOptions:{height:100}">
+	<div id="lineChart" data-bind="linechart: salesPerMonthChart, chartOptions:{height:100,xAxisTextAngle:45}">
 
 	</div>
 
@@ -31,7 +30,7 @@
 	 <!-- ko foreach: cars -->
 	 	<div style="float:left;margin-right:10px">
 		 	<h3 data-bind="text:name"></h3>
-			<div data-bind="piechart: sales,transformation:transform2">
+			<div data-bind="piechart: sales">
 
 			</div>
 	 	</div> 
@@ -121,35 +120,42 @@
                             self.name(data.name);
                         }
 
-                        self.transform2 = function(car) {
-                            return { x: car.model, y: car.amount };
-                        }
-
+                        var salesChart = ko.computed(function () {
+                            return self.sales().map(function (car) {
+                                return { x: car.model, y: car.amount };
+                            });
+                        });
                     }
 
                     function TestViewModels(data, lastWeekData) {
                         var self = this;
 
-                        self.transformToLineChart = function(i) {
-
-                            return {
-                                x: i.linename,
-                                values: i.data.map(function(item) {
-                                    return { x: item.month, y: item[i.linename] };
-                                })
-                            };
-                        }
-
-                        self.transformToChart = function(car) {
-                            return { x: car.name(), y: car.totalSales() };
-                        }
-
                         self.cars = ko.observableArray([]);
                         self.salesPerMonth = ko.observableArray([]);
+
+                        self.salesPerMonthChart = ko.computed(function () {
+                            return self.salesPerMonth().map(function (i) {
+
+                                return {
+                                    x: i.linename,
+                                    values: i.data.map(function (item) {
+                                        return { x: item.month, y: item[i.linename] };
+                                    })
+                                };
+                            });
+                        });
+
                         self.carSales = ko.observableArray([]);
 
                         self.carSales(data);
 
+                        self.carsChart = ko.computed(function () {
+                            return self.cars().map(function (car) {
+                                return { x: car.name(), y: car.totalSales() };
+                            });
+                        });
+
+                        
                         var keys = d3.keys(data[0]).filter(function(i) { return i != 'month'; });
                         var perMonth = keys.map(function(key) {
                             return {

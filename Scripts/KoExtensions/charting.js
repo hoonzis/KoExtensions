@@ -9,9 +9,10 @@ define(['./kotools'], function () {
     charting.getElementAndCheckData = function(element, data) {
         var el = d3.select(element);
         if (data == null || data.length == 0) {
-            el.innerHTML = "No data available";
+            element.innerHTML = "No data available";
             return null;
         }
+        element.innerHTML = "";
         return el;
     };
 
@@ -118,8 +119,13 @@ define(['./kotools'], function () {
 
     };
 
-    charting.getDimensions = function (options) {
-        var margin = { top: 20, right: 80, bottom: 30, left: 50 };
+    charting.getDimensions = function (options, el) {
+
+        if (options.fillParentController) {
+            options.width = el.width;
+            options.height = el.height;
+        }
+        var margin = { top: 20, right: 80, bottom: 50, left: 50 };
         var width = options.width == null ? (960 - margin.left - margin.right) : options.width;
         var height = options.height == null ? (500 - margin.top - margin.bottom) : options.height;
         return {
@@ -138,5 +144,30 @@ define(['./kotools'], function () {
 
         return svg;
     }
+
+    charting.createXAxis = function(svg,options,x,dims) {
+        var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+        if (options.xUnitFormat != null)
+            xAxis.tickFormat(options.xUnitFormat);
+
+        var xAxisEl = svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + dims.height + ")")
+        .call(xAxis);
+
+        if (options.xAxisTextAngle != null) {
+            xAxisEl.selectAll("text")
+                .attr("y", 0)
+                .attr("x", 9)
+                .attr("dy", ".35em")
+                .attr("transform", "rotate(" + options.xAxisTextAngle + ")")
+                .style("text-anchor", "start");
+        }
+    }
+
+
     return charting;
 });

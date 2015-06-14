@@ -73,85 +73,33 @@ define(['./charting', './kotools', './EventDrops/eventDrops'],
         }
     };
 
-    function transformData(chartData) {
-        if (chartData.transf != null)
-            chartData.data = chartData.data.map(chartData.transf);
-        if (chartData.options.normalizeSeries) {
-            chartData.data = kotools.normalizeSeries(chartData.data);
-        }
-
-        chartData.data = koTools.convertAllSeriesToXYPairs(chartData.data);        
-    }
-
-    function getLineDataFromAccessor(accesor) {
-        var options = setDefaultOptions(accesor.chartOptions, "line");
-        var chartData = {
-            transf: accesor.transformation,
-            data: accesor.linechart(),
-            options: options
-        };
-        chartData.options.unitTransform = accesor.unitTransform;
-        transformData(chartData);
-        return chartData;
-    }
-
-    ko.bindingHandlers.
-        linechart = {
+    ko.bindingHandlers.linechart = {
         update: function (element, valueAccessor, allBindingsAccessor) {
-            var chartData = getLineDataFromAccessor(allBindingsAccessor());
-
-            if (isValidUpdate(element._chartData,chartData)) {
-                element.innerHTML = "";
-                drawLineChart(chartData.data, element, chartData.options,charting);
-                element._chartData = chartData;
-            }
+            var options = allBindingsAccessor().chartOptions;
+            var data = allBindingsAccessor().linechart();
+            drawLineChart(data, element, options,charting);
         }
     };
 
-    function getPieDataFromAccessor(accesor) {
-        var chartData = {
-            transf: accesor.transformation,
-            data: accesor.piechart(),
-            options: setDefaultOptions(accesor.chartOptions, "pie")
-        };
-        chartData.options.unitTransform = accesor.unitTransform;
-        transformData(chartData);
-        return chartData;
-    }
-
+   
     ko.bindingHandlers.piechart = {
         update: function (element, valueAccessor, allBindingsAccessor) {
-            var chartData = getPieDataFromAccessor(allBindingsAccessor());
-
-            if (isValidUpdate(element._chartData, chartData)) {
-                element.innerHTML = "";
-                drawPieChart(chartData.data, element, chartData.options,charting);
-                element._chartData = chartData;
-            }
+            var data = allBindingsAccessor().piechart();
+            var options = allBindingsAccessor().chartOptions;
+            drawPieChart(data, element, options,charting);
         }
-    };
-
-    function getBarChartDataFromAccessor(accessor) {
-        var chartData = {
-            data: accessor.barchart(),
-            options: setDefaultOptions(accessor.chartOptions, "bar"),
-            xcoord: accessor.xcoord
-        };
-        if (accessor.line != null)
-            chartData.line = accessor.line();
-        chartData.options.unitTransform = accessor.unitTransform;
-        return chartData;
     };
 
     ko.bindingHandlers.barchart = {
         update: function (element, valueAccessor, allBindingsAccessor) {
-            var chartData = getBarChartDataFromAccessor(allBindingsAccessor());
-            
-            if (isValidUpdate(element._chartData,chartData)) {
-                element.innerHTML = "";
-                element._chartData = chartData;
-                drawBarChart(chartData.data, element, chartData.options, chartData.xcoord, chartData.line,charting);
-            }
+            var data = ko.unwrap(valueAccessor());
+            var options = ko.unwrap(allBindingsAccessor().chartOptions);
+
+            var line = null;
+            if (allBindingsAccessor().line != null)
+                line = allBindingsAccessor().line();
+
+            drawBarChart(data, element, options, line,charting);
         }
     };
 
@@ -174,7 +122,6 @@ define(['./charting', './kotools', './EventDrops/eventDrops'],
             var color = d3.scale.category20().domain(flatColorsArray);
 
             if (isValidUpdate(element._chartData,chartData)) {
-                element.innerHTML = "";
                 element._chartData = chartData;
 
                 var eventDropsChart = eventDrops()
@@ -210,7 +157,6 @@ define(['./charting', './kotools', './EventDrops/eventDrops'],
             update: function (element, valueAccessor, allBindingsAccessor) {
                 var data = ko.unwrap(valueAccessor());
                 var options = ko.unwrap(allBindingsAccessor().chartOptions);
-                element.innerHTML = "";
                 drawScatterPlot(data, element, options, charting);
             }
         };

@@ -1,4 +1,5 @@
 //Takes as input collection of items [data]. Each item has two values [x] and [y].
+//x is the label and y the value which determines the size of the slice of the pie chart.
 function drawPieChart(data, element,options,charting) {
     var el = charting.getElementAndCheckData(element, data);
     if (el == null)

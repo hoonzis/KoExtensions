@@ -3,9 +3,7 @@ function drawBubbleChart(data, element, options, charting) {
     if (el == null)
         return;
 
-    var margin = { top: 60, right: 30, bottom: 70, left: 40 },
-        width = 960 - margin.right,
-        height = 500 - margin.top - margin.bottom;
+    var dims = charting.getDimensions(options, el);
 
     var maxY = d3.max(data, options.bubbleVertical);
     var horizontalValues = data.map(options.bubbleHorizontal);
@@ -21,11 +19,8 @@ function drawBubbleChart(data, element, options, charting) {
     var colors = koTools.distinct(data, options.bubbleColor);
     var colorScale = d3.scale.category20().domain(colors);
 
-    var xAxis = d3.svg.axis().scale(xScale).orient("bottom"),
-        yAxis = d3.svg.axis().scale(yScale).tickSize(width).orient("right");
-
-    if (options.xUnitFormat != null)
-        xAxis.tickFormat(options.xUnitFormat);
+    
+    var yAxis = d3.svg.axis().scale(yScale).tickSize(width).orient("right");
 
     charting.showStandardLegend(el, colors, function (i) { return i; }, colorScale, true, height);
 
@@ -35,10 +30,7 @@ function drawBubbleChart(data, element, options, charting) {
     .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + (height + 50) + ")")
-        .call(xAxis);
+    charting.createXAxis(svg, options, x, dims);
 
     var gy = svg.append("g")
         .attr("class", "y axis")

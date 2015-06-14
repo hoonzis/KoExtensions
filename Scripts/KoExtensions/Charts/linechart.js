@@ -14,8 +14,8 @@ function drawLineChart(data, element, options,charting) {
     }
 
     options = koTools.setDefaultOptions(defaultOptions, options);
-    var dims = charting.getDimensions(options);
-    
+  
+    var dims = charting.getDimensions(options,el);
     data.forEach(function (singleLine) {
         if (singleLine.values == null)
             throw "Each line needs to have values property containing tuples of x and y values";
@@ -61,13 +61,6 @@ function drawLineChart(data, element, options,charting) {
         })
     ]);
 
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
-    
-    if (options.xUnitFormat != null)
-        xAxis.tickFormat(options.xUnitFormat);
-    
     var yAxis = d3.svg.axis()
       .scale(y)
       .tickSize(dims.width)
@@ -92,11 +85,8 @@ function drawLineChart(data, element, options,charting) {
     var keys = data.map(function(item) { return item.x; });
     color.domain(keys);
     charting.showStandardLegend(el,keys, function(i) { return i; },color,options.legend,dims.height);
-  
-    svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + dims.height + ")")
-      .call(xAxis);
+
+    charting.createXAxis(svg, options, x, dims);
 
     var gy = svg.append("g")
         .attr("class", "y axis")
