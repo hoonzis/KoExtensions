@@ -1,5 +1,5 @@
 ﻿"use strict";
-define(function() {
+define(['d3'],function(d3) {
     function KoTools() {
 
         var self = this;
@@ -34,7 +34,7 @@ define(function() {
         };
 
         self.monthsComparer = function(item1, item2) {
-            if (koTools.isString(item1)) {
+            if (self.isString(item1)) {
                 var year1 = parseInt(item1.substring(0, 4));
                 var month1 = parseInt(item1.substring(4, item1.length));
 
@@ -82,7 +82,7 @@ define(function() {
         var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
         self.getYearAndMonthLabel = function(i) {
-            if (!isString(i))
+            if (!self.isString(i))
                 return "";
             var month = monthNames[parseInt(i.substring(4, i.length)) - 1];
             return month;

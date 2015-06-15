@@ -2,6 +2,7 @@
 require.config({
     paths: {
         'QUnit': '../Scripts/qunit-1.18.0',
+        'd3': '../Scripts/d3',
     },
     shim: {
         'QUnit': {
@@ -13,6 +14,7 @@ require.config({
         }
     }
 });
+
 
 // require the unit tests.
 require(
