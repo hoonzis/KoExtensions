@@ -14,6 +14,10 @@ function drawLineChart(data, element, options,charting) {
     }
 
     options = koTools.setDefaultOptions(defaultOptions, options);
+
+    if (options.normalizeSeries) {
+        data = koTools.normalizeSeries(data);
+    }
   
     var dims = charting.getDimensions(options,el);
     data.forEach(function (singleLine) {
