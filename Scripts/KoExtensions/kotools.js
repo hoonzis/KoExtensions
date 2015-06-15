@@ -346,18 +346,28 @@ define(['d3'],function(d3) {
                         for (var j = 0; j < data[i].values.length; j++) {
                             data[i].values[j] = (data[i].values[j] / baseValue) * 100;
                         }
-                    } else if (minCommonKey != null) {                   
-                        baseValue = self.find(data[i].values, function (item) {
+                    } else if (minCommonKey != null) {
+                        //try to find the min. common item in this series
+                        var commonItem = self.find(data[i].values, function (item) {
                             return item.x == minCommonKey;
-                        }).y;
-
-                        for (var j = 0; j < data[i].values.length; j++) {
-                            data[i].values[j].y = (data[i].values[j].y / baseValue) * 100;
+                        });
+                        //if the min common item was found, than we can get the y, which will be the base value
+                        //used to normalize all values
+                        if (commonItem != null) {
+                            baseValue = commonItem.y;
+                            for (var j = 0; j < data[i].values.length; j++) {
+                                data[i].values[j].y = (data[i].values[j].y / baseValue) * 100;
+                            }
+                        } else {
+                            //this series does not have the common item, mark it to remove it
+                            data[i].removeIt = true;
                         }
                     }
                 }
             }
-            return data;
+            return data.filter(function (series) {
+                return series.removeIt == null || series.removeIt == false;
+            });
         }
 
         self.convertSeriesToXYPairs = function(data) {

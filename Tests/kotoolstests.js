@@ -112,6 +112,24 @@ define(
 
 
             });
+
+            test("normalizeSeries 3 series but only 2 have common element - one will be excluded", function () {
+                var data = [
+                    { values: [{ x: "20101", y: 10 }, { x: "20105", y: 20 }, { x: "201012", y: 40 }] },
+                    { values: [{ x: "20105", y: 5 }, { x: "201012", y: 2.5 }] },
+                    { values: [{ x: "20106", y: 5 }, { x: "20107", y: 2.5 }] }
+                ];
+
+                var res = koTools.normalizeSeries(data);
+
+                equal(res[0].values[0].y, 50);
+                equal(res[0].values[1].y, 100);
+                equal(res[0].values[2].y, 200);
+
+
+                equal(res[1].values[0].y, 100);
+                equal(res[1].values[1].y, 50);
+            });
             
             test("default options setter sets all values specified in default options", function () {
                 var defaultOptions = {
