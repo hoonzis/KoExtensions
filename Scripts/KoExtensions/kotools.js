@@ -19,6 +19,21 @@ define(['d3'],function(d3) {
             return cDate + "/" + cMonth + "/" + cYear;
         }
 
+        Array.prototype.setOrAdd = function (x, y, value) {
+            if (this[x] == null)
+                this[x] = [];
+            if (this[x][y] == null || isNaN(this[x][y]))
+                this[x][y] = value;
+            else
+                this[x][y] += value;
+        }
+
+        Array.prototype.set = function (x, y, value) {
+            if (this[x] == null)
+                this[x] = [];
+            this[x][y] = value;
+        }
+
         self.getQuarter = function(item) {
             if (item.Year != null && item.Quarter != null) {
                 return "Q" + item.Quarter + item.Year;

@@ -160,6 +160,29 @@ define(
                 var res = comparer("20111", "20121");
                 equal(res, -1);
             });
+
+            test("adding values to empty matrix", function () {
+                var matrix = [];
+                matrix.setOrAdd(1, 2, 3);
+                matrix.setOrAdd(1, 2, 3);
+                equal(matrix[1][2], 6);
+            });
+
+            test("set values two times", function () {
+                var matrix = [];
+                matrix.set(1, 2, 2);
+                matrix.set(1, 2, 3);
+                equal(matrix[1][2], 3);
+            });
+
+            test("densifying a sparse matrix", function () {
+                var matrix = [];
+                matrix.set(1, 2, 2);
+                matrix.set(1, 2, 3);
+                equal(matrix[1][2], 3);
+            });
+
+
         };
         return { run: run }
     }
