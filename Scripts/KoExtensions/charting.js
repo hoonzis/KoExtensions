@@ -1,8 +1,5 @@
-﻿var d3;
-define(['./kotools'], function () {
-
-    if (d3 == null)
-        throw "KoExtensions charting module depends on globaly defined d3 variable";
+﻿"use strict";
+define(['d3'],function (d3) {
 
     var charting = {};
 
@@ -57,7 +54,7 @@ define(['./kotools'], function () {
     charting.showTooltip = function(info) {
         var toolTip = d3.select("#toolTip");
         var i = 1;
-        for (key in info) {
+        for (var key in info) {
             d3.select("#info" + i + "header").text(key);
             if (info[key] != null)
                 d3.select("#info" + i).text(info[key]);

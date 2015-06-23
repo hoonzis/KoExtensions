@@ -358,8 +358,13 @@ define(['d3'],function(d3) {
                 if (data[i].values != null) {
                     var baseValue = data[i].values[0];
                     if (self.isNumber(baseValue)) {
+                        //here we just convert a standard array into array of x/y pairs and we normalize it as well
                         for (var j = 0; j < data[i].values.length; j++) {
-                            data[i].values[j] = (data[i].values[j] / baseValue) * 100;
+
+                            data[i].values[j] = {
+                                x: j,
+                                y: data[i].values[j].y = (data[i].values[j] / baseValue) * 100
+                            };
                         }
                     } else if (minCommonKey != null) {
                         //try to find the min. common item in this series
@@ -439,6 +444,7 @@ define(['d3'],function(d3) {
             }
             return config;
         }
+
     };
 
     return new KoTools();

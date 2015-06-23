@@ -16,11 +16,11 @@ define(
 
                 var res = koTools.normalizeSeries(data);
                 for (var i = 0; i < data.length; i++) {
-                    equal(res[i].values[0], 100);
+                    equal(res[i].values[0].y, 100);
                 }
 
-                equal(res[0].values[2], 10);
-                equal(res[1].values[1].toFixed(2), 300);
+                equal(res[0].values[2].y, 10);
+                equal(res[1].values[1].y.toFixed(2), 300);
             });
 
             

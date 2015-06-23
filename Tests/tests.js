@@ -18,10 +18,11 @@ require.config({
 
 // require the unit tests.
 require(
-    ['QUnit', 'kotoolstests'],
-    function (QUnit, kotoolstests) {
+    ['QUnit', 'kotoolstests','kotreetests'],
+    function (QUnit, kotoolstests,kotreetests) {
 
         kotoolstests.run();
+        kotreetests.run();
 
         // start QUnit.
         QUnit.load();
