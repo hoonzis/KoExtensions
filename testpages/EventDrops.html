@@ -12,14 +12,25 @@
     <script>
         var ko;
         var d3;
+
         require.config({
             baseUrl: "/Scripts",
-            urlArgs: "bust=2" + (new Date()).getTime()
+            urlArgs: "bust=2" + (new Date()).getTime(),
+            paths: {
+                'd3.chart.eventDrops': 'eventDrops'
+            },
+            shim: {
+                'd3.chart.eventDrops': {
+                    deps: ['d3'],
+                    exports: 'd3.chart.eventDrops'
+                }
+            }
         });
 
-        require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {
+        require(['knockout-3.2.0.debug', 'd3', 'd3.chart.eventDrops'], function (kol, d3l) {
             ko = kol;
             d3 = d3l;
+
             require(['KoExtensions/koextbindings'], function() {
 
                 function createRundomSales(country) {

@@ -1,8 +1,9 @@
+
 //accepts and array of objects. one property of each object is used as the x-coordinate 
 //(determined by the xcoord option, which by default is set to 'x')
 //the rest of the properties is stacked to the chart
 function drawBarChart(data, element, options, lineData, charting) {
-    var el = charting.getElementAndCheckData(element,data);
+    var el = charting.getElementAndCheckData(element, data);
     if (el == null)
         return;
 
@@ -14,11 +15,11 @@ function drawBarChart(data, element, options, lineData, charting) {
         itemName: 'Item',
         xcoord: 'x'
     };
-    
+
     options = koTools.setDefaultOptions(defaultOptions, options);
     var xcoord = options.xcoord;
-    var dims = charting.getDimensions(options,el);
-    
+    var dims = charting.getDimensions(options, el);
+
     var x = d3.scale.ordinal()
         .rangeRoundBands([0, dims.width], .3);
 
@@ -27,7 +28,7 @@ function drawBarChart(data, element, options, lineData, charting) {
 
     var color = d3.scale.category20();
 
-    
+
     var yAxis = d3.svg.axis()
         .scale(y)
         .tickSize(dims.width)
@@ -35,24 +36,24 @@ function drawBarChart(data, element, options, lineData, charting) {
 
     // not all the items do have the same set of properties, therefor scan them all and concatenate the result
     var keys = [];
-    data.map(function (i) {
-        var itemKeys = d3.keys(i).filter(function (key) { return key != xcoord && keys.indexOf(key) < 0; });
+    data.map(function(i) {
+        var itemKeys = d3.keys(i).filter(function(key) { return key != xcoord && keys.indexOf(key) < 0; });
         keys = keys.concat(itemKeys);
     });
     color.domain(keys);
 
-	//runs overs all the data. copies the result to a new array
+    //runs overs all the data. copies the result to a new array
     var arranged = [];
     var arrangedByX = {};
-    data.forEach(function (d) {
-		var newD = {x: d[xcoord]};
+    data.forEach(function(d) {
+        var newD = { x: d[xcoord] };
         var y0Neg = 0;
         var y0Pos = 0;
-        
-        
+
+
         var values = [];
-        color.domain().forEach(function (m) {
-            
+        color.domain().forEach(function(m) {
+
             if (d[m] == 0 || d[m] == null)
                 return;
             var xLabel = newD.x;
@@ -71,38 +72,42 @@ function drawBarChart(data, element, options, lineData, charting) {
         });
 
         newD.values = values;
-        newD.totalPositive = d3.max(newD.values, function (v) { return v.y1; });
-        newD.totalNegative = d3.min(newD.values, function (v) { return v.y0; });
+        newD.totalPositive = d3.max(newD.values, function(v) { return v.y1; });
+        newD.totalNegative = d3.min(newD.values, function(v) { return v.y0; });
         arranged.push(newD);
         arrangedByX[newD.x] = newD;
     });
-	
-    charting.showStandardLegend(el,keys, function(item) { return item; },color,options.legend,dims.height);
+
+    charting.showStandardLegend(el, keys, function(item) { return item; }, color, options.legend, dims.height);
 
     var svg = charting.appendContainer(el, dims);
 
     var xKeys = arranged.map(function(d) { return d.x; });
     x.domain(xKeys);
     if (options.style == "stack") {
-        y.domain([d3.min(arranged, function (d) { return d.totalNegative; }), d3.max(arranged, function (d) {
-            if (d == null)
-                return 0;
-            return d.totalPositive;
-        })]);
+        y.domain([
+            d3.min(arranged, function(d) { return d.totalNegative; }), d3.max(arranged, function(d) {
+                if (d == null)
+                    return 0;
+                return d.totalPositive;
+            })
+        ]);
     } else {
         y.domain(
-            [d3.min(arranged, function (d) {
+        [
+            d3.min(arranged, function(d) {
                 return d3.min(d.values,
-                    function (i) {
-                        if(i.val < 0) 
+                    function(i) {
+                        if (i.val < 0)
                             return i.val;
-                        return 0; 
+                        return 0;
                     });
             }),
-            d3.max(arranged, function (d) {
+            d3.max(arranged, function(d) {
                 return d3.max(d.values,
-                    function (i) { return i.val; });
-            })]);
+                    function(i) { return i.val; });
+            })
+        ]);
     }
 
     //for the groupped chart
@@ -116,14 +121,14 @@ function drawBarChart(data, element, options, lineData, charting) {
         .call(yAxis);
 
     gy.selectAll("g").
-       filter(function (d) { return d; })
-       .classed("minor", true);
+        filter(function(d) { return d; })
+        .classed("minor", true);
 
     gy.selectAll("text")
-    .attr("x", 4)
-    .attr("dy", -4);
+        .attr("x", 4)
+        .attr("dy", -4);
 
-    var onBarOver = function (d) {
+    var onBarOver = function(d) {
         var column = arrangedByX[d.x];
 
         d3.select(this).style("stroke", 'black');
@@ -136,7 +141,7 @@ function drawBarChart(data, element, options, lineData, charting) {
         charting.showTooltip(info);
     }
 
-    var onPointOver = function (d) {
+    var onPointOver = function(d) {
         d3.select(this).style("fill", "blue");
         var info = {};
         var unitName = d.xUnitName;
@@ -150,12 +155,12 @@ function drawBarChart(data, element, options, lineData, charting) {
         charting.showTooltip(info);
     }
 
-    var onPointOut = function () {
+    var onPointOut = function() {
         d3.select(this).style("fill", "white");
         charting.hideTooltip();
     }
 
-    var onBarOut = function () {
+    var onBarOut = function() {
         d3.select(this).style("stroke", 'none');
         d3.select(this).style("opacity", 0.8);
         charting.hideTooltip();
@@ -163,75 +168,75 @@ function drawBarChart(data, element, options, lineData, charting) {
 
     var group = svg.selectAll(".xVal")
         .data(arranged)
-      .enter().append("g")
+        .enter().append("g")
         .attr("class", "g")
-        .attr("transform", function (d) { return "translate(" + x(d.x) + ",0)"; });
+        .attr("transform", function(d) { return "translate(" + x(d.x) + ",0)"; });
 
     if (options.style == "stack") {
         group.selectAll("rect")
-            .data(function (d) { return d.values; })
-          .enter().append("rect")
+            .data(function(d) { return d.values; })
+            .enter().append("rect")
             .attr("width", x.rangeBand())
-            .attr("y", function (d) { return y(d.y1); })
-            .attr("height", function (d) { return y(d.y0) - y(d.y1); })
+            .attr("y", function(d) { return y(d.y1); })
+            .attr("height", function(d) { return y(d.y0) - y(d.y1); })
             .on("mouseover", onBarOver)
             .on("mouseout", onBarOut)
-            .style("opacity",0.8)
+            .style("opacity", 0.8)
             .style("cursor", "pointer")
-            .style("fill", function (d) {
+            .style("fill", function(d) {
                 return color(d.name);
             });
 
     } else {
         group.selectAll("rect")
-         .data(function (d) {
-             return d.values;
-         })
-       .enter().append("rect")
-         .attr("width", x1.rangeBand())
-         .attr("x", function (d) {
-             return x1(d.name);
-         })
-         .attr("y", function (d) {
-             return y(d.val);
-         })
-         .attr("height", function (d) {
-             return dims.height - y(d.val);
-         })
-        .style("cursor", "pointer")
-        .on("mouseover", onBarOver)
-        .on("mouseout", onBarOut)
-         .style("fill", function (d) { return color(d.name); });
+            .data(function(d) {
+                return d.values;
+            })
+            .enter().append("rect")
+            .attr("width", x1.rangeBand())
+            .attr("x", function(d) {
+                return x1(d.name);
+            })
+            .attr("y", function(d) {
+                return y(d.val);
+            })
+            .attr("height", function(d) {
+                return dims.height - y(d.val);
+            })
+            .style("cursor", "pointer")
+            .on("mouseover", onBarOver)
+            .on("mouseout", onBarOut)
+            .style("fill", function(d) { return color(d.name); });
     }
 
     //Add the single line
     if (lineData == null || lineData.length == 0)
         return;
-    
+
     var lineY = d3.scale.linear()
         .range([dims.height, 0]);
 
     var line = d3.svg.line()
-     .interpolate("linear")
-     .x(function(d) {
-             return x(d.x) + x.rangeBand() / 2;
+        .interpolate("linear")
+        .x(function(d) {
+            return x(d.x) + x.rangeBand() / 2;
         })
-     .y(function(d) {
-         return lineY(d.y);
-    });
+        .y(function(d) {
+            return lineY(d.y);
+        });
 
     //in some cases it makes sense to use the same scale for both
     //typically the cash-flow chart
     //for other cases (line  volumne / units correlations a separate scale should be used for each)
-    if(!options.sameScaleLinesAndBars){
+    if (!options.sameScaleLinesAndBars) {
         lineY.domain([
             0,
-            d3.max(lineData, function (v) { return v.y; })
+            d3.max(lineData, function(v) { return v.y; })
         ]);
-    }else{
+    } else {
         lineY.domain(y.domain());
     }
-    
+
 
     var yAxisRight = d3.svg.axis()
         .scale(lineY)
@@ -241,7 +246,7 @@ function drawBarChart(data, element, options, lineData, charting) {
         .call(yAxisRight)
         .attr("transform", "translate(" + dims.width + " ,0)");
 
-    
+
     svg.append("path")
         .attr("d", line(lineData))
         .style("stroke", "blue")

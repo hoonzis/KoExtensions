@@ -1,6 +1,8 @@
 ﻿"use strict";
-define(['d3'],function (d3) {
-
+define(function () {
+    if (d3 == null) {
+        throw "KoExtensions need d3";
+    }
     var charting = {};
 
     charting.getElementAndCheckData = function(element, data) {

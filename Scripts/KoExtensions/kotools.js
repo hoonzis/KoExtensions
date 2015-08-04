@@ -1,5 +1,8 @@
 ﻿"use strict";
-define(['d3'],function(d3) {
+define(function () {
+    if (d3 == null) {
+        throw "KoTools need d3";
+    }
     function KoTools() {
 
         var self = this;
