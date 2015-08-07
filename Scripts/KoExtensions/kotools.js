@@ -443,7 +443,7 @@ define(function () {
         self.setDefaultOptions = function (defaultConfig, config) {
             config = config || {};
             for (var key in defaultConfig) {
-                config[key] = config[key] || defaultConfig[key];
+                config[key] = config[key] != null ? config[key] : defaultConfig[key];
             }
             return config;
         }

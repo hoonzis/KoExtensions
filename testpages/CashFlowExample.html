@@ -19,8 +19,8 @@
             require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {
                 ko = kol;
                 d3 = d3l;
-                require(['KoExtensions/koextbindings', 'KoExtensions/Charts/barchart'], function() {
-
+                require(['KoExtensions/koextensions'], function(koext) {
+                    koext.registerExtensions();
                     var lifeExpenses = [
                         {
                             month: 'january',

@@ -48,7 +48,8 @@
     require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {
         ko = kol;
         d3 = d3l;
-        require(['KoExtensions/koextbindings', 'jquery-2.1.1'], function() {
+        require(['KoExtensions/koextensions', 'jquery-2.1.1'], function (koext) {
+            koext.registerExtensions();
             require(['bootstrap', 'bootstrap-datepicker'], function() {
                 //taken from StackOverflow
                 function daysBetween(first, second) {

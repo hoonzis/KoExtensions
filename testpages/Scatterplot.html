@@ -18,7 +18,8 @@
             require(['knockout-3.2.0', 'd3'], function(kol, d3l) {
                 ko = kol;
                 d3 = d3l;
-                require(['KoExtensions/koextbindings', 'KoExtensions/Charts/scatterplot'], function() {
+                require(['KoExtensions/koextensions'], function (koext) {
+                    koext.registerExtensions();
                     var hours = [30, 35, 40, 45, 50, 55, 60, 65, 70];
                     var result = [5, 6, 9, 12, 14, 18, 23, 27, 34, 40];
 

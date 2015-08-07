@@ -152,6 +152,9 @@ define(function () {
         if (options.xUnitFormat != null)
             xAxis.tickFormat(options.xUnitFormat);
 
+        if (options.tickSize!=null)
+            xAxis.innerTickSize(options.tickSize);
+
         var xAxisEl = svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + dims.height + ")")

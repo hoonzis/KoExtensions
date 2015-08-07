@@ -10,7 +10,8 @@ function drawLineChart(data, element, options,charting) {
         legend: true,
         width: 200,
         height: 200,
-        xUnitName: 'x'
+        xUnitName: 'x',
+        showDataPoints:true
     }
 
     options = koTools.setDefaultOptions(defaultOptions, options);
@@ -38,6 +39,7 @@ function drawLineChart(data, element, options,charting) {
         return l.color;
     }
 
+
     //xKeys - not all the lines have neceseraly the same x values -> concat & filter
     var xKeys = [];
     data.map(function (i) {
@@ -51,19 +53,26 @@ function drawLineChart(data, element, options,charting) {
     });
     x.domain(xKeys);
 
-    y.domain([
-        d3.min(data, function (c) {
-            return d3.min(c.values, function (v) {
-                if (v.y < 0)
-                    return v.y;
-                return 0;
-            });
-        }),
-        d3.max(data, function (c) {
-            return d3.max(c.values,
-                function (v) { return v.y; });
-        })
-    ]);
+    if (options.numberOfTicks) {
+        var minX = d3.min(xKeys);
+        var maxX = d3.max(xKeys);
+
+        options.tickSize = (maxX - minX) / options.numberOfTicks;
+    }
+
+    var yMin = options.yMin != null ? options.yMin : d3.min(data, function (c) {
+        return d3.min(c.values, function (v) {
+            if (v.y < 0)
+                return v.y;
+            return 0;
+        });
+    });
+
+    var yMax = options.yMax != null ? options.yMax : d3.max(data, function (c) {
+        return d3.max(c.values,
+            function (v) { return v.y; });
+    });
+    y.domain([yMin,yMax]);
 
     var yAxis = d3.svg.axis()
       .scale(y)
@@ -107,26 +116,27 @@ function drawLineChart(data, element, options,charting) {
     var point = svg.selectAll(".point")
         .data(data)
         .enter().append("g")
-        .each(function (d) {d.values.forEach(
-            function (item) {
-                item.color = getColor(d);
-                if(item.formattedValue!= null)
-                    return;
-                if(item.name == null)
-                  item.name = d.x;
-                var formattedValue = item.y;
-                if (options.unitTransform != null)
-                    formattedValue = options.unitTransform(item.y);
-                item.formattedValue = formattedValue;
-            });
+        .each(function (d) {
+            d.values.forEach(
+                function (item) {
+                    item.color = getColor(d);
+                    if (item.formattedValue != null)
+                        return;
+                    if (item.name == null)
+                        item.name = d.x;
+                    var formattedValue = item.y;
+                    if (options.unitTransform != null)
+                        formattedValue = options.unitTransform(item.y);
+                    item.formattedValue = formattedValue;
+                });
         });
-
+    
     var lines = point.selectAll("circle")
         .data(function (d) {
             return d.values;
         });
 
-  
+    
     var spMouseOut = function() {
         d3.select(this).style("fill", "white");
         point.style("opacity", 1);
@@ -159,19 +169,22 @@ function drawLineChart(data, element, options,charting) {
       })
       .style("fill", "none");
 
-  lines.enter().append("circle")
-       .attr("cx", function (d) {
-           return x(d.x) + x.rangeBand() / 2;
-       })
-      .attr("cy", function (d) { return y(d.y); })
-      .attr("r", function () { return 4; })
-      .style("fill","white")
-      .style("stroke-width", "2")
-      .style("stroke", function (d) { return d.color; })
-      .style("cursor", "pointer")
-      .on("mouseover", spMouseOver)
-      .on("click", spMouseOver)
-      .on("mouseout", spMouseOut);
+  if (options.showDataPoints) {
+
+      lines.enter().append("circle")
+           .attr("cx", function (d) {
+               return x(d.x) + x.rangeBand() / 2;
+           })
+          .attr("cy", function (d) { return y(d.y); })
+          .attr("r", function () { return 4; })
+          .style("fill", "white")
+          .style("stroke-width", "2")
+          .style("stroke", function (d) { return d.color; })
+          .style("cursor", "pointer")
+          .on("mouseover", spMouseOver)
+          .on("click", spMouseOver)
+          .on("mouseout", spMouseOut);
+  }
 }
 
 

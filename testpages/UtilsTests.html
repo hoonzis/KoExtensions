@@ -27,8 +27,8 @@
         require(['knockout-3.2.0', 'd3'], function(kol, d3l) {
             ko = kol;
             d3 = d3l;
-            require(['KoExtensions/koextbindings'], function() {
-
+            require(['KoExtensions/koextensions'], function(koext) {
+                koext.registerExtensions();
                 function CarViewModel() {
                     var self = this;
                     self.efficiency = ko.observable(0.95);

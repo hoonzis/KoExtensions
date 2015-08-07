@@ -96,7 +96,8 @@
                 ko = kol;
                 d3 = d3l;
                 
-                require(['KoExtensions/koextbindings'], function() {
+                require(['KoExtensions/koextensions'], function (koext) {
+                    koext.registerExtensions();
                     initialize();
                     var stationsData = {
                         "stations": [

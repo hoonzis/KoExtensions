@@ -22,9 +22,13 @@
 	</div>
 
 	<h2>Sales Per Month - 3 normalized series</h2>
-	<div id="lineChart" data-bind="linechart: salesPerMonthChart, chartOptions:{height:100,normalizeSeries:true, xAxisTextAngle:45}">
+	<div id="lineChart" data-bind="linechart: salesPerMonthChart, chartOptions:{height:300,width:800,normalizeSeries:true, xAxisTextAngle:45}">
 
 	</div>
+
+    <div id="lineChart" data-bind="linechart: salesPerMonthChart2, chartOptions:{height:300,width:800,showDataPoints:false,yMin:-10,numberOfTicks:2}">
+
+    </div>
 
 	<h2>Sales per car mark</h2>
 	 <!-- ko foreach: cars -->
@@ -49,32 +53,43 @@
             require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {
                 ko = kol;
                 d3 = d3l;
-                require(['KoExtensions/koextbindings', 'KoExtensions/Charts/linechart', 'KoExtensions/Charts/piechart', 'KoExtensions/Charts/barchart'], function() {
-
+                require(['KoExtensions/koextensions'], function(koext) {
+                    koext.registerExtensions();
                     var carSales = [
                         {
+                            id: 1,
                             month: 'january',
                             peugot: 100,
                             audit: 200,
                             bmw: 300
                         },
                         {
+                            id: 2,
                             month: 'february',
                             peugot: 50,
                             audit: 110,
                             bmw: 80
                         },
                         {
+                            id: 3,
                             month: 'marz',
                             peugot: 120,
                             audit: 230,
                             bmw: 115
                         },
                         {
+                            id: 4,
                             month: 'april',
                             peugot: 80,
                             audit: 120,
                             bmw: 75
+                        },
+                        {
+                            id: 5,
+                            month: 'may',
+                            peugot: 100,
+                            audit: 140,
+                            bmw: 80
                         }
                     ];
                     var lastWeek = [
@@ -133,6 +148,7 @@
                         self.cars = ko.observableArray([]);
                         self.salesPerMonth = ko.observableArray([]);
 
+                        //first chart with month x-axis
                         self.salesPerMonthChart = ko.computed(function () {
                             return self.salesPerMonth().map(function (i) {
 
@@ -144,6 +160,20 @@
                                 };
                             });
                         });
+
+                        //second chart with integer x axis
+                        self.salesPerMonthChart2 = ko.computed(function () {
+                            return self.salesPerMonth().map(function (i) {
+
+                                return {
+                                    x: i.linename,
+                                    values: i.data.map(function (item) {
+                                        return { x: item.id, y: item[i.linename] };
+                                    })
+                                };
+                            });
+                        });
+
 
                         self.carSales = ko.observableArray([]);
 

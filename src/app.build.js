@@ -23,7 +23,7 @@
 		
 	},
 	exclude: ["d3"],
-	include: ["../build/almond"],
+	include: ["../src/almond"],
 	optimize: "none",
 	name:"KoExtensions/koextensions",
 	out:"KoExtensions.js",
