@@ -597,8 +597,8 @@ define('KoExtensions/charting',[],function () {
         if (options.xUnitFormat != null)
             xAxis.tickFormat(options.xUnitFormat);
 
-        if (options.tickSize!=null)
-            xAxis.innerTickSize(options.tickSize);
+        if (options.tickValues!=null)
+            xAxis.tickValues(options.tickValues);
 
         var xAxisEl = svg.append("g")
         .attr("class", "x axis")
@@ -1494,13 +1494,6 @@ function drawLineChart(data, element, options,charting) {
     });
     x.domain(xKeys);
 
-    if (options.numberOfTicks) {
-        var minX = d3.min(xKeys);
-        var maxX = d3.max(xKeys);
-
-        options.tickSize = (maxX - minX) / options.numberOfTicks;
-    }
-
     var yMin = options.yMin != null ? options.yMin : d3.min(data, function (c) {
         return d3.min(c.values, function (v) {
             if (v.y < 0)
@@ -1536,10 +1529,16 @@ function drawLineChart(data, element, options,charting) {
 
     var svg = charting.appendContainer(el, dims);
 
-    var keys = data.map(function(item) { return item.x; });
-    color.domain(keys);
-    charting.showStandardLegend(el,keys, function(i) { return i; },color,options.legend,dims.height);
+    var linenames = data.map(function(item) { return item.linename; });
+    color.domain(linenames);
+    charting.showStandardLegend(el,linenames, function(i) { return i; },color,options.legend,dims.height);
 
+    if (options.xTick) {
+        var xValues = xKeys.filter(function (k) {
+            return k % options.xTick == 0;
+        });
+        options.tickValues = xValues;
+    }
     charting.createXAxis(svg, options, x, dims);
 
     var gy = svg.append("g")

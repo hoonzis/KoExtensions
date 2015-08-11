@@ -35,7 +35,7 @@ function drawLineChart(data, element, options,charting) {
     var color = d3.scale.category20();
 
     var getColor = function(l) {
-        if (l.color == null) return color(l.x);
+        if (l.color == null) return color(l.linename);
         return l.color;
     }
 
@@ -52,13 +52,6 @@ function drawLineChart(data, element, options,charting) {
         xKeys = xKeys.concat(itemKeys);
     });
     x.domain(xKeys);
-
-    if (options.numberOfTicks) {
-        var minX = d3.min(xKeys);
-        var maxX = d3.max(xKeys);
-
-        options.tickSize = (maxX - minX) / options.numberOfTicks;
-    }
 
     var yMin = options.yMin != null ? options.yMin : d3.min(data, function (c) {
         return d3.min(c.values, function (v) {
@@ -95,10 +88,16 @@ function drawLineChart(data, element, options,charting) {
 
     var svg = charting.appendContainer(el, dims);
 
-    var keys = data.map(function(item) { return item.x; });
-    color.domain(keys);
-    charting.showStandardLegend(el,keys, function(i) { return i; },color,options.legend,dims.height);
+    var linenames = data.map(function(item) { return item.linename; });
+    color.domain(linenames);
+    charting.showStandardLegend(el,linenames, function(i) { return i; },color,options.legend,dims.height);
 
+    if (options.xTick) {
+        var xValues = xKeys.filter(function (k) {
+            return k % options.xTick == 0;
+        });
+        options.tickValues = xValues;
+    }
     charting.createXAxis(svg, options, x, dims);
 
     var gy = svg.append("g")

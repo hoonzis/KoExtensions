@@ -128,7 +128,7 @@
 				return self.salesPerMonth().map(function (i) {
 
 					return {
-						x: i.linename,
+						linename: i.linename,
 						values: i.data.map(function (item) {
 							return { x: item.month, y: item[i.linename] };
 						})

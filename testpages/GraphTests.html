@@ -26,8 +26,8 @@
 
 	</div>
 
-    <div id="lineChart" data-bind="linechart: salesPerMonthChart2, chartOptions:{height:300,width:800,showDataPoints:false,yMin:-10,numberOfTicks:2}">
-
+    <div id="lineChart" data-bind="linechart: simpleLine, chartOptions:{height:300,width:800,showDataPoints:false,yMin:-100,xTick:10}">
+        s
     </div>
 
 	<h2>Sales per car mark</h2>
@@ -57,35 +57,30 @@
                     koext.registerExtensions();
                     var carSales = [
                         {
-                            id: 1,
                             month: 'january',
                             peugot: 100,
                             audit: 200,
                             bmw: 300
                         },
                         {
-                            id: 2,
                             month: 'february',
                             peugot: 50,
                             audit: 110,
                             bmw: 80
                         },
                         {
-                            id: 3,
                             month: 'marz',
                             peugot: 120,
                             audit: 230,
                             bmw: 115
                         },
                         {
-                            id: 4,
                             month: 'april',
                             peugot: 80,
                             audit: 120,
                             bmw: 75
                         },
                         {
-                            id: 5,
                             month: 'may',
                             peugot: 100,
                             audit: 140,
@@ -147,33 +142,19 @@
 
                         self.cars = ko.observableArray([]);
                         self.salesPerMonth = ko.observableArray([]);
-
+                        
                         //first chart with month x-axis
                         self.salesPerMonthChart = ko.computed(function () {
                             return self.salesPerMonth().map(function (i) {
 
                                 return {
-                                    x: i.linename,
+                                    linename: i.linename,
                                     values: i.data.map(function (item) {
                                         return { x: item.month, y: item[i.linename] };
                                     })
                                 };
                             });
                         });
-
-                        //second chart with integer x axis
-                        self.salesPerMonthChart2 = ko.computed(function () {
-                            return self.salesPerMonth().map(function (i) {
-
-                                return {
-                                    x: i.linename,
-                                    values: i.data.map(function (item) {
-                                        return { x: item.id, y: item[i.linename] };
-                                    })
-                                };
-                            });
-                        });
-
 
                         self.carSales = ko.observableArray([]);
 
@@ -186,7 +167,7 @@
                         });
 
                         
-                        var keys = d3.keys(data[0]).filter(function(i) { return i != 'month'; });
+                        var keys = d3.keys(data[0]).filter(function(i) { return i != 'month' && i!= 'id'; });
                         var perMonth = keys.map(function(key) {
                             return {
                                 linename: key,
@@ -202,6 +183,18 @@
                         self.valueToLabel = function (x) {
                             return x + " cars sold";
                         }
+                        
+                        var simpleData = [];
+                        for(var i=0;i<100;i++){
+                            simpleData.push({
+                                x:i,
+                                y:i*2
+                            });
+                        }
+                        self.simpleLine = ko.observableArray([{
+                            linename: "test",
+                            values: simpleData
+                        }]);
                     }
 
                     var vm = new TestViewModels(carSales, lastWeek);
