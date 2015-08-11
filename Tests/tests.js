@@ -3,6 +3,7 @@ require.config({
     paths: {
         'QUnit': '../Scripts/qunit-1.18.0',
         'd3': '../Scripts/d3',
+		'ko':'../Scripts/knockout-3.2.0'
     },
     shim: {
         'QUnit': {
@@ -14,18 +15,24 @@ require.config({
         }
     }
 });
+var ko;
+var d3;
 
+//require d3 and ko which have to be defined globally
+require(['ko', 'd3'], function(kol, d3l) {	
+	// require the unit tests.
+	ko = kol;
+	d3 = d3l;
+	require(
+		['QUnit', 'kotoolstests','kotreetests'],
+		function (QUnit, kotoolstests,kotreetests) {
 
-// require the unit tests.
-require(
-    ['QUnit', 'kotoolstests','kotreetests'],
-    function (QUnit, kotoolstests,kotreetests) {
+			kotoolstests.run();
+			kotreetests.run();
 
-        kotoolstests.run();
-        kotreetests.run();
-
-        // start QUnit.
-        QUnit.load();
-        QUnit.start();
-    }
-);
+			// start QUnit.
+			QUnit.load();
+			QUnit.start();
+		}
+	);
+});

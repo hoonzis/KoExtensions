@@ -17,13 +17,43 @@ More advanced ready-to-use charts:
 * Bubble chart
 * Events visualization based on [EventDrops](https://github.com/marmelab/EventDrops) project [example](https://github.com/hoonzis/KoExtensions/blob/master/testpages/EventDrops.html)
 
-Other bindings usefull for Knockout:
+Other bindings useful for Knockout:
 
 * Google maps binding
 * Bootstrap DateTime picker binding
 * FormattedValue binding - simply format the values as you need.
 
 All charts are created with [D3JS](http://d3js.org/) and based on multiple examples provided in the documentation. Following are few examples of the available bindings. See the [wiki](https://github.com/hoonzis/KoExtensions/wiki) for full examples and documentation.
+
+####Referencing KoExtensions:
+There are two ways to reference KoExtensions:
+* Reference single [KoExtensions.js](https://github.com/hoonzis/KoExtensions/blob/master/src/KoExtensions.js) file. See the [example.html](https://github.com/hoonzis/KoExtensions/blob/master/src/example.html) file.
+* Use RequireJS. All files in the *testpages* folder use this approach. KoExtension expects D3 and Knockout to be defined globaly before being loaded, this is a simple way to get around:
+
+```javascript
+require(['knockout-3.2.0', 'd3'], function(kol, d3l) {
+	ko = kol;
+	d3 = d3l;
+	require(['KoExtensions/koextensions'], function(koext) {
+		//registers the additional global bindings
+		koext.registerExtensions();
+			//ViewModel initialization and so on...
+		});
+});
+```
+
+####Contributing building
+RequireJS is used to handle dependencies as well as to bundle single referencable JS file, which can be built with NodeJS and RequireJS optimizer:
+
+```
+nodejs r.js -o app.build.js
+```
+
+Tests can be run with QUnit:
+
+```
+phantomjs run-qunit.js Tests/Tests.html
+```
 
 #### Multiple binded charts ####
 ![alt text][foreachpiechart]
