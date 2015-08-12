@@ -65,6 +65,10 @@ function drawLineChart(data, element, options,charting) {
         return d3.max(c.values,
             function (v) { return v.y; });
     });
+    
+    yMax = yMax > 0 ? yMax * 1.1 : yMax * 0.9;
+    yMin = yMin < 0 ? yMin * 1.1 : yMin * 0.9;
+
     y.domain([yMin,yMax]);
 
     var yAxis = d3.svg.axis()
