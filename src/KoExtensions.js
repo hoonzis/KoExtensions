@@ -1607,7 +1607,9 @@ function drawLineChart(data, element, options,charting) {
       .attr("d", function (d) {
           return line(d.values);
       })
-      .style("stroke-width", 2)
+      .style("stroke-width", function(d){
+          return d.width ? d.width : 2;
+      })
       .style("stroke", function (d) {
           return getColor(d);
       })

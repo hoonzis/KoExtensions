@@ -142,13 +142,14 @@
 
                         self.cars = ko.observableArray([]);
                         self.salesPerMonth = ko.observableArray([]);
-                        
+                                               
                         //first chart with month x-axis
                         self.salesPerMonthChart = ko.computed(function () {
                             return self.salesPerMonth().map(function (i) {
 
                                 return {
                                     linename: i.linename,
+                                    width : 5,
                                     values: i.data.map(function (item) {
                                         return { x: item.month, y: item[i.linename] };
                                     })
