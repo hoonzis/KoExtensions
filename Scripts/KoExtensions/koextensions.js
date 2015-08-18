@@ -1,17 +1,25 @@
 ﻿var charting = null;
 var koTools;
-define(['./charting', './kotools','./Charts/barchart','./Charts/piechart','./Charts/linechart'],
+define(['./charting', './kotools','./Charts/barchart','./Charts/piechart','./Charts/linechart','./Charts/histogramchart'],
     function (ch, kotools) {
         function koextensions() {
             var self = this;
             if (ko == null)
                 throw "Ko extensions depend on globally defined knockout ko variable";
+           
             koTools = kotools;
             charting = ch;
+
+            //let tools and charting be accesible globaly
+            self.tools = kotools;
+            self.charting = ch;
+
             charting.initializeCharts();
             var markers = [];
 
-            self.registerExtensions = function() {
+            self.registerExtensions = function () {
+                
+
                 ko.bindingHandlers.map = {
                     init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
 
