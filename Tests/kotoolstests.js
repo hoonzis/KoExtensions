@@ -184,8 +184,8 @@ define(
 
             test("adding days", function () {
                 var dat = new Date(2015, 12, 30);
-                dat.addDays(10);
-                equal(dat.day, 9);
+                var newDate = dat.addDays(10);
+                equal(newDate.getDate(), 9);
             });
         };
         return { run: run }
