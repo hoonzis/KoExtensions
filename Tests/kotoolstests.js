@@ -182,7 +182,11 @@ define(
                 equal(matrix[1][2], 3);
             });
 
-
+            test("adding days", function () {
+                var dat = new Date(2015, 12, 30);
+                dat.addDays(10);
+                equal(dat.day, 9);
+            });
         };
         return { run: run }
     }
