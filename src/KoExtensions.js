@@ -657,6 +657,12 @@ define('KoExtensions/kotools',[],function () {
             this[x][y] = value;
         }
 
+        Date.prototype.addDays = function (days) {
+            var dat = new Date(this.valueOf());
+            dat.setDate(dat.getDate() + days);
+            return dat;
+        }
+
         self.getQuarter = function(item) {
             if (item.Year != null && item.Quarter != null) {
                 return "Q" + item.Quarter + item.Year;
