@@ -2,8 +2,8 @@ KoExtensions
 ============
 [![Build Status](https://travis-ci.org/hoonzis/KoExtensions.svg?branch=master)](https://travis-ci.org/hoonzis/KoExtensions)
 
-Additional binding and tools for KnockoutJS, the package includes:
-
+KoExtensions can be used as standalone JavaScript charting library or plug-in for KnockoutJS. Besides charting, when used with Knockout, KoExtensions provide few useful bindings. The library includes:
+ 
 Simple charts ([example page](https://github.com/hoonzis/KoExtensions/blob/master/testpages/GraphTests.html)):
 
 * Piechart
@@ -25,28 +25,40 @@ Other bindings useful for Knockout:
 
 All charts are created with [D3JS](http://d3js.org/) and based on multiple examples provided in the documentation. Following are few examples of the available bindings. See the [wiki](https://github.com/hoonzis/KoExtensions/wiki) for full examples and documentation.
 
-####Referencing KoExtensions:
+####Referencing and using KoExtensions:
 There are two ways to reference KoExtensions:
-* Reference single [KoExtensions.js](https://github.com/hoonzis/KoExtensions/blob/master/src/KoExtensions.js) file. See the [example.html](https://github.com/hoonzis/KoExtensions/blob/master/src/example.html) file.
-* Use RequireJS. All files in the *testpages* folder use this approach. KoExtension expects D3 and Knockout to be defined globaly before being loaded, this is a simple way to get around:
+* Reference single [KoExtensions.js](https://github.com/hoonzis/KoExtensions/blob/master/src/KoExtensions.js) file. See the [example.html](https://github.com/hoonzis/KoExtensions/blob/master/src/example.html) file. If used in such way, global variable **koExtensions** is defined which exposes all the functionality.
+```javascript
+<script src="d3.js"></script>
+<script src="KoExtensions.js"></script>
+//if you want to use knockout binding, just call:
+koExtensions.registerExtensions
+//otherwise, use charting with all the charts
+koext.charting.lineChart(testData, el, chartOptions);
+```
+* Use RequireJS. All files in the *testpages* folder use this approach. KoExtension expects D3 to be defined globally before being loaded, this is a simple way to get around:
 
 ```javascript
-require(['knockout-3.2.0', 'd3'], function(kol, d3l) {
-	ko = kol;
+require(['d3'], function(d3l) {
 	d3 = d3l;
 	require(['KoExtensions/koextensions'], function(koext) {
-		//registers the additional global bindings
-		koext.registerExtensions();
-			//ViewModel initialization and so on...
-		});
+		var testData = [
+			{ linename: "Price:", values: [100.0, 125.0, 130, 145, 101] },
+			{ linename: "Consumption", values: [1, 0.5, 0.8, 0.2, 0.1] }
+		];
+		var chartOptions = {height:100, normalizeSeries:true}
+		var el = document.getElementById("lineChartDiv");
+
+		koext.charting.lineChart(testData, el, chartOptions);
 });
 ```
+Both approaches can also be used when using KnockoutJS. In order for the automatic bindings to work with knockout, **registerExtensions** method has to be called.
 
-####Contributing building
+####Contributing and building
 RequireJS is used to handle dependencies as well as to bundle single referencable JS file, which can be built with NodeJS and RequireJS optimizer:
 
 ```
-nodejs r.js -o app.build.js
+node r.js -o app.build.js
 ```
 
 Tests can be run with QUnit:

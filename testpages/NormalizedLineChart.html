@@ -21,17 +21,22 @@
                 urlArgs: "bust=2" + (new Date()).getTime()
             });
 
-            require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {
+            require.config({
+                baseUrl: "/Scripts",
+                urlArgs: "bust=2" + (new Date()).getTime()
+            });
+
+            require(['knockout-3.2.0.debug', 'd3'], function (kol, d3l) {
                 ko = kol;
                 d3 = d3l;
-                require(['KoExtensions/koextbindings', 'KoExtensions/Charts/linechart', 'KoExtensions/Charts/piechart', 'KoExtensions/Charts/barchart'], function() {
-
+                require(['KoExtensions/koextensions'], function (koext) {
+                    koext.registerExtensions();
                     function TestViewModels() {
                         var self = this;
 
                         var testData = [
-                            { x: "Price:", values: [100.0, 125.0, 130, 145, 101] },
-                            { x: "Consumption", values: [1, 0.5, 0.8, 0.2, 0.1] }
+                            { linename: "Price:", values: [100.0, 125.0, 130, 145, 101] },
+                            { linename: "Consumption", values: [1, 0.5, 0.8, 0.2, 0.1] }
                         ];
                         self.data = ko.observableArray(testData);
                     }

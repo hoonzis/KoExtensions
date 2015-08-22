@@ -1,24 +1,18 @@
-﻿var charting = null;
-var koTools;
-define(['./charting', './kotools','./Charts/barchart','./Charts/piechart','./Charts/linechart','./Charts/histogramchart'],
-    function (ch, kotools) {
+﻿define(['./charting', './kotools','./Charts/barchart','./Charts/piechart','./Charts/linechart','./Charts/histogramchart','./Charts/scatterplot'],
+    function (charting, kotools) {
         function koextensions() {
             var self = this;
-            if (ko == null)
-                throw "Ko extensions depend on globally defined knockout ko variable";
-           
-            koTools = kotools;
-            charting = ch;
 
             //let tools and charting be accesible globaly
             self.tools = kotools;
-            self.charting = ch;
+            self.charting = charting;
 
             charting.initializeCharts();
             var markers = [];
 
             self.registerExtensions = function () {
-                
+                if (ko == null)
+                    throw "knockout ko global variable has to be defined in order to use the bindings";
 
                 ko.bindingHandlers.map = {
                     init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
@@ -90,16 +84,15 @@ define(['./charting', './kotools','./Charts/barchart','./Charts/piechart','./Cha
                     update: function(element, valueAccessor, allBindingsAccessor) {
                         var options = allBindingsAccessor().chartOptions;
                         var data = allBindingsAccessor().linechart();
-                        drawLineChart(data, element, options, charting);
+                        charting.lineChart(data, element, options);
                     }
                 };
-
 
                 ko.bindingHandlers.piechart = {
                     update: function(element, valueAccessor, allBindingsAccessor) {
                         var data = allBindingsAccessor().piechart();
                         var options = allBindingsAccessor().chartOptions;
-                        drawPieChart(data, element, options, charting);
+                        charting.pieChart(data, element, options);
                     }
                 };
 
@@ -111,8 +104,7 @@ define(['./charting', './kotools','./Charts/barchart','./Charts/piechart','./Cha
                         var line = null;
                         if (allBindingsAccessor().line != null)
                             line = allBindingsAccessor().line();
-
-                        drawBarChart(data, element, options, line, charting);
+                        charting.barChart(data, element, options, line);
                     }
                 };
 
@@ -161,7 +153,7 @@ define(['./charting', './kotools','./Charts/barchart','./Charts/piechart','./Cha
                     update: function(element, valueAccessor, allBindingsAccessor) {
                         var data = ko.unwrap(valueAccessor());
                         var options = ko.unwrap(allBindingsAccessor().chartOptions);
-                        drawHistogram(data, element, options, charting);
+                        charting.histogram(data, element, options);
                     }
                 };
 
@@ -169,7 +161,7 @@ define(['./charting', './kotools','./Charts/barchart','./Charts/piechart','./Cha
                     update: function(element, valueAccessor, allBindingsAccessor) {
                         var data = ko.unwrap(valueAccessor());
                         var options = ko.unwrap(allBindingsAccessor().chartOptions);
-                        drawScatterPlot(data, element, options, charting);
+                        charting.scatterPlot(data, element, options);
                     }
                 };
 
@@ -177,7 +169,31 @@ define(['./charting', './kotools','./Charts/barchart','./Charts/piechart','./Cha
                     update: function(element, valueAccessor, allBindingsAccessor) {
                         var data = ko.unwrap(valueAccessor());
                         var options = ko.unwrap(allBindingsAccessor().chartOptions);
-                        drawBubbleChart(data, element, options, charting);
+                        charting.bubbleChart(data, element, options);
+                    }
+                };
+
+                ko.bindingHandlers.formattedValue = {
+                    update: function (element, valueAccessor, allBindingsAccessor) {
+                        var fValue = getFormattedValueFromAccessor(allBindingsAccessor());
+                        applyFormattedValue(fValue, element);
+                    }
+                }
+
+                ko.bindingHandlers.progress = {
+                    init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+                        var value = valueAccessor()();
+                        if (value == null)
+                            value = 0;
+                        element.style.width = value + "%";
+                        element.style.display = 'none';
+                        element.style.display = 'block';
+                    },
+                    update: function (element, valueAccessor, allBindingsAccessor) {
+                        var value = valueAccessor()();
+                        if (value == null)
+                            value = 0;
+                        element.style.width = value + "%";
                     }
                 };
             };
@@ -205,29 +221,7 @@ define(['./charting', './kotools','./Charts/barchart','./Charts/piechart','./Cha
                 return fValue;
             }
 
-            ko.bindingHandlers.formattedValue = {
-                update: function(element, valueAccessor, allBindingsAccessor) {
-                    var fValue = getFormattedValueFromAccessor(allBindingsAccessor());
-                    applyFormattedValue(fValue, element);
-                }
-            }
-
-            ko.bindingHandlers.progress = {
-                init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-                    var value = valueAccessor()();
-                    if (value == null)
-                        value = 0;
-                    element.style.width = value + "%";
-                    element.style.display = 'none';
-                    element.style.display = 'block';
-                },
-                update: function(element, valueAccessor, allBindingsAccessor) {
-                    var value = valueAccessor()();
-                    if (value == null)
-                        value = 0;
-                    element.style.width = value + "%";
-                }
-            };
+            
 
             function getValue(val) {
                 if (val != null && typeof (val) == 'function')
