@@ -19,7 +19,19 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
 
         options = koTools.setDefaultOptions(defaultOptions, options);
         var xcoord = options.xcoord;
-        var dims = charting.getDimensions(options, el);
+        
+        // not all the items do have the same set of properties, therefor scan them all and concatenate the result
+        var keys = [];
+        data.map(function (i) {
+            var itemKeys = d3.keys(i).filter(function (key) { return key != xcoord && keys.indexOf(key) < 0; });
+            keys = keys.concat(itemKeys);
+        });
+
+        //we need color for each possible variable
+        var color = d3.scale.category20();
+        color.domain(keys);
+
+        var dims = charting.getDimensions(options, el,keys);
 
         var x = d3.scale.ordinal()
             .rangeRoundBands([0, dims.width], .3);
@@ -27,21 +39,13 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
         var y = d3.scale.linear()
             .rangeRound([dims.height, 0]);
 
-        var color = d3.scale.category20();
-
+        
 
         var yAxis = d3.svg.axis()
             .scale(y)
             .tickSize(dims.width)
             .orient("right");
 
-        // not all the items do have the same set of properties, therefor scan them all and concatenate the result
-        var keys = [];
-        data.map(function (i) {
-            var itemKeys = d3.keys(i).filter(function (key) { return key != xcoord && keys.indexOf(key) < 0; });
-            keys = keys.concat(itemKeys);
-        });
-        color.domain(keys);
 
         //runs overs all the data. copies the result to a new array
         var arranged = [];
@@ -79,7 +83,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             arrangedByX[newD.x] = newD;
         });
 
-        charting.showStandardLegend(el, keys, function (item) { return item; }, color, options.legend, dims.height);
+        charting.showStandardLegend(el, keys,color, options.legend, dims.height);
 
         var svg = charting.appendContainer(el, dims);
 

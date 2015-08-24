@@ -23,22 +23,27 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             data = koTools.normalizeSeries(data);
         }
 
-        var dims = charting.getDimensions(options, el);
+
         data.forEach(function (singleLine) {
             if (singleLine.values == null)
                 throw "Each line needs to have values property containing tuples of x and y values";
         });
 
-        var y = d3.scale.linear()
-          .range([dims.height, 0]);
-
+        //define all the linenames to compute the legen width approximation
+        var linenames = data.map(function (item) { return item.linename; });
+        //we need also one color per linename
         var color = d3.scale.category20();
-
+        color.domain(linenames);
+        //and helper function to get the color
         var getColor = function (l) {
             if (l.color == null) return color(l.linename);
             return l.color;
         }
 
+        var dims = charting.getDimensions(options, el,linenames);
+
+        var y = d3.scale.linear()
+          .range([dims.height, 0]);
 
         //xKeys - not all the lines have neceseraly the same x values -> concat & filter
         var xKeys = [];
@@ -109,9 +114,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
 
         var svg = charting.appendContainer(el, dims);
 
-        var linenames = data.map(function (item) { return item.linename; });
-        color.domain(linenames);
-        charting.showStandardLegend(el, linenames, function (i) { return i; }, color, options.legend, dims.height);
+        charting.showStandardLegend(el, linenames, color, options.legend, dims.height);
 
         if (options.xTick) {
             var xValues = xKeys.filter(function (k) {

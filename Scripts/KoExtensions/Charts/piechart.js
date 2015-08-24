@@ -36,26 +36,23 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             color.domain(keys);
         }
    
+        var xKeys = data.map(function (i) { return i.x; });
+        var dims = charting.getDimensions(options, el, xKeys);
 
-        var width = options.width / 2;
-        var height = options.height;
-        var outerRadius = Math.min(width, height) / 2 - 3,
-        innerRadius = outerRadius * .3,
-        donut = d3.layout.pie(),
-        arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
+        var outerRadius = Math.min(dims.width, dims.height) / 2 - 3;
+        var innerRadius = outerRadius * .3;
+        var donut = d3.layout.pie();
+        var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
         donut.value(function (d) { return d.y; });
         var sum = d3.sum(data, function (item) { return item.y; });
-        charting.showStandardLegend(el, data, function (i) { return i.x; }, color, options.legend, height, function (i) {
-            if (options.unitTransform != null)
-                return options.unitTransform(i.y);
-            return i.y;
-        });
-        var vis = el.append("svg")
-          .data([data])
-          .attr("width", width)
-          .attr("height", height);
 
-        var arcs = vis.selectAll("g.arc")
+        //piechart shows the values in the legend as well
+        //that's why it passes the whole data collection and both, description and value function provider
+        charting.showStandardLegend(el, xKeys, color, options.legend, dims.height);
+        var svg = charting.appendContainer(el, dims);
+        svg.data([data]);
+
+        var arcs = svg.selectAll("g.arc")
             .data(donut)
           .enter().append("g")
             .attr("class", "arc")

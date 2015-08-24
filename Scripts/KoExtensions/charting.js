@@ -15,21 +15,19 @@ define(function () {
         return el;
     };
 
-    charting.showStandardLegend = function(parent, data, descGetter, color, showLegend, height, valueGetter) {
-        var getItemAndValue = function(item) {
-            if (valueGetter != null) {
-                return descGetter(item) + ": " + valueGetter(item);
-            } else {
-                return descGetter(item);
-            }
-        };
-
-        var maxLegendLength = d3.max(data, function(el) {
-            return getItemAndValue(el).length;
+    charting.getLegendWidth = function (data,valueGetter,descGetter) {
+        var maxWidth = d3.max(data, function (el) {
+            return el.length;
         });
+        return maxWidth;
+    }
+
+    charting.showStandardLegend = function(parent, data, color, showLegend, height) {
+        
+        var maxWidth = charting.getLegendWidth(data);
 
         //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
-        var legendWidth = 25 + maxLegendLength * 7;
+        var legendWidth = 25 + maxWidth * 7;
 
         if (showLegend) {
             var legend = parent
@@ -44,12 +42,12 @@ define(function () {
             legend.append("rect")
                 .attr("width", 18)
                 .attr("height", 18)
-                .style("fill", function(i) { return color(descGetter(i)); });
+                .style("fill", function(i) { return color(i); });
             legend.append("text")
                 .attr("x", 24)
                 .attr("y", 9)
                 .attr("dy", ".35em")
-                .text(getItemAndValue);
+                .text(function (t) { return t; });
         }
     };
 
@@ -118,7 +116,7 @@ define(function () {
 
     };
 
-    charting.getDimensions = function (options, el) {
+    charting.getDimensions = function (options, el, legenKeys) {
 
         if (options.fillParentController) {
             options.width = el.width;
@@ -126,6 +124,9 @@ define(function () {
         }
         var margin = { top: 20, right: 80, bottom: 50, left: 50 };
         var width = options.width == null ? (960 - margin.left - margin.right) : options.width;
+        if (options.legend) {
+            width = width - charting.getLegendWidth(legenKeys);
+        }
         var height = options.height == null ? (500 - margin.top - margin.bottom) : options.height;
         return {
             width: width,

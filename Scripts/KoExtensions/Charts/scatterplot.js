@@ -34,7 +34,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
 
         var svg = charting.appendContainer(el, dims);
 
-        charting.showStandardLegend(el, xKeys, function (i) { return i; }, color, options.legend, dims.height);
+        charting.showStandardLegend(el, xKeys, color, options.legend, dims.height);
 
         charting.createXAxis(svg, options, x, dims);
 

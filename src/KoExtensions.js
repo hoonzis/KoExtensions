@@ -460,21 +460,19 @@ define('KoExtensions/charting',[],function () {
         return el;
     };
 
-    charting.showStandardLegend = function(parent, data, descGetter, color, showLegend, height, valueGetter) {
-        var getItemAndValue = function(item) {
-            if (valueGetter != null) {
-                return descGetter(item) + ": " + valueGetter(item);
-            } else {
-                return descGetter(item);
-            }
-        };
-
-        var maxLegendLength = d3.max(data, function(el) {
-            return getItemAndValue(el).length;
+    charting.getLegendWidth = function (data,valueGetter,descGetter) {
+        var maxWidth = d3.max(data, function (el) {
+            return el.length;
         });
+        return maxWidth;
+    }
+
+    charting.showStandardLegend = function(parent, data, color, showLegend, height) {
+        
+        var maxWidth = charting.getLegendWidth(data);
 
         //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
-        var legendWidth = 25 + maxLegendLength * 7;
+        var legendWidth = 25 + maxWidth * 7;
 
         if (showLegend) {
             var legend = parent
@@ -489,12 +487,12 @@ define('KoExtensions/charting',[],function () {
             legend.append("rect")
                 .attr("width", 18)
                 .attr("height", 18)
-                .style("fill", function(i) { return color(descGetter(i)); });
+                .style("fill", function(i) { return color(i); });
             legend.append("text")
                 .attr("x", 24)
                 .attr("y", 9)
                 .attr("dy", ".35em")
-                .text(getItemAndValue);
+                .text(function (t) { return t; });
         }
     };
 
@@ -563,7 +561,7 @@ define('KoExtensions/charting',[],function () {
 
     };
 
-    charting.getDimensions = function (options, el) {
+    charting.getDimensions = function (options, el, legenKeys) {
 
         if (options.fillParentController) {
             options.width = el.width;
@@ -571,6 +569,9 @@ define('KoExtensions/charting',[],function () {
         }
         var margin = { top: 20, right: 80, bottom: 50, left: 50 };
         var width = options.width == null ? (960 - margin.left - margin.right) : options.width;
+        if (options.legend) {
+            width = width - charting.getLegendWidth(legenKeys);
+        }
         var height = options.height == null ? (500 - margin.top - margin.bottom) : options.height;
         return {
             width: width,
@@ -1099,7 +1100,19 @@ define('KoExtensions/Charts/barchart',['./../charting','./../kotools'], function
 
         options = koTools.setDefaultOptions(defaultOptions, options);
         var xcoord = options.xcoord;
-        var dims = charting.getDimensions(options, el);
+        
+        // not all the items do have the same set of properties, therefor scan them all and concatenate the result
+        var keys = [];
+        data.map(function (i) {
+            var itemKeys = d3.keys(i).filter(function (key) { return key != xcoord && keys.indexOf(key) < 0; });
+            keys = keys.concat(itemKeys);
+        });
+
+        //we need color for each possible variable
+        var color = d3.scale.category20();
+        color.domain(keys);
+
+        var dims = charting.getDimensions(options, el,keys);
 
         var x = d3.scale.ordinal()
             .rangeRoundBands([0, dims.width], .3);
@@ -1107,21 +1120,13 @@ define('KoExtensions/Charts/barchart',['./../charting','./../kotools'], function
         var y = d3.scale.linear()
             .rangeRound([dims.height, 0]);
 
-        var color = d3.scale.category20();
-
+        
 
         var yAxis = d3.svg.axis()
             .scale(y)
             .tickSize(dims.width)
             .orient("right");
 
-        // not all the items do have the same set of properties, therefor scan them all and concatenate the result
-        var keys = [];
-        data.map(function (i) {
-            var itemKeys = d3.keys(i).filter(function (key) { return key != xcoord && keys.indexOf(key) < 0; });
-            keys = keys.concat(itemKeys);
-        });
-        color.domain(keys);
 
         //runs overs all the data. copies the result to a new array
         var arranged = [];
@@ -1159,7 +1164,7 @@ define('KoExtensions/Charts/barchart',['./../charting','./../kotools'], function
             arrangedByX[newD.x] = newD;
         });
 
-        charting.showStandardLegend(el, keys, function (item) { return item; }, color, options.legend, dims.height);
+        charting.showStandardLegend(el, keys,color, options.legend, dims.height);
 
         var svg = charting.appendContainer(el, dims);
 
@@ -1388,26 +1393,23 @@ define('KoExtensions/Charts/piechart',['./../charting','./../kotools'], function
             color.domain(keys);
         }
    
+        var xKeys = data.map(function (i) { return i.x; });
+        var dims = charting.getDimensions(options, el, xKeys);
 
-        var width = options.width / 2;
-        var height = options.height;
-        var outerRadius = Math.min(width, height) / 2 - 3,
-        innerRadius = outerRadius * .3,
-        donut = d3.layout.pie(),
-        arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
+        var outerRadius = Math.min(dims.width, dims.height) / 2 - 3;
+        var innerRadius = outerRadius * .3;
+        var donut = d3.layout.pie();
+        var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
         donut.value(function (d) { return d.y; });
         var sum = d3.sum(data, function (item) { return item.y; });
-        charting.showStandardLegend(el, data, function (i) { return i.x; }, color, options.legend, height, function (i) {
-            if (options.unitTransform != null)
-                return options.unitTransform(i.y);
-            return i.y;
-        });
-        var vis = el.append("svg")
-          .data([data])
-          .attr("width", width)
-          .attr("height", height);
 
-        var arcs = vis.selectAll("g.arc")
+        //piechart shows the values in the legend as well
+        //that's why it passes the whole data collection and both, description and value function provider
+        charting.showStandardLegend(el, xKeys, color, options.legend, dims.height);
+        var svg = charting.appendContainer(el, dims);
+        svg.data([data]);
+
+        var arcs = svg.selectAll("g.arc")
             .data(donut)
           .enter().append("g")
             .attr("class", "arc")
@@ -1471,22 +1473,27 @@ define('KoExtensions/Charts/linechart',['./../charting','./../kotools'], functio
             data = koTools.normalizeSeries(data);
         }
 
-        var dims = charting.getDimensions(options, el);
+
         data.forEach(function (singleLine) {
             if (singleLine.values == null)
                 throw "Each line needs to have values property containing tuples of x and y values";
         });
 
-        var y = d3.scale.linear()
-          .range([dims.height, 0]);
-
+        //define all the linenames to compute the legen width approximation
+        var linenames = data.map(function (item) { return item.linename; });
+        //we need also one color per linename
         var color = d3.scale.category20();
-
+        color.domain(linenames);
+        //and helper function to get the color
         var getColor = function (l) {
             if (l.color == null) return color(l.linename);
             return l.color;
         }
 
+        var dims = charting.getDimensions(options, el,linenames);
+
+        var y = d3.scale.linear()
+          .range([dims.height, 0]);
 
         //xKeys - not all the lines have neceseraly the same x values -> concat & filter
         var xKeys = [];
@@ -1557,9 +1564,7 @@ define('KoExtensions/Charts/linechart',['./../charting','./../kotools'], functio
 
         var svg = charting.appendContainer(el, dims);
 
-        var linenames = data.map(function (item) { return item.linename; });
-        color.domain(linenames);
-        charting.showStandardLegend(el, linenames, function (i) { return i; }, color, options.legend, dims.height);
+        charting.showStandardLegend(el, linenames, color, options.legend, dims.height);
 
         if (options.xTick) {
             var xValues = xKeys.filter(function (k) {
@@ -1852,7 +1857,7 @@ define('KoExtensions/Charts/scatterplot',['./../charting','./../kotools'], funct
 
         var svg = charting.appendContainer(el, dims);
 
-        charting.showStandardLegend(el, xKeys, function (i) { return i; }, color, options.legend, dims.height);
+        charting.showStandardLegend(el, xKeys, color, options.legend, dims.height);
 
         charting.createXAxis(svg, options, x, dims);
 

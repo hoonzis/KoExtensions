@@ -24,7 +24,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
 
         var yAxis = d3.svg.axis().scale(yScale).tickSize(width).orient("right");
 
-        charting.showStandardLegend(el, colors, function (i) { return i; }, colorScale, true, height);
+        charting.showStandardLegend(el, colors, colorScale, true, height);
 
         var svg = el.append("svg")
             .attr("width", width + margin.left + margin.right)
