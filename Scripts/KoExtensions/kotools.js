@@ -52,7 +52,7 @@ define(function () {
 
         self.getMonth = function(item) {
             if (item.Year != null && item.Month != null) {
-                return item.Year + '' + item.Month;
+                return item.Year + ' ' + item.Month;
             }
             return null;
         };
