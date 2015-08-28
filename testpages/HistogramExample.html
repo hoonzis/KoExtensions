@@ -31,7 +31,7 @@
             require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {
                 ko = kol;
                 d3 = d3l;
-                require(['KoExtensions/koextensions'], function() {
+                require(['KoExtensions/koextensions'], function(koext) {
                     var histogramDataExample = "3.9,3.8,3.9,2.7,2.8,1.9,2.7,3.5, 4.4, 2.8, 3.4, 8.6, 4.5, 3.5, 3.6, 3.8, 4.3, 4.5, 3.5,30,33,31";
 
                     function TestViewModel() {
@@ -58,7 +58,7 @@
                             return {
                                 tolerance: self.tolerance(),
                                 showProbabilityDistribution: self.showProbabilityDistribution(),
-                                min: koTools.tryConvertToNumber(self.min()),
+                                min: koext.tools.tryConvertToNumber(self.min()),
                                 expected: self.expected(),
                                 useMAD: self.useMAD(),
                                 showOutliers: self.showOutliers(),
@@ -70,7 +70,7 @@
                     }
 
                     var vm = new TestViewModel();
-
+                    koext.registerExtensions();
                     ko.applyBindings(vm);
                 });
             });

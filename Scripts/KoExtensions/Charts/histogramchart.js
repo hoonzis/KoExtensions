@@ -1,5 +1,5 @@
 "use strict";
-define(['./../charting'], function (charting) {
+define(['./../charting', './../kotools'], function (charting, koTools) {
     charting.histogram = function(data, element, options) {
         var defaultOptions = {
             bins: 80,

@@ -1667,7 +1667,7 @@ define('KoExtensions/Charts/linechart',['./../charting','./../kotools'], functio
 
 
 
-define('KoExtensions/Charts/histogramchart',['./../charting'], function (charting) {
+define('KoExtensions/Charts/histogramchart',['./../charting', './../kotools'], function (charting, koTools) {
     charting.histogram = function(data, element, options) {
         var defaultOptions = {
             bins: 80,
