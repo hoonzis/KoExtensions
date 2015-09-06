@@ -167,6 +167,7 @@
 
 		$( document ).ready(function() {
 			var vm = new TestViewModels(carSales, lastWeek);
+			koExtensions.charting.initializeCharts();
 			ko.applyBindings(vm);
 		});
     </script>

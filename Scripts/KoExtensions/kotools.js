@@ -50,9 +50,15 @@ define(function () {
             return null;
         };
 
+        self.paddy = function (n, p, c) {
+            var pad_char = typeof c !== 'undefined' ? c : '0';
+            var pad = new Array(1 + p).join(pad_char);
+            return (pad + n).slice(-pad.length);
+        }
+
         self.getMonth = function(item) {
             if (item.Year != null && item.Month != null) {
-                return item.Year + '' + item.Month;
+                return item.Year + '' + self.paddy(item.Month, 2);
             }
             return null;
         };

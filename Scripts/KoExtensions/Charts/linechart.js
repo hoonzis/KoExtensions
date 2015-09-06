@@ -27,6 +27,12 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
         data.forEach(function (singleLine) {
             if (singleLine.values == null)
                 throw "Each line needs to have values property containing tuples of x and y values";
+            //sort each line using the x coordinate
+            singleLine.values.sort(function (a, b) {
+                if (a.x > b.x) return 1;
+                if (a.x < b.x) return -1;
+                return 0;
+            });
         });
 
         //define all the linenames to compute the legen width approximation
@@ -40,14 +46,16 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             return l.color;
         }
 
-        var dims = charting.getDimensions(options, el,linenames);
+        var dims = charting.getDimensions(options, el, linenames);
 
         var y = d3.scale.linear()
           .range([dims.height, 0]);
 
         //xKeys - not all the lines have neceseraly the same x values -> concat & filter
         var xKeys = [];
+
         var allNumbers = true;
+        var allDates = true;
         var min = 100000000000000000000;
         var max = -10000000000000000000;
 
@@ -55,6 +63,8 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             var itemKeys = i.values.map(function (v) {
                 if (!koTools.isNumber(v.x))
                     allNumbers = false;
+                if (!koTools.isDate(v.x))
+                    allDates = false;
                 if (v.x < min)
                     min = v.x;
                 if (v.x > max)
@@ -65,17 +75,24 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             });
 
             xKeys = xKeys.concat(itemKeys);
+            xKeys.sort();
         });
         var x;
-        
-        if (allNumbers) {
+
+        var scaleType = allNumbers ? 'linear' : allDates ? 'date' : 'ordinal';
+
+        if (scaleType == 'linear') {
             x = d3.scale.linear().range([0, dims.width], .1);
             x.domain([min, max]);
-        } else {
+        } else if (scaleType == 'ordinal') {
             x = d3.scale.ordinal()
                 .rangeRoundBands([0, dims.width], .1);
 
             x.domain(xKeys);
+        } else if (scaleType == 'date') {
+            x = d3.time.scale().range([0, dims.width], .1);
+            x.domain([min, max]);
+            x.ticks(10);
         }
 
         var yMin = options.yMin != null ? options.yMin : d3.min(data, function (c) {
@@ -102,15 +119,16 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
           .orient("right");
 
         var getX = function (d) {
-            if (!allNumbers)
+            if (scaleType == 'ordinal')
                 return x(d.x) + x.rangeBand() / 2;
-            return x(d.x);
+            else if (scaleType == 'date' || scaleType == 'linear')
+                return x(d.x);
         };
 
         var line = d3.svg.line()
           .interpolate("linear")
           .x(getX)
-          .y(function (d) { return y(d.y);});
+          .y(function (d) { return y(d.y); });
 
         var svg = charting.appendContainer(el, dims);
 
