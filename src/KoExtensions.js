@@ -460,7 +460,10 @@ define('KoExtensions/charting',[],function () {
         return el;
     };
 
-    charting.getLegendWidth = function (data,valueGetter,descGetter) {
+    charting.getLegendWidth = function (data) {
+        //when there is no legend, just return 0 pixels
+        if (data == null || data.length === 0)
+            return 0;
         var maxWidth = d3.max(data, function (el) {
             return el.length;
         });
@@ -1085,6 +1088,7 @@ define('KoExtensions/kotools',[],function () {
 
     return new KoTools();
 });
+
 
 define('KoExtensions/Charts/barchart',['./../charting','./../kotools'], function (charting,koTools) {
     //accepts and array of objects. one property of each object is used as the x-coordinate 
@@ -1916,7 +1920,132 @@ define('KoExtensions/Charts/scatterplot',['./../charting','./../kotools'], funct
 
 
 
-define('KoExtensions/koextensions',['./charting', './kotools','./Charts/barchart','./Charts/piechart','./Charts/linechart','./Charts/histogramchart','./Charts/scatterplot'],
+
+define('KoExtensions/Charts/chordchart',['./../charting', './../kotools'], function(charting, koTools) {
+    charting.chordChart = function(data, element, options) {
+
+        var el = charting.getElementAndCheckData(element, data);
+        if (el == null)
+            return;
+
+        var defaultOptions = {
+            width: 800,
+            height: 800
+        };
+
+        options = koTools.setDefaultOptions(defaultOptions, options);
+        var dims = charting.getDimensions(options, el, null);
+        var outerRadius = Math.min(dims.width, dims.height) / 2 - 100;
+        var innerRadius = outerRadius - 24;
+
+        //get the name of the item by id
+        var descGetter = function (item) {
+            if(options.hideNames)
+                return item.index + 1;
+            else
+                return data.names[item.index];
+        };
+
+        var color = d3.scale.category20();
+
+        var arc = d3.svg.arc()
+            .innerRadius(innerRadius)
+            .outerRadius(outerRadius);
+
+        var layout = d3.layout.chord()
+            .padding(.04);
+
+        var path = d3.svg.chord()
+            .radius(innerRadius);
+
+        var svg = el.append("svg")
+            .attr("width", dims.width)
+            .attr("height", dims.height)
+            .append("g")
+            .attr("id", "circle")
+            .attr("transform", "translate(" + dims.width / 2 + "," + dims.height / 2 + ")");
+
+        var chord_mouse_over = function (g, i) {
+            var a1 = data.names[g.source.index];
+            var a2 = data.names[g.source.subindex];
+            var title = a1 + " - " + a2;
+            var info = {};
+            info[title] = g.source.value;
+
+            //get all except this chord and put it in background
+            svg.selectAll(".chord")
+                .filter(function (d, index) {
+                    return i !== index;
+                })
+                .transition()
+                .style("opacity", 0.1);
+
+            charting.showTooltip(info);
+        }
+
+        var chord_mouse_out = function (g, i) {
+            svg.selectAll(".chord")
+                .transition()
+                .style("opacity", 1);
+
+            charting.hideTooltip();
+        }
+
+        var fade = function(opacity) {
+            return function (g, i) {
+                svg.selectAll(".chord")
+                    .filter(function (d) {
+                        return d.target.index != i && d.source.index != i;
+                    })
+                    .transition()
+                    .style("opacity", opacity);
+
+                var info = {};
+                info[descGetter(g)] = g.value;
+                charting.showTooltip(info);
+            };
+        }
+
+        layout.matrix(data.matrix);
+        var group = svg.selectAll(".group")
+            .data(layout.groups)
+            .enter().append("g")
+            .attr("class", "group");
+
+        
+        group.append("path")
+            .attr("id", function(d, i) { return "group" + i; })
+            .attr("d", arc)
+            .style("fill", function(d, i) { return color(i); })
+            .on("mouseover", fade(.1))
+            .on("mouseout", fade(1));
+
+        group.append("text")
+            .each(function(d) { d.angle = (d.startAngle + d.endAngle) / 2; })
+            .attr("dy", ".35em")
+            .attr("transform", function(d) {
+                return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
+                    + "translate(" + (innerRadius + 26) + ")"
+                    + (d.angle > Math.PI ? "rotate(180)" : "");
+            })
+            .style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
+            .attr("font-family", "Open Sans, sans-serif")
+            .style("font-size", "13px")
+            .text(descGetter);
+
+        // Add the chords.
+        svg.selectAll(".chord")
+            .data(layout.chords)
+            .enter().append("path")
+            .attr("class", "chord")
+            .style("fill", function(d) { return color(d.source.index); })
+            .attr("d", path)
+            .on("mouseover", chord_mouse_over)
+            .on("mouseout", chord_mouse_out);   
+    }
+});
+    
+define('KoExtensions/koextensions',['./charting', './kotools', './Charts/barchart', './Charts/piechart', './Charts/linechart', './Charts/histogramchart', './Charts/scatterplot', './Charts/chordchart'],
     function (charting, kotools) {
         function koextensions() {
             var self = this;
@@ -2023,6 +2152,14 @@ define('KoExtensions/koextensions',['./charting', './kotools','./Charts/barchart
                         if (allBindingsAccessor().line != null)
                             line = allBindingsAccessor().line();
                         charting.barChart(data, element, options, line);
+                    }
+                };
+
+                ko.bindingHandlers.chordChart = {
+                    update: function (element, valueAccessor, allBindingsAccessor) {
+                        var data = allBindingsAccessor().chordChart();
+                        var options = allBindingsAccessor().chartOptions;
+                        charting.chordChart(data, element, options);
                     }
                 };
 
@@ -2159,7 +2296,6 @@ define('KoExtensions/koextensions',['./charting', './kotools','./Charts/barchart
     var extensions = require('KoExtensions/koextensions');
 	//this part is the only one using Knockout and probably shall be left out
 	//so that the charting and tools can be used in project without knockout
-	extensions.charting.initializeCharts();
 	extensions.registerExtensions();
 	return extensions;
 }));

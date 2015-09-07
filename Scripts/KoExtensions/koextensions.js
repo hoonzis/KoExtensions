@@ -1,4 +1,4 @@
-﻿define(['./charting', './kotools','./Charts/barchart','./Charts/piechart','./Charts/linechart','./Charts/histogramchart','./Charts/scatterplot'],
+﻿define(['./charting', './kotools', './Charts/barchart', './Charts/piechart', './Charts/linechart', './Charts/histogramchart', './Charts/scatterplot', './Charts/chordchart'],
     function (charting, kotools) {
         function koextensions() {
             var self = this;
@@ -105,6 +105,14 @@
                         if (allBindingsAccessor().line != null)
                             line = allBindingsAccessor().line();
                         charting.barChart(data, element, options, line);
+                    }
+                };
+
+                ko.bindingHandlers.chordChart = {
+                    update: function (element, valueAccessor, allBindingsAccessor) {
+                        var data = allBindingsAccessor().chordChart();
+                        var options = allBindingsAccessor().chartOptions;
+                        charting.chordChart(data, element, options);
                     }
                 };
 

@@ -15,7 +15,10 @@ define(function () {
         return el;
     };
 
-    charting.getLegendWidth = function (data,valueGetter,descGetter) {
+    charting.getLegendWidth = function (data) {
+        //when there is no legend, just return 0 pixels
+        if (data == null || data.length === 0)
+            return 0;
         var maxWidth = d3.max(data, function (el) {
             return el.length;
         });
