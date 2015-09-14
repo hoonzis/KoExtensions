@@ -1,5 +1,5 @@
 ﻿"use strict";
-define(function () {
+define(['./kotools'],function (koTools) {
     if (d3 == null) {
         throw "KoExtensions need d3";
     }
@@ -7,7 +7,7 @@ define(function () {
 
     charting.getElementAndCheckData = function(element, data) {
         var el = d3.select(element);
-        if (data == null || data.length == 0) {
+        if (data == null || data.length === 0) {
             element.innerHTML = "No data available";
             return null;
         }
@@ -160,9 +160,9 @@ define(function () {
             xAxis.tickValues(options.tickValues);
 
         var xAxisEl = svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + dims.height + ")")
-        .call(xAxis);
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + dims.height + ")")
+            .call(xAxis);
 
         if (options.xAxisTextAngle != null) {
             xAxisEl.selectAll("text")
@@ -172,8 +172,113 @@ define(function () {
                 .attr("transform", "rotate(" + options.xAxisTextAngle + ")")
                 .style("text-anchor", "start");
         }
+
+        if (options.xAxisLabel) {
+            svg.append("text")
+                .style("font-size", "15px")
+                .attr("class", "x label")
+                .attr("text-anchor", "end")
+                .attr("x", dims.width)
+                .attr("y", dims.height + 40)
+                .text(options.xAxisLabel);
+        }
     }
 
+    charting.createYAxis = function (svg, options, yScale, dims) {
+        var yAxis = d3.svg.axis().scale(yScale).tickSize(dims.width).orient("right");
+        var gy = svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+
+        gy.selectAll("g").
+            filter(function (d) { return d; })
+            .classed("minor", true);
+
+        gy.selectAll("text")
+            .attr("x", 4)
+            .attr("dy", -4);
+
+        if (options.yAxisLabel) {
+            svg.append("text")
+                .attr("class", "y label")
+                .attr("text-anchor", "end")
+                .attr("y", 6)
+                .attr("dy", ".75em")
+                .style("font-size", "15px")
+                .text(options.yAxisLabel)
+                .attr("transform", "translate(" + dims.width + "," + 40 + ")rotate(-90)");
+        }
+    }
+
+    charting.determineXScale = function (data, def) {
+        if (def == null) {
+            def = {
+                allNumbers: true,
+                allDates: true,
+                min: 100000000000000000000,
+                max: -1000000000000000000000,
+                xKeys:[]
+            }    
+        }
+
+        var newKeys = data.map(function(v) {
+            if (!koTools.isNumber(v))
+                def.allNumbers = false;
+            if (!koTools.isDate(v))
+                def.allDates = false;
+            if (v < def.min)
+                def.min = v;
+            if (v > def.max)
+                def.max = v;
+            return v;
+        });
+
+        def.xKeys = def.xKeys.concat(newKeys);
+        def.scaleType = def.allNumbers ? 'linear' : def.allDates ? 'date' : 'ordinal';
+        return def;
+    }
+
+    charting.determineXScaleForMultipleLines = function (data) {
+        var def = null;
+        data.forEach(function(i) {
+            def = charting.determineXScale(i.values.map(function(v) {
+                return v.x;
+            }), def);
+        });
+
+        return def;
+    }
+
+    //takes the result of determineXScale and creates D3 scale
+    charting.getXScaleFromConfig = function(def,dims) {
+        var x;
+
+        if (def.scaleType === 'linear') {
+            x = d3.scale.linear().range([0, dims.width], .1);
+            x.domain([def.min, def.max]);
+        } else if (def.scaleType === 'ordinal') {
+            x = d3.scale.ordinal()
+                .rangeRoundBands([0, dims.width], .1);
+            x.domain(def.xKeys);
+        } else if (def.scaleType === 'date') {
+            x = d3.time.scale().range([0, dims.width], .1);
+            x.domain([def.min, def.max]);
+            x.ticks(10);
+        } else {
+            throw "invalid scale type";
+        }
+        return x;
+    }
+
+    charting.xGetter = function (scaleDef, x) {
+        return function(d) {
+            if (scaleDef.scaleType === 'ordinal')
+                return x(d) + x.rangeBand() / 2;
+            else if (scaleDef.scaleType === 'date' || scaleDef.scaleType === 'linear')
+                return x(d);
+            throw "invalid Scale Type";
+        }
+    }
 
     return charting;
 });

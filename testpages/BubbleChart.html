@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF8">
+    <title>BubbleChart Chart</title>
+    <script src="../Scripts/require.js"></script>
+    <link type="text/css" rel="stylesheet" href="../styles/kostyles.css" />
+</head>
+<body>
+    <div id="bullChart" data-bind="bubblechart: bubbleChartData, chartOptions:bubbleChartOptions"></div>
+    <script>
+
+            window.document.onload = function (e) {
+                initialize();
+            }
+
+            require.config({
+                baseUrl: "/Scripts",
+                urlArgs: "bust=2" + (new Date()).getTime()
+            });
+
+            require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {
+                ko = kol;
+                d3 = d3l;
+                require(['KoExtensions/koextensions'], function(koext) {
+                    koext.registerExtensions();
+
+                    
+                    function TestViewModel() {
+                        var self = this;
+                        self.bubbleChartData = ko.observableArray([]);
+                        self.bubbleChartOptions = {
+                            bubbleHorizontal: function (d) { return d.day; },
+                            bubbleVertical: function (d) { return d.strike; },
+                            bubbleSize: function (d) { return d.price; },
+                            bubbleColor: function (d) { return d.type; }
+                        }
+                    }
+
+                    var vm = new TestViewModel();
+                    ko.applyBindings(vm);
+
+                    var day1 = new Date(2015, 1, 1);
+                    var day2 = new Date(2015, 1, 2);
+                    var day3 = new Date(2015, 1, 3);
+
+                    var data = [
+                        { strike: 100, day: day1, price: 4.45,type:"PUT" },
+                        { strike: 100, day: day2, price: 5.45,type:"CALL"},
+                        { strike: 100, day: day3, price: 6.45, type:"PUT"},
+                        { strike: 110, day: day1, price: 5.8,type:"CALL"},
+                        { strike: 110, day: day2, price: 6.8, type: "PUT" },
+                        { strike: 110, day: day3, price: 7.45, type: "CALL" },
+                        { strike: 120, day: day1, price: 8.45, type: "CALL" },
+                        { strike: 120, day: day2, price: 9.2, type: "CALL" },
+                        { strike: 120, day: day3, price: 10.45, type: "CALL" }
+                    ];
+
+                    vm.bubbleChartData(data);
+                });
+            });
+    </script>
+</body>
+</html> 

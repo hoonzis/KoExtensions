@@ -14,7 +14,8 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             width: 200,
             height: 200,
             xUnitName: 'x',
-            showDataPoints: true
+            showDataPoints: true,
+            marginCoef: 1.1
         }
 
         options = koTools.setDefaultOptions(defaultOptions, options);
@@ -51,79 +52,30 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
         var y = d3.scale.linear()
           .range([dims.height, 0]);
 
-        //xKeys - not all the lines have neceseraly the same x values -> concat & filter
-        var xKeys = [];
-
-        var allNumbers = true;
-        var allDates = true;
-        var min = 100000000000000000000;
-        var max = -10000000000000000000;
-
-        data.map(function (i) {
-            var itemKeys = i.values.map(function (v) {
-                if (!koTools.isNumber(v.x))
-                    allNumbers = false;
-                if (!koTools.isDate(v.x))
-                    allDates = false;
-                if (v.x < min)
-                    min = v.x;
-                if (v.x > max)
-                    max = v.x;
-                return v.x;
-            }).filter(function (v) {
-                return xKeys.indexOf(v) < 0;
-            });
-
-            xKeys = xKeys.concat(itemKeys);
-            xKeys.sort();
-        });
-        var x;
-
-        var scaleType = allNumbers ? 'linear' : allDates ? 'date' : 'ordinal';
-
-        if (scaleType == 'linear') {
-            x = d3.scale.linear().range([0, dims.width], .1);
-            x.domain([min, max]);
-        } else if (scaleType == 'ordinal') {
-            x = d3.scale.ordinal()
-                .rangeRoundBands([0, dims.width], .1);
-
-            x.domain(xKeys);
-        } else if (scaleType == 'date') {
-            x = d3.time.scale().range([0, dims.width], .1);
-            x.domain([min, max]);
-            x.ticks(10);
+        var scaleDef = charting.determineXScaleForMultipleLines(data);
+        var x = charting.getXScaleFromConfig(scaleDef, dims);
+        var getX = function(d) {
+            return charting.xGetter(scaleDef, x)(d.x);
         }
 
+        //TODO: calculating y min and max can probably go to the same method that calculates x scale def
+        //thus making in on loop only
         var yMin = options.yMin != null ? options.yMin : d3.min(data, function (c) {
-            return d3.min(c.values, function (v) {
-                if (v.y < 0)
-                    return v.y;
-                return 0;
-            });
+            return d3.min(c.values, function (v) { return v.y;});
         });
 
         var yMax = options.yMax != null ? options.yMax : d3.max(data, function (c) {
-            return d3.max(c.values,
-                function (v) { return v.y; });
+            return d3.max(c.values, function (v) { return v.y; });
         });
 
-        yMax = yMax > 0 ? yMax * 1.1 : yMax * 0.9;
-        yMin = yMin < 0 ? yMin * 1.1 : yMin * 0.9;
+
+        //setting up margings. how much more on the bottom and on the top of the chart should be shown
+        //bellow or above the max and minimum value - carefull to handle negative max values
+        var reversedCoef = 2.0 - options.marginCoef;
+        yMax = yMax > 0 ? yMax * options.marginCoef : yMax * reversedCoef;
+        yMin = yMin < 0 ? yMin * options.marginCoef : yMin * reversedCoef;
 
         y.domain([yMin, yMax]);
-
-        var yAxis = d3.svg.axis()
-          .scale(y)
-          .tickSize(dims.width)
-          .orient("right");
-
-        var getX = function (d) {
-            if (scaleType == 'ordinal')
-                return x(d.x) + x.rangeBand() / 2;
-            else if (scaleType == 'date' || scaleType == 'linear')
-                return x(d.x);
-        };
 
         var line = d3.svg.line()
           .interpolate("linear")
@@ -135,24 +87,13 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
         charting.showStandardLegend(el, linenames, color, options.legend, dims.height);
 
         if (options.xTick) {
-            var xValues = xKeys.filter(function (k) {
-                return k % options.xTick == 0;
+            var xValues = scaleDef.xKeys.filter(function (k) {
+                return k % options.xTick === 0;
             });
             options.tickValues = xValues;
         }
         charting.createXAxis(svg, options, x, dims);
-
-        var gy = svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis);
-
-        gy.selectAll("g").
-            filter(function (d) { return d; })
-            .classed("minor", true);
-
-        gy.selectAll("text")
-        .attr("x", 4)
-        .attr("dy", -4);
+        charting.createYAxis(svg, options, y, dims);
 
         var point = svg.selectAll(".point")
             .data(data)
@@ -161,14 +102,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
                 d.values.forEach(
                     function (item) {
                         item.color = getColor(d);
-                        if (item.formattedValue != null)
-                            return;
-                        if (item.name == null)
-                            item.name = d.x;
-                        var formattedValue = item.y;
-                        if (options.unitTransform != null)
-                            formattedValue = options.unitTransform(item.y);
-                        item.formattedValue = formattedValue;
+                        item.linename = d.linename;
                     });
             });
 
@@ -184,17 +118,22 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             charting.hideTooltip();
         }
 
-        //TODO: tooltip should show linename
+        var lineMouseOver = function(d) {
+            var info = {};
+            info['line'] = d.linename;
+            charting.showTooltip(info);
+        }
+
         var spMouseOver = function (d) {
             var xLabel = d.xLabel != null ? d.xLabel : d.x;
             var info = {};
             info[options.xUnitName] = xLabel;
-            info[d.name] = d.formattedValue;
+            info[d.linename] = d.y;
             charting.showTooltip(info);
-            d3.select(this).style("fill", d.color);
 
+            d3.select(this).style("fill", d.color);
             point.style("opacity", function (item) {
-                if (item.x != d.linename)
+                if (item.x !== d.linename)
                     return 0.4;
                 return 1;
             });
@@ -202,16 +141,18 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
 
         point.append("path")
             .attr("class", "line")
-            .attr("d", function (d) {
+            .attr("d", function(d) {
                 return line(d.values);
             })
-            .style("stroke-width", function (d) {
+            .style("stroke-width", function(d) {
                 return d.width ? d.width : 2;
             })
-            .style("stroke", function (d) {
+            .style("stroke", function(d) {
                 return getColor(d);
             })
-            .style("fill", "none");
+            .style("fill", "none")
+            .on("mouseover", lineMouseOver)
+            .on("mouseout", charting.hideTooltip);
 
         if (options.showDataPoints) {
 

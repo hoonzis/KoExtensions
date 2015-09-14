@@ -40,13 +40,6 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             .rangeRound([dims.height, 0]);
 
         
-
-        var yAxis = d3.svg.axis()
-            .scale(y)
-            .tickSize(dims.width)
-            .orient("right");
-
-
         //runs overs all the data. copies the result to a new array
         var arranged = [];
         var arrangedByX = {};
@@ -120,18 +113,8 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
         x1.domain(keys).rangeRoundBands([0, x.rangeBand()]);
 
         charting.createXAxis(svg, options, x, dims);
-
-        var gy = svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis);
-
-        gy.selectAll("g").
-            filter(function (d) { return d; })
-            .classed("minor", true);
-
-        gy.selectAll("text")
-            .attr("x", 4)
-            .attr("dy", -4);
+        charting.createYAxis(svg, options, y, dims);
+        
 
         var onBarOver = function (d) {
             var column = arrangedByX[d.x];
