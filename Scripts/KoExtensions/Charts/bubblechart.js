@@ -10,10 +10,14 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             width: 500,
             height: 200,
             maxBubbleSize: 50,
-            bubbleHorizontal: function (d) { return d.x; },
-            bubbleVertical: function (d) { return d.y; },
-            bubbleSize: function (d) { return d.size; },
-            bubbleColor: function (d) { return d.color; }
+            bubbleHorizontal: function(d) { return d.x; },
+            bubbleVertical: function(d) { return d.y; },
+            bubbleSize: function(d) { return d.size; },
+            bubbleColor: function(d) { return d.color; },
+            horizontalLabel: 'x',
+            verticalLabel: 'y',
+            sizeLabel: 'size',
+            typeLabel: 'type'
         }
 
         options = koTools.setDefaultOptions(defaultOptions, options);
@@ -50,10 +54,13 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
         };
 
         var bubblenodeMouseover = function (d) {
-            var info = {
-                "Type:": options.bubbleColor(d),
-                "Value": options.bubbleSize(d)
-            };
+            var info = {};
+
+            info[options.typeLabel] = options.bubbleColor(d);
+            info[options.sizeLabel] = options.bubbleSize(d);
+            info[options.verticalLabel] = options.bubbleVertical(d);
+            info[options.horizontalLabel] = options.bubbleHorizontal(d);
+                
             charting.showTooltip(info);
         }
 

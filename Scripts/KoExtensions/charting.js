@@ -58,9 +58,15 @@ define(['./kotools'],function (koTools) {
         var toolTip = d3.select("#toolTip");
         var i = 1;
         for (var key in info) {
+            var value = info[key];
             d3.select("#info" + i + "header").text(key);
-            if (info[key] != null)
-                d3.select("#info" + i).text(info[key]);
+            if (value != null) {
+                if (koTools.isDate(value)) {
+                    d3.select("#info" + i).text(value.toFormattedString());
+                } else {
+                    d3.select("#info" + i).text(value);
+                }
+            }
 
             //make sure this one is shown
             d3.select("#info" + i + "header").style("display", "block");
@@ -115,6 +121,18 @@ define(['./kotools'],function (koTools) {
             .attr("class", "header1");
 
         tooltip.append("div").attr("id", "info2")
+            .attr("class", "header2");
+
+        tooltip.append("div").attr("id", "info3header")
+            .attr("class", "header1");
+
+        tooltip.append("div").attr("id", "info3")
+            .attr("class", "header2");
+
+        tooltip.append("div").attr("id", "info4header")
+            .attr("class", "header1");
+
+        tooltip.append("div").attr("id", "info4")
             .attr("class", "header2");
 
     };
