@@ -5,6 +5,19 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
         if (el == null)
             return;
 
+        var defaultOptions = {
+            legend: true,
+            width: 500,
+            height: 200,
+            maxBubbleSize: 50,
+            bubbleHorizontal: function (d) { return d.x; },
+            bubbleVertical: function (d) { return d.y; },
+            bubbleSize: function (d) { return d.size; },
+            bubbleColor: function (d) { return d.color; }
+        }
+
+        options = koTools.setDefaultOptions(defaultOptions, options);
+
         var dims = charting.getDimensions(options, el);
 
         var maxY = d3.max(data, options.bubbleVertical);
@@ -12,18 +25,21 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
 
         var bubbleSizes = data.map(options.bubbleSize);
         bubbleSizes.sort(d3.ascending);
-        var maxBubbleSize = d3.quantile(bubbleSizes, 0.95);
+
+        var maxBubbleSize = d3.max(bubbleSizes);
+        var minBubbleSize = d3.min(bubbleSizes);
+
 
         var xScaleDef = charting.determineXScale(horizontalValues, null);
         var xScale = charting.getXScaleFromConfig(xScaleDef,dims);
         var yScale = d3.scale.linear().domain([0, maxY]).range([dims.height, 0]);
-        var radiusScale = d3.scale.pow().exponent(.4).domain([0, maxBubbleSize]).range([0, 60]).clamp(true);
+        var radiusScale = d3.scale.pow().exponent(.4).domain([minBubbleSize, maxBubbleSize]).range([2, options.maxBubbleSize]).clamp(true);
 
         var colors = koTools.distinct(data, options.bubbleColor);
         var colorScale = d3.scale.category20().domain(colors);
 
 
-        charting.showStandardLegend(el, colors, colorScale, true, dims.height);
+        charting.showStandardLegend(el, colors, colorScale, options.legend, dims.height);
         var svg = charting.appendContainer(el, dims);
 
         charting.createXAxis(svg, options, xScale, dims);
