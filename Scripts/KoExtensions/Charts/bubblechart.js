@@ -17,7 +17,10 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             horizontalLabel: 'x',
             verticalLabel: 'y',
             sizeLabel: 'size',
-            typeLabel: 'type'
+            typeLabel: 'type',
+            xAxisLabel: false,
+            yAxisLabel: false,
+            xAxisTextAngle: null
         }
 
         options = koTools.setDefaultOptions(defaultOptions, options);

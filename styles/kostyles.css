@@ -47,3 +47,8 @@ div.header2{
 .graph-body .line circle {
     opacity: 0.4;
 }
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}

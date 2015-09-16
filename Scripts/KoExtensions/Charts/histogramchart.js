@@ -3,7 +3,8 @@ define(['./../charting', './../kotools'], function (charting, koTools) {
     charting.histogram = function(data, element, options) {
         var defaultOptions = {
             bins: 80,
-            width: 500
+            width: 500,
+            fillParentController:false
         };
 
         var el = charting.getElementAndCheckData(element,data);
@@ -77,7 +78,7 @@ define(['./../charting', './../kotools'], function (charting, koTools) {
             var step = (max - min)/500;
             var expected = total / data.length;
             if(options.expected == 'median'){
-                expected = median(data);
+                expected = d3.median(data);
             }
 
             var variance = 0;
@@ -90,7 +91,7 @@ define(['./../charting', './../kotools'], function (charting, koTools) {
 
 
             if(options.useMAD){
-                variance = median(distances);
+                variance = d3.median(distances);
             }else{
                 variance= variance / data.length-1;
             }

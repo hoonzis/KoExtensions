@@ -36,7 +36,10 @@
                     bubbleSize: function(d) { return d.price; },
                     bubbleColor: function(d) { return d.type; },
                     legend: false,
-                    maxBubbleSize: 10
+                    maxBubbleSize: 20,
+                    width: 260,
+                    height: 150,
+                    xAxisTextAngle: 45
                 }
             }
 
@@ -46,6 +49,7 @@
             var day1 = new Date(2015, 1, 1);
             var day2 = new Date(2015, 1, 2);
             var day3 = new Date(2015, 1, 3);
+            var day4 = new Date(2015, 1, 4);
 
             var data = [
                 { strike: 100, day: day1, price: 4.45, type: "PUT" },
@@ -54,9 +58,14 @@
                 { strike: 110, day: day1, price: 5.8, type: "CALL" },
                 { strike: 110, day: day2, price: 6.8, type: "PUT" },
                 { strike: 110, day: day3, price: 7.45, type: "CALL" },
+                { strike: 20, day: day3, price: 7.45, type: "CASH" },
+                { strike: 40, day: day2, price: 7.45, type: "CASH" },
                 { strike: 120, day: day1, price: 8.45, type: "CALL" },
                 { strike: 120, day: day2, price: 9.2, type: "CALL" },
-                { strike: 120, day: day3, price: 10.45, type: "CALL" }
+                { strike: 120, day: day3, price: 10.45, type: "CALL" },
+                { strike: 120, day: day4, price: 8.45, type: "CALL" },
+                { strike: 110, day: day4, price: 9.2, type: "CALL" },
+                { strike: 105, day: day4, price: 10.45, type: "CASH" }
             ];
 
             vm.bubbleChartData(data);

@@ -13,9 +13,14 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             legend: true,
             width: 200,
             height: 200,
-            xUnitName: 'x',
+            horizontalLabel: 'x',
+            verticalLabel: 'y',
             showDataPoints: true,
-            marginCoef: 1.1
+            marginCoef: 1.1,
+            verticalCursorLine: false,
+            xAxisLabel: false,
+            yAxisLabel: false,
+            xAxisTextAngle: null
         }
 
         options = koTools.setDefaultOptions(defaultOptions, options);
@@ -23,7 +28,6 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
         if (options.normalizeSeries) {
             data = koTools.normalizeSeries(data);
         }
-
 
         data.forEach(function (singleLine) {
             if (singleLine.values == null)
@@ -111,6 +115,50 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
                 return d.values;
             });
 
+        var verticalLine = null;
+        var lastMove = new Date();
+        var cursorLineMove = function () {
+            var now = new Date();
+            if (now - lastMove < 50)
+                return;
+
+            var coordinates = [0, 0];
+            coordinates = d3.mouse(this);
+            var x1 = coordinates[0];
+            var y1 = coordinates[1];
+            
+            if (verticalLine == null) {
+                verticalLine = svg.append("line")
+                    .attr("x1",x1)
+                    .attr("y1", 0)
+                    .attr("x2", x1)
+                    .attr("y2", dims.height)
+                    .attr("stroke-width", 2)
+                    .attr("stroke", "black");
+            } else {
+                var current = verticalLine.attr("x1");
+                var trans = x1 - current;
+                verticalLine.attr("transform", "translate(" + trans + ",0)");
+                
+                var realY = y.invert(y1);
+                var info = { y: realY };
+                if (x.invert != null) {
+                    var realX = x.invert(x1);
+                    info["x"] = realX;
+                }
+                charting.showTooltip(info);
+            }
+            lastMove = new Date();
+        };
+
+        if (options.verticalCursorLine) {
+
+            svg.append("rect")
+              .attr("class", "overlay")
+              .attr("width", dims.width)
+              .attr("height", dims.height)
+              .on("mousemove", cursorLineMove);
+        }
 
         var spMouseOut = function () {
             d3.select(this).style("fill", "white");
@@ -127,7 +175,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
         var spMouseOver = function (d) {
             var xLabel = d.xLabel != null ? d.xLabel : d.x;
             var info = {};
-            info[options.xUnitName] = xLabel;
+            info[options.horizontalLabel] = xLabel;
             info[d.linename] = d.y;
             charting.showTooltip(info);
 

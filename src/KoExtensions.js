@@ -905,6 +905,23 @@ define('KoExtensions/kotools',[],function () {
             return config;
         }
 
+        self.throttle = function(delay, callback) {
+            var previousCall = new Date().getTime();
+            return function () {
+                var time = new Date().getTime();
+
+                //
+                // if "delay" milliseconds have expired since
+                // the previous call then propagate this call to
+                // "callback"
+                //
+                if ((time - previousCall) >= delay) {
+                    previousCall = time;
+                    callback.apply(null, arguments);
+                }
+            };
+        }
+
     };
 
     return new KoTools();
@@ -1579,9 +1596,14 @@ define('KoExtensions/Charts/linechart',['./../charting','./../kotools'], functio
             legend: true,
             width: 200,
             height: 200,
-            xUnitName: 'x',
+            horizontalLabel: 'x',
+            verticalLabel: 'y',
             showDataPoints: true,
-            marginCoef: 1.1
+            marginCoef: 1.1,
+            verticalCursorLine: false,
+            xAxisLabel: false,
+            yAxisLabel: false,
+            xAxisTextAngle: null
         }
 
         options = koTools.setDefaultOptions(defaultOptions, options);
@@ -1589,7 +1611,6 @@ define('KoExtensions/Charts/linechart',['./../charting','./../kotools'], functio
         if (options.normalizeSeries) {
             data = koTools.normalizeSeries(data);
         }
-
 
         data.forEach(function (singleLine) {
             if (singleLine.values == null)
@@ -1677,6 +1698,50 @@ define('KoExtensions/Charts/linechart',['./../charting','./../kotools'], functio
                 return d.values;
             });
 
+        var verticalLine = null;
+        var lastMove = new Date();
+        var cursorLineMove = function () {
+            var now = new Date();
+            if (now - lastMove < 50)
+                return;
+
+            var coordinates = [0, 0];
+            coordinates = d3.mouse(this);
+            var x1 = coordinates[0];
+            var y1 = coordinates[1];
+            
+            if (verticalLine == null) {
+                verticalLine = svg.append("line")
+                    .attr("x1",x1)
+                    .attr("y1", 0)
+                    .attr("x2", x1)
+                    .attr("y2", dims.height)
+                    .attr("stroke-width", 2)
+                    .attr("stroke", "black");
+            } else {
+                var current = verticalLine.attr("x1");
+                var trans = x1 - current;
+                verticalLine.attr("transform", "translate(" + trans + ",0)");
+                
+                var realY = y.invert(y1);
+                var info = { y: realY };
+                if (x.invert != null) {
+                    var realX = x.invert(x1);
+                    info["x"] = realX;
+                }
+                charting.showTooltip(info);
+            }
+            lastMove = new Date();
+        };
+
+        if (options.verticalCursorLine) {
+
+            svg.append("rect")
+              .attr("class", "overlay")
+              .attr("width", dims.width)
+              .attr("height", dims.height)
+              .on("mousemove", cursorLineMove);
+        }
 
         var spMouseOut = function () {
             d3.select(this).style("fill", "white");
@@ -1693,7 +1758,7 @@ define('KoExtensions/Charts/linechart',['./../charting','./../kotools'], functio
         var spMouseOver = function (d) {
             var xLabel = d.xLabel != null ? d.xLabel : d.x;
             var info = {};
-            info[options.xUnitName] = xLabel;
+            info[options.horizontalLabel] = xLabel;
             info[d.linename] = d.y;
             charting.showTooltip(info);
 
@@ -1746,7 +1811,8 @@ define('KoExtensions/Charts/histogramchart',['./../charting', './../kotools'], f
     charting.histogram = function(data, element, options) {
         var defaultOptions = {
             bins: 80,
-            width: 500
+            width: 500,
+            fillParentController:false
         };
 
         var el = charting.getElementAndCheckData(element,data);
@@ -1820,7 +1886,7 @@ define('KoExtensions/Charts/histogramchart',['./../charting', './../kotools'], f
             var step = (max - min)/500;
             var expected = total / data.length;
             if(options.expected == 'median'){
-                expected = median(data);
+                expected = d3.median(data);
             }
 
             var variance = 0;
@@ -1833,7 +1899,7 @@ define('KoExtensions/Charts/histogramchart',['./../charting', './../kotools'], f
 
 
             if(options.useMAD){
-                variance = median(distances);
+                variance = d3.median(distances);
             }else{
                 variance= variance / data.length-1;
             }
@@ -2111,7 +2177,10 @@ define('KoExtensions/Charts/bubblechart',['./../charting','./../kotools'], funct
             horizontalLabel: 'x',
             verticalLabel: 'y',
             sizeLabel: 'size',
-            typeLabel: 'type'
+            typeLabel: 'type',
+            xAxisLabel: false,
+            yAxisLabel: false,
+            xAxisTextAngle: null
         }
 
         options = koTools.setDefaultOptions(defaultOptions, options);
