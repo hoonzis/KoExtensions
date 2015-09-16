@@ -17,16 +17,17 @@ KoExtensions can be used as standalone JavaScript charting library or plug-in fo
 [bubbleEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/BubbleChart.html
 [histoEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/HistogramExample.html
 
+|  Chord chart            | Bubble Chart             | Histogram               |
+| ------------------------|:------------------------:| ---------------------- :|
+| ![alt text][chordchart] | ![alt text][bubblechart] | ![alt text][histochart] |
+
+
 |         Pie Chart       | Bar Chart             | Line Chart             |
 | ------------------------|:---------------------:| ----------------------:|
 | ![alt text][piechart]   | ![alt text][cashflow] | ![alt text][linechart] |
 | [Example][simpleEx]     | [Example1][simpleEx] [Example2][cashFlowEx]  | [Example1][simpleEx] [Example2][normalizedLineEx] |
  
- Other charts
  
-|  Chord chart            | Bubble Chart             | Histogram               |
-| ------------------------|:------------------------:| ---------------------- :|
-| ![alt text][chordchart] | ![alt text][bubblechart] | ![alt text][histochart] |
 
 
 Other bindings useful for Knockout:
