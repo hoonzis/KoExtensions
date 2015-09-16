@@ -20,9 +20,9 @@ KoExtensions can be used as standalone JavaScript charting library or plug-in fo
 |         Pie Chart       | Bar Chart             | Line Chart             |
 | ------------------------|:---------------------:| ----------------------:|
 | ![alt text][piechart]   | ![alt text][cashflow] | ![alt text][linechart] |
-| [Example][simpleEx]|    | wtf                   | [Example1][simpleEx] [Example2][normalizedLineEx] |
+| [Example][simpleEx]     | [Example1][simpleEx] [Example2][cashFlowEx]  | [Example1][simpleEx] [Example2][normalizedLineEx] |
  
- [Example1][simpleEx] [Example2][cashFlowEx]
+ 
  
 |  Chord chart            | Bubble Chart             | Histogram               |
 | ------------------------|:------------------------:| ---------------------- :|
