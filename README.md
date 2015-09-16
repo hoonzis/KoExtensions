@@ -2,7 +2,17 @@ KoExtensions
 ============
 [![Build Status](https://travis-ci.org/hoonzis/KoExtensions.svg?branch=master)](https://travis-ci.org/hoonzis/KoExtensions)
 
-KoExtensions can be used as standalone JavaScript charting library or plug-in for KnockoutJS. Besides charting, when used with Knockout, KoExtensions provide few useful bindings. The library includes:
+KoExtensions can be used as standalone JavaScript charting library or plug-in for KnockoutJS. Besides charting, when used with Knockout, KoExtensions provide few useful bindings.
+
+[piechart]: http://hoonzis.github.com/KoExtensions/img/
+small/piechart.PNG
+
+[cashflow]: http://hoonzis.github.com/KoExtensions/img/
+small/cashflow.PNG
+
+|  Pie Chart              | Are                   | Cool  |
+| ------------------------|:---------------------:| -----:|
+| ![alt text][piechart]   | ![alt text][cashflow] | $1600 |
  
 Simple charts ([example page](https://github.com/hoonzis/KoExtensions/blob/master/testpages/GraphTests.html)):
 
