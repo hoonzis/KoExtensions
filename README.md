@@ -4,11 +4,9 @@ KoExtensions
 
 KoExtensions can be used as standalone JavaScript charting library or plug-in for KnockoutJS. Besides charting, when used with Knockout, KoExtensions provide few useful bindings.
 
-[piechart]: http://hoonzis.github.com/KoExtensions/img/
-small/piechart.PNG
+[piechart]: http://hoonzis.github.com/KoExtensions/img/small/piechart.PNG
 
-[cashflow]: http://hoonzis.github.com/KoExtensions/img/
-small/cashflow.PNG
+[cashflow]: http://hoonzis.github.com/KoExtensions/img/small/cashflow.PNG
 
 |  Pie Chart              | Are                   | Cool  |
 | ------------------------|:---------------------:| -----:|
