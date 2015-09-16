@@ -10,12 +10,12 @@ KoExtensions can be used as standalone JavaScript charting library or plug-in fo
 [chordchart]: http://hoonzis.github.com/KoExtensions/img/small/chordchart.PNG
 [bubblechart]: http://hoonzis.github.com/KoExtensions/img/small/bubblechart.PNG
 [histochart]: http://hoonzis.github.com/KoExtensions/img/small/histogram.PNG
-[simpleEx] https://github.com/hoonzis/KoExtensions/blob/master/testpages/GraphTests.html
-[cashFlowEx] https://github.com/hoonzis/KoExtensions/blob/master/testpages/CashFlowExample.html
-[normalizedLineEx] https://github.com/hoonzis/KoExtensions/blob/master/testpages/NormalizedLineChart.html.html
-[chordEx] https://github.com/hoonzis/KoExtensions/blob/master/testpages/ChordChart.html
-[bubbleEx] https://github.com/hoonzis/KoExtensions/blob/master/testpages/BubbleChart.html
-[histoEx] https://github.com/hoonzis/KoExtensions/blob/master/testpages/HistogramExample.html
+[simpleEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/GraphTests.html
+[cashFlowEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/CashFlowExample.html
+[normalizedLineEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/NormalizedLineChart.html.html
+[chordEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/ChordChart.html
+[bubbleEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/BubbleChart.html
+[histoEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/HistogramExample.html
 
 |         Pie Chart       | Bar Chart             | Line Chart             |
 | ------------------------|:---------------------:| ----------------------:|
@@ -25,6 +25,7 @@ KoExtensions can be used as standalone JavaScript charting library or plug-in fo
 |  Chord chart            | Bubble Chart             | Histogram               |
 | ------------------------|:------------------------:| ---------------------- :|
 | ![alt text][chordchart] | ![alt text][bubblechart] | ![alt text][histochart] |
+|[Example][chordEx]|[Example][bubbleEx]|[Example][histoEx]|
 
 
 Other bindings useful for Knockout:
