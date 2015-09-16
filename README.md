@@ -5,25 +5,23 @@ KoExtensions
 KoExtensions can be used as standalone JavaScript charting library or plug-in for KnockoutJS. Besides charting, when used with Knockout, KoExtensions provide few useful bindings.
 
 [piechart]: http://hoonzis.github.com/KoExtensions/img/small/piechart.PNG
-
 [cashflow]: http://hoonzis.github.com/KoExtensions/img/small/cashflow.PNG
+[linechart]: http://hoonzis.github.com/KoExtensions/img/small/linechart.PNG
+[chordchart]: http://hoonzis.github.com/KoExtensions/img/small/chordchart.PNG
+[bubblechart]: http://hoonzis.github.com/KoExtensions/img/small/bubblechart.PNG
+[histochart]: http://hoonzis.github.com/KoExtensions/img/small/histogram.PNG
 
-|  Pie Chart              | Are                   | Cool  |
-| ------------------------|:---------------------:| -----:|
-| ![alt text][piechart]   | ![alt text][cashflow] | $1600 |
+|  Pie Chart              | Bar Chart             | Line Chart             |
+| ------------------------|:---------------------:| ----------------------:|
+| ![alt text][piechart]   | ![alt text][cashflow] | ![alt text][linechart] |
+
  
 Simple charts ([example page](https://github.com/hoonzis/KoExtensions/blob/master/testpages/GraphTests.html)):
 
-* Piechart
-* Barchart (stacked or grouped)
-* Multi-line chart
+|  Chord chart            | Bubble Chart             | Histogram              |
+| ------------------------|:------------------------:| ----------------------:|
+| ![alt text][chordchart] | ![alt text][bubblechart] | ![alt text][histochart] |
 
-More advanced ready-to-use charts:
-
-* Histogram chart with data probability distribution ([example](https://github.com/hoonzis/KoExtensions/blob/master/testpages/HistogramExample.html))
-* Cashflow chart ([example](https://github.com/hoonzis/KoExtensions/blob/master/testpages/CashFlowExample.html))
-* Bubble chart
-* Events visualization based on [EventDrops](https://github.com/marmelab/EventDrops) project [example](https://github.com/hoonzis/KoExtensions/blob/master/testpages/EventDrops.html)
 
 Other bindings useful for Knockout:
 
@@ -36,6 +34,10 @@ All charts are created with [D3JS](http://d3js.org/) and based on multiple examp
 ####Referencing and using KoExtensions:
 There are two ways to reference KoExtensions:
 * Reference single [KoExtensions.js](https://github.com/hoonzis/KoExtensions/blob/master/src/KoExtensions.js) file. See the [example.html](https://github.com/hoonzis/KoExtensions/blob/master/src/example.html) file. If used in such way, global variable **koExtensions** is defined which exposes all the functionality.
+* Use RequireJS. All files in the *testpages* folder use this approach. KoExtension expects D3 to be defined globally before being loaded.
+
+Both approaches can be used whether KoExtensions is used as standalone charting library or with KnockoutJS. In order for the automatic bindings to work with knockout, **registerExtensions** method has to be called.
+
 ```javascript
 <script src="d3.js"></script>
 <script src="KoExtensions.js"></script>
@@ -44,28 +46,12 @@ koExtensions.registerExtensions
 //otherwise, use charting with all the charts
 koext.charting.lineChart(testData, el, chartOptions);
 ```
-* Use RequireJS. All files in the *testpages* folder use this approach. KoExtension expects D3 to be defined globally before being loaded, this is a simple way to get around:
-
-```javascript
-require(['d3'], function(d3l) {
-	d3 = d3l;
-	require(['KoExtensions/koextensions'], function(koext) {
-		var testData = [
-			{ linename: "Price:", values: [100.0, 125.0, 130, 145, 101] },
-			{ linename: "Consumption", values: [1, 0.5, 0.8, 0.2, 0.1] }
-		];
-		var chartOptions = {height:100, normalizeSeries:true}
-		var el = document.getElementById("lineChartDiv");
-
-		koext.charting.lineChart(testData, el, chartOptions);
-});
-```
-Both approaches can also be used when using KnockoutJS. In order for the automatic bindings to work with knockout, **registerExtensions** method has to be called.
 
 ####Contributing and building
 RequireJS is used to handle dependencies as well as to bundle single referencable JS file, which can be built with NodeJS and RequireJS optimizer:
 
 ```
+cd src
 node r.js -o app.build.js
 ```
 
