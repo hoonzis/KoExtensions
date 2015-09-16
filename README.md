@@ -124,7 +124,7 @@ function TestViewModels (expenses){
 ```
 
 - Google maps binding is useful anytime you want a list of objects to be vizualized as points on google maps.
-- 
+
 - [maps]: http://hoonzis.github.com/KoExtensions/img/maps.PNG  
 ![alt text][maps]
 
