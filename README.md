@@ -10,20 +10,21 @@ KoExtensions can be used as standalone JavaScript charting library or plug-in fo
 [chordchart]: http://hoonzis.github.com/KoExtensions/img/small/chordchart.PNG
 [bubblechart]: http://hoonzis.github.com/KoExtensions/img/small/bubblechart.PNG
 [histochart]: http://hoonzis.github.com/KoExtensions/img/small/histogram.PNG
+[simpleEx] https://github.com/hoonzis/KoExtensions/blob/master/testpages/GraphTests.html
+[cashFlowEx] https://github.com/hoonzis/KoExtensions/blob/master/testpages/CashFlowExample.html
+[normalizedLineEx] https://github.com/hoonzis/KoExtensions/blob/master/testpages/NormalizedLineChart.html.html
+[chordEx] https://github.com/hoonzis/KoExtensions/blob/master/testpages/ChordChart.html
+[bubbleEx] https://github.com/hoonzis/KoExtensions/blob/master/testpages/BubbleChart.html
+[histoEx] https://github.com/hoonzis/KoExtensions/blob/master/testpages/HistogramExample.html
 
 |         Pie Chart       | Bar Chart             | Line Chart             |
 | ------------------------|:---------------------:| ----------------------:|
 | ![alt text][piechart]   | ![alt text][cashflow] | ![alt text][linechart] |
-|[Simple Charts](https://github.com/hoonzis/KoExtensions/blob/master/testpages/GraphTests.html)                    |[Simple Charts](https://github.com/hoonzis/KoExtensions/blob/master/testpages/GraphTests.html)
-[Cash Flow](https://github.com/hoonzis/KoExtensions/blob/master/testpages/CashFlowExample.html)
-|[Simple Charts](https://github.com/hoonzis/KoExtensions/blob/master/testpages/GraphTests.html)
-[Normalized Lines](https://github.com/hoonzis/KoExtensions/blob/master/testpages/NormalizedLineChart.html.html)| 
+| [Example][simpleEx]|    | [Example 1][simpleEx] [Example2][cashFlowEx]|[Example1][simpleEx][Example2][normalizedLineEx]|
  
 |  Chord chart            | Bubble Chart             | Histogram               |
 | ------------------------|:------------------------:| ---------------------- :|
 | ![alt text][chordchart] | ![alt text][bubblechart] | ![alt text][histochart] |
-|[Chord Chart](https://github.com/hoonzis/KoExtensions/blob/master/testpages/ChordChart.html|[Bubble Chart](https://github.com/hoonzis/KoExtensions/blob/master/testpages/BubbleChart.html)
-|[Histogram](https://github.com/hoonzis/KoExtensions/blob/master/testpages/HistogramExample.html)
 
 
 Other bindings useful for Knockout:
