@@ -2,7 +2,7 @@ KoExtensions
 ============
 [![Build Status](https://travis-ci.org/hoonzis/KoExtensions.svg?branch=master)](https://travis-ci.org/hoonzis/KoExtensions)
 
-KoExtensions can be used as standalone JavaScript charting library or plug-in for KnockoutJS. Besides charting, when used with Knockout, KoExtensions provide few useful bindings.
+KoExtensions can be used as standalone JavaScript charting library basedo on D3JS or plug-in for KnockoutJS. Besides charting, when used with Knockout it provides other usefull bindings. Available charts:
 
 [piechart]: http://hoonzis.github.com/KoExtensions/img/small/piechart.PNG
 [cashflow]: http://hoonzis.github.com/KoExtensions/img/small/cashflow.PNG
@@ -16,34 +16,38 @@ KoExtensions can be used as standalone JavaScript charting library or plug-in fo
 [chordEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/ChordChart.html
 [bubbleEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/BubbleChart.html
 [histoEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/HistogramExample.html
+[googleMapsEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/MapTests.html
+[datepickerEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/DateBindingTests.html
+[formattingEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/UtilsTests.html
 
-|  Chord chart            | Bubble Chart             | Histogram               |
-| ------------------------|:------------------------:| ---------------------- :|
-| ![alt text][chordchart] | ![alt text][bubblechart] | ![alt text][histochart] |
+
 
 
 |         Pie Chart       | Bar Chart             | Line Chart             |
 | ------------------------|:---------------------:| ----------------------:|
 | ![alt text][piechart]   | ![alt text][cashflow] | ![alt text][linechart] |
 | [Example][simpleEx]     | [Example1][simpleEx] [Example2][cashFlowEx]  | [Example1][simpleEx] [Example2][normalizedLineEx] |
+
+|         Chord Chart       | Bubble Chart             | Histogram             |
+| ------------------------|:---------------------:| ----------------------:|
+| ![alt text][chordchart]   | ![alt text][bubblechart] | ![alt text][histochart] |
+| [Example][chordEx]    | [Example][bubbleEx] | [Example][histoEx] |
+
  
- 
+**Other bindings useful for Knockout:**
 
+* Google maps binding [Example] [googleMapsEx]
+* Bootstrap DateTime picker binding [[Example] [datepickerEx]
+* FormattedValue binding - showing data values in the UI with applied formatting (currencies, rounding). [Example][formattingEx]
 
-Other bindings useful for Knockout:
+All charts are created with [D3JS](http://d3js.org/) and based on multiple examples provided in the documentation.
 
-* Google maps binding
-* Bootstrap DateTime picker binding
-* FormattedValue binding - simply format the values as you need.
-
-All charts are created with [D3JS](http://d3js.org/) and based on multiple examples provided in the documentation. Following are few examples of the available bindings. See the [wiki](https://github.com/hoonzis/KoExtensions/wiki) for full examples and documentation.
-
-####Referencing and using KoExtensions:
+#### Referencing and using KoExtensions
 There are two ways to reference KoExtensions:
 * Reference single [KoExtensions.js](https://github.com/hoonzis/KoExtensions/blob/master/src/KoExtensions.js) file. See the [example.html](https://github.com/hoonzis/KoExtensions/blob/master/src/example.html) file. If used in such way, global variable **koExtensions** is defined which exposes all the functionality.
 * Use RequireJS. All files in the *testpages* folder use this approach. KoExtension expects D3 to be defined globally before being loaded.
 
-Both approaches can be used whether KoExtensions is used as standalone charting library or with KnockoutJS. In order for the automatic bindings to work with knockout, **registerExtensions** method has to be called.
+Both approaches can be used whether KoExtensions is used as standalone charting library or with KnockoutJS. The charting library has to be initialized by calling **charting.initializeCharts**. In order for the automatic bindings to work with KnockoutJS, **registerExtensions** method has to be called.
 
 ```javascript
 <script src="d3.js"></script>
@@ -68,28 +72,25 @@ Tests can be run with QUnit:
 phantomjs run-qunit.js Tests/Tests.html
 ```
 
-#### Multiple binded charts ####
-![alt text][foreachpiechart]
+#### Some usefull tips ####
+- Showing multiple charts in knockout foreach loop can be achieved as follows:
+
 [foreachpiechart]: http://hoonzis.github.com/KoExtensions/img/multiple_pie.PNG
+![alt text][foreachpiechart]
 
 ```html
 <!-- ko foreach: cars -->
  	<div style="float:left;margin-right:10px">
 	 	<h3 data-bind="text:name"></h3>
-		<div data-bind="piechart: sales,transformation:transform2">
-
-		</div>
+		<div data-bind="piechart: data"></div>
  	</div> 
  <!-- /ko -->
-
-function transform2(car){
-	return {x:car.model, y:car.amount };
-}
 ```
 
-#### Cashflow chart ####
-![alt text][cashflowchart]
+- Interesting usage of barchart can be "cashflow chart" which shows a single line, going through the bars being the addition of the bars values. This can be achieved as follows:
+
 [cashflowchart]: http://hoonzis.github.com/KoExtensions/img/cashflowchart.png
+![alt text][cashflowchart]
 
 ```html
 <div id="cashFlow" data-bind="barchart: lifeExpenses, xcoord:'month',line:expensesPerMonth,chartOptions:{legend:true, width:800,height:300,style:'stack',sameScaleLinesAndBars:true}">
@@ -107,14 +108,11 @@ function TestViewModels (expenses){
 	self.lifeExpenses(expenses);
 	self.expensesPerMonth(totalPerMonth);
 }
-var vm = new TestViewModels(lifeExpenses);
-ko.applyBindings(vm);
-initializeCharts();
 ```
+- Hisotgram chart has some additional properties which can be used to vizualize the statisticial distribution, using either Mean or Median and standard variance or MAD (Median absolute deviation)
 
-#### Histogram ####
-![alt text][histogram]
 [histogram]: http://hoonzis.github.com/KoExtensions/img/histogram.PNG
+![alt text][histogram]
 
 ```html
 <div id="histogram" data-bind="histogram: data, chartOptions : {
@@ -124,20 +122,11 @@ initializeCharts();
         useMAD: true,
         showOutliers: true}"></div>
 ```
-```javascript
-var exData = [3.9,3.8,3.9,2.7,2.8,1.9,2.7,3.5, 4.4, 2.8, 3.4, 8.6, 4.5, 3.5, 3.6, 3.8, 4.3, 4.5, 3.5,30,33,31]; 
-function TestViewModel() {
-    var self = this;
-    self.data = ko.observableArray(exData);
-}
-var vm = new TestViewModel();
-ko.applyBindings(vm);
-initializeCharts();
-```
 
-#### Google maps binding ####
+- Google maps binding is useful anytime you want a list of objects to be vizualized as points on google maps.
+- 
+- [maps]: http://hoonzis.github.com/KoExtensions/img/maps.PNG  
 ![alt text][maps]
-[maps]: http://hoonzis.github.com/KoExtensions/img/maps.PNG
 
 ```html
 <div id="map">
@@ -154,11 +143,5 @@ function StationViewModel(data){
 	self.lng = ko.observable();
 	self.name = ko.observable();
 	self.selected = ko.observable();
-	
-	if(data!=null){
-		self.lat(data.lat);
-		self.lng(data.lng);
-		self.name(data.name);
-	}
 }
 ```
