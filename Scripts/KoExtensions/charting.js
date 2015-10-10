@@ -1,8 +1,5 @@
 ﻿"use strict";
-define(['./kotools'],function (koTools) {
-    if (d3 == null) {
-        throw "KoExtensions need d3";
-    }
+define(['d3','./kotools'],function (d3,koTools) {
     var charting = {};
 
     charting.getElementAndCheckData = function(element, data) {
@@ -164,17 +161,17 @@ define(['./kotools'],function (koTools) {
         .attr("transform", "translate(" + dims.margin.left + "," + dims.margin.top + ")");
 
         return svg;
-    }
+    };
 
     charting.createXAxis = function(svg,options,x,dims) {
         var xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom");
 
-        if (options.xUnitFormat != null)
+        if (options.xUnitFormat !== null && options.xUnitFormat!== undefined)
             xAxis.tickFormat(options.xUnitFormat);
 
-        if (options.tickValues!=null)
+        if (options.tickValues!==null && options.tickValues!==undefined)
             xAxis.tickValues(options.tickValues);
 
         var xAxisEl = svg.append("g")
@@ -226,7 +223,7 @@ define(['./kotools'],function (koTools) {
                 .text(options.yAxisLabel)
                 .attr("transform", "translate(" + dims.width + "," + 40 + ")rotate(-90)");
         }
-    }
+    };
 
     charting.determineXScale = function (data, def) {
         if (def == null) {

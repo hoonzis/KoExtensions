@@ -46,162 +46,159 @@
             }
 
             require.config({
-                baseUrl: "../Scripts",
-                urlArgs: "bust=2" + (new Date()).getTime()
+                baseUrl: "../Scripts"
             });
 
-            require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {
+            var ko;
+            require(['KoExtensions/koextensions','knockout-3.2.0.debug','d3'], function(koext,kol,d3) {
                 ko = kol;
-                d3 = d3l;
-                require(['KoExtensions/koextensions'], function(koext) {
-                    koext.registerExtensions();
-                    var carSales = [
-                        {
-                            month: 'january',
-                            peugot: 100,
-                            audit: 200,
-                            bmw: 300
-                        },
-                        {
-                            month: 'february',
-                            peugot: 50,
-                            audit: 110,
-                            bmw: 80
-                        },
-                        {
-                            month: 'marz',
-                            peugot: 120,
-                            audit: 230,
-                            bmw: 115
-                        },
-                        {
-                            month: 'april',
-                            peugot: 80,
-                            audit: 120,
-                            bmw: 75
-                        },
-                        {
-                            month: 'may',
-                            peugot: 100,
-                            audit: 140,
-                            bmw: 80
-                        }
-                    ];
-                    var lastWeek = [
-                        {
-                            name: "peugot",
-                            sales: [
-                                { model: 'model1', amount: 100 },
-                                { model: 'model2', amount: 200 },
-                                { model: 'model3', amount: 300 }
-                            ]
-                        },
-                        {
-                            name: "audi",
-                            sales: [
-                                { model: 'a3', amount: 200 },
-                                { model: 'qutro', amount: 300 },
-                                { model: 'a8', amount: 100 }
-                            ]
-                        },
-                        {
-                            name: "bmw",
-                            sales: [
-                                { model: 'model5', amount: 200 },
-                                { model: 'model8', amount: 100 },
-                                { model: 'model3', amount: 150 }
-                            ]
-                        }
-                    ];
+                koext.registerExtensions();
+                var carSales = [
+                    {
+                        month: 'january',
+                        peugot: 100,
+                        audit: 200,
+                        bmw: 300
+                    },
+                    {
+                        month: 'february',
+                        peugot: 50,
+                        audit: 110,
+                        bmw: 80
+                    },
+                    {
+                        month: 'marz',
+                        peugot: 120,
+                        audit: 230,
+                        bmw: 115
+                    },
+                    {
+                        month: 'april',
+                        peugot: 80,
+                        audit: 120,
+                        bmw: 75
+                    },
+                    {
+                        month: 'may',
+                        peugot: 100,
+                        audit: 140,
+                        bmw: 80
+                    }
+                ];
+                var lastWeek = [
+                    {
+                        name: "peugot",
+                        sales: [
+                            { model: 'model1', amount: 100 },
+                            { model: 'model2', amount: 200 },
+                            { model: 'model3', amount: 300 }
+                        ]
+                    },
+                    {
+                        name: "audi",
+                        sales: [
+                            { model: 'a3', amount: 200 },
+                            { model: 'qutro', amount: 300 },
+                            { model: 'a8', amount: 100 }
+                        ]
+                    },
+                    {
+                        name: "bmw",
+                        sales: [
+                            { model: 'model5', amount: 200 },
+                            { model: 'model8', amount: 100 },
+                            { model: 'model3', amount: 150 }
+                        ]
+                    }
+                ];
 
-                    function CarViewModel(data) {
-                        var self = this;
-                        self.sales = ko.observableArray([]);
-                        self.name = ko.observable();
+                function CarViewModel(data) {
+                    var self = this;
+                    self.sales = ko.observableArray([]);
+                    self.name = ko.observable();
 
-                        self.totalSales = ko.computed(function() {
-                            return d3.sum(self.sales().map(function(item) {
-                                return item.amount;
-                            }));
-                        }, self);
+                    self.totalSales = ko.computed(function() {
+                        return d3.sum(self.sales().map(function(item) {
+                            return item.amount;
+                        }));
+                    }, self);
 
-                        if (data != null) {
-                            self.sales(data.sales);
-                            self.name(data.name);
-                        }
-
-                        self.salesChart = ko.computed(function () {
-                            return self.sales().map(function (car) {
-                                return { x: car.model, y: car.amount };
-                            });
-                        });
+                    if (data != null) {
+                        self.sales(data.sales);
+                        self.name(data.name);
                     }
 
-                    function TestViewModels(data, lastWeekData) {
-                        var self = this;
-
-                        self.cars = ko.observableArray([]);
-                        self.salesPerMonth = ko.observableArray([]);
-
-                        //first chart with month x-axis
-                        self.salesPerMonthChart = ko.computed(function () {
-                            return self.salesPerMonth().map(function (i) {
-
-                                return {
-                                    linename: i.linename,
-                                    width : 5,
-                                    values: i.data.map(function (item) {
-                                        return { x: item.month, y: item[i.linename] };
-                                    })
-                                };
-                            });
+                    self.salesChart = ko.computed(function () {
+                        return self.sales().map(function (car) {
+                            return { x: car.model, y: car.amount };
                         });
+                    });
+                }
 
-                        self.carSales = ko.observableArray([]);
+                function TestViewModels(data, lastWeekData) {
+                    var self = this;
 
-                        self.carSales(data);
+                    self.cars = ko.observableArray([]);
+                    self.salesPerMonth = ko.observableArray([]);
 
-                        self.carsChart = ko.computed(function () {
-                            return self.cars().map(function (car) {
-                                return { x: car.name(), y: car.totalSales() };
-                            });
-                        });
+                    //first chart with month x-axis
+                    self.salesPerMonthChart = ko.computed(function () {
+                        return self.salesPerMonth().map(function (i) {
 
-
-                        var keys = d3.keys(data[0]).filter(function(i) { return i != 'month' && i!= 'id'; });
-                        var perMonth = keys.map(function(key) {
                             return {
-                                linename: key,
-                                data: data
+                                linename: i.linename,
+                                width : 5,
+                                values: i.data.map(function (item) {
+                                    return { x: item.month, y: item[i.linename] };
+                                })
                             };
                         });
+                    });
 
-                        self.salesPerMonth(perMonth);
+                    self.carSales = ko.observableArray([]);
 
-                        var carsVMs = lastWeekData.map(function(x) { return new CarViewModel(x); });
-                        self.cars(carsVMs);
+                    self.carSales(data);
 
-                        self.valueToLabel = function (x) {
-                            return x + " cars sold";
-                        }
+                    self.carsChart = ko.computed(function () {
+                        return self.cars().map(function (car) {
+                            return { x: car.name(), y: car.totalSales() };
+                        });
+                    });
 
-                        var simpleData = [];
-                        for(var i=0;i<100;i++){
-                            simpleData.push({
-                                x:i,
-                                y:i*2
-                            });
-                        }
-                        self.simpleLine = ko.observableArray([{
-                            linename: "test",
-                            values: simpleData
-                        }]);
+
+                    var keys = d3.keys(data[0]).filter(function(i) { return i != 'month' && i!= 'id'; });
+                    var perMonth = keys.map(function(key) {
+                        return {
+                            linename: key,
+                            data: data
+                        };
+                    });
+
+                    self.salesPerMonth(perMonth);
+
+                    var carsVMs = lastWeekData.map(function(x) { return new CarViewModel(x); });
+                    self.cars(carsVMs);
+
+                    self.valueToLabel = function (x) {
+                        return x + " cars sold";
                     }
 
-                    var vm = new TestViewModels(carSales, lastWeek);
+                    var simpleData = [];
+                    for(var i=0;i<100;i++){
+                        simpleData.push({
+                            x:i,
+                            y:i*2
+                        });
+                    }
+                    self.simpleLine = ko.observableArray([{
+                        linename: "test",
+                        values: simpleData
+                    }]);
+                }
 
-                    ko.applyBindings(vm);
-                });
+                var vm = new TestViewModels(carSales, lastWeek);
+
+                ko.applyBindings(vm);
             });
     </script>
 </body>

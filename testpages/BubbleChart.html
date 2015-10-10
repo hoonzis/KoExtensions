@@ -17,59 +17,57 @@
 
     require.config({
         baseUrl: "../Scripts",
-        urlArgs: "bust=2" + (new Date()).getTime()
+        paths:{
+          'ko':'knockout-3.2.0.debug'
+        }
     });
 
-    require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {
+    require(['ko','KoExtensions/koextensions'], function(kol,koext) {
         ko = kol;
-        d3 = d3l;
-        require(['KoExtensions/koextensions'], function(koext) {
-            koext.registerExtensions();
+        koext.registerExtensions();
 
-
-            function TestViewModel() {
-                var self = this;
-                self.bubbleChartData = ko.observableArray([]);
-                self.bubbleChartOptions = {
-                    bubbleHorizontal: function(d) { return d.day; },
-                    bubbleVertical: function(d) { return d.strike; },
-                    bubbleSize: function(d) { return d.price; },
-                    bubbleColor: function(d) { return d.type; },
-                    legend: false,
-                    maxBubbleSize: 20,
-                    width: 260,
-                    height: 150,
-                    xAxisTextAngle: 45
-                }
+        function TestViewModel() {
+            var self = this;
+            self.bubbleChartData = ko.observableArray([]);
+            self.bubbleChartOptions = {
+                bubbleHorizontal: function(d) { return d.day; },
+                bubbleVertical: function(d) { return d.strike; },
+                bubbleSize: function(d) { return d.price; },
+                bubbleColor: function(d) { return d.type; },
+                legend: false,
+                maxBubbleSize: 20,
+                width: 260,
+                height: 150,
+                xAxisTextAngle: 45
             }
+        }
 
-            var vm = new TestViewModel();
-            ko.applyBindings(vm);
+        var vm = new TestViewModel();
+        ko.applyBindings(vm);
 
-            var day1 = new Date(2015, 1, 1);
-            var day2 = new Date(2015, 1, 2);
-            var day3 = new Date(2015, 1, 3);
-            var day4 = new Date(2015, 1, 4);
+        var day1 = new Date(2015, 1, 1);
+        var day2 = new Date(2015, 1, 2);
+        var day3 = new Date(2015, 1, 3);
+        var day4 = new Date(2015, 1, 4);
 
-            var data = [
-                { strike: 100, day: day1, price: 4.45, type: "PUT" },
-                { strike: 100, day: day2, price: 5.45, type: "CALL" },
-                { strike: 100, day: day3, price: 6.45, type: "PUT" },
-                { strike: 110, day: day1, price: 5.8, type: "CALL" },
-                { strike: 110, day: day2, price: 6.8, type: "PUT" },
-                { strike: 110, day: day3, price: 7.45, type: "CALL" },
-                { strike: 20, day: day3, price: 7.45, type: "CASH" },
-                { strike: 40, day: day2, price: 7.45, type: "CASH" },
-                { strike: 120, day: day1, price: 8.45, type: "CALL" },
-                { strike: 120, day: day2, price: 9.2, type: "CALL" },
-                { strike: 120, day: day3, price: 10.45, type: "CALL" },
-                { strike: 120, day: day4, price: 8.45, type: "CALL" },
-                { strike: 110, day: day4, price: 9.2, type: "CALL" },
-                { strike: 105, day: day4, price: 10.45, type: "CASH" }
-            ];
+        var data = [
+            { strike: 100, day: day1, price: 4.45, type: "PUT" },
+            { strike: 100, day: day2, price: 5.45, type: "CALL" },
+            { strike: 100, day: day3, price: 6.45, type: "PUT" },
+            { strike: 110, day: day1, price: 5.8, type: "CALL" },
+            { strike: 110, day: day2, price: 6.8, type: "PUT" },
+            { strike: 110, day: day3, price: 7.45, type: "CALL" },
+            { strike: 20, day: day3, price: 7.45, type: "CASH" },
+            { strike: 40, day: day2, price: 7.45, type: "CASH" },
+            { strike: 120, day: day1, price: 8.45, type: "CALL" },
+            { strike: 120, day: day2, price: 9.2, type: "CALL" },
+            { strike: 120, day: day3, price: 10.45, type: "CALL" },
+            { strike: 120, day: day4, price: 8.45, type: "CALL" },
+            { strike: 110, day: day4, price: 9.2, type: "CALL" },
+            { strike: 105, day: day4, price: 10.45, type: "CASH" }
+        ];
 
-            vm.bubbleChartData(data);
-        });
+        vm.bubbleChartData(data);
     });
 </script>
 </body>

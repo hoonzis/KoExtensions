@@ -1,5 +1,5 @@
 "use strict";
-define(['./../charting', './../kotools'], function(charting, koTools) {
+define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
     charting.chordChart = function(data, element, options) {
 
         var el = charting.getElementAndCheckData(element, data);

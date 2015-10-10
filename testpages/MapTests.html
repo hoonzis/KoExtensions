@@ -76,8 +76,7 @@
             var map = null;
 
             require.config({
-                baseUrl: "../Scripts",
-                urlArgs: "bust=2" + (new Date()).getTime()
+                baseUrl: "../Scripts"
             });
 
             function initialize() {
@@ -92,92 +91,89 @@
                 }
             }
 
-            require(['knockout-3.2.0', 'd3'], function (kol, d3l) {
+            var ko;
+            require(['KoExtensions/koextensions','knockout-3.2.0.debug'], function(koext,kol) {
                 ko = kol;
-                d3 = d3l;
-
-                require(['KoExtensions/koextensions'], function (koext) {
-                    koext.registerExtensions();
-                    initialize();
-                    var stationsData = {
-                        "stations": [
-                            {
-                                "lat": 55.16,
-                                "lng": 55.335,
-                                "name": "Station 1"
-                            },
-                            {
-                                "lat": 55.25,
-                                "lng": 55.34,
-                                "name": "Station 2"
-                            },
-                            {
-                                "lat": 55.23,
-                                "lng": 55.345,
-                                "name": "Station 3"
-                            }
-                        ],
-                        "points": [
-                            {
-                                "lat": 55.172,
-                                "lng": 55.142,
-                                "name": "Point 1"
-                            },
-                            {
-                                "lat": 55.274,
-                                "lng": 55.154,
-                                "name": "Point 2"
-                            },
-                            {
-                                "lat": 55.278,
-                                "lng": 55.148,
-                                "name": "Point 3"
-                            }
-                        ]
-                    };
-
-                    function StationViewModel(data) {
-                        var self = this;
-                        self.lat = ko.observable();
-                        self.lng = ko.observable();
-                        self.name = ko.observable();
-                        self.selected = ko.observable();
-
-                        if (data != null) {
-                            self.lat(data.lat);
-                            self.lng(data.lng);
-                            self.name(data.name);
+                koext.registerExtensions();
+                initialize();
+                var stationsData = {
+                    "stations": [
+                        {
+                            "lat": 55.16,
+                            "lng": 55.335,
+                            "name": "Station 1"
+                        },
+                        {
+                            "lat": 55.25,
+                            "lng": 55.34,
+                            "name": "Station 2"
+                        },
+                        {
+                            "lat": 55.23,
+                            "lng": 55.345,
+                            "name": "Station 3"
                         }
-                    }
-
-                    function PointViewModel(data) {
-                        var self = this;
-                        self.lat = ko.observable();
-                        self.lng = ko.observable();
-                        self.name = ko.observable();
-                        self.selected = ko.observable();
-
-                        if (data != null) {
-                            self.lat(data.lat);
-                            self.lng(data.lng);
-                            self.name(data.name);
+                    ],
+                    "points": [
+                        {
+                            "lat": 55.172,
+                            "lng": 55.142,
+                            "name": "Point 1"
+                        },
+                        {
+                            "lat": 55.274,
+                            "lng": 55.154,
+                            "name": "Point 2"
+                        },
+                        {
+                            "lat": 55.278,
+                            "lng": 55.148,
+                            "name": "Point 3"
                         }
+                    ]
+                };
+
+                function StationViewModel(data) {
+                    var self = this;
+                    self.lat = ko.observable();
+                    self.lng = ko.observable();
+                    self.name = ko.observable();
+                    self.selected = ko.observable();
+
+                    if (data != null) {
+                        self.lat(data.lat);
+                        self.lng(data.lng);
+                        self.name(data.name);
                     }
+                }
 
-                    function StationListViewModel(json) {
-                        var self = this;
-                        self.stations = ko.observableArray([]);
-                        self.points = ko.observableArray([]);
+                function PointViewModel(data) {
+                    var self = this;
+                    self.lat = ko.observable();
+                    self.lng = ko.observable();
+                    self.name = ko.observable();
+                    self.selected = ko.observable();
 
-                        if (json != null) {
-                            self.stations(json.stations.map(function(x) { return new StationViewModel(x); }));
-                            self.points(json.points.map(function(x) { return new PointViewModel(x); }));
-                        }
+                    if (data != null) {
+                        self.lat(data.lat);
+                        self.lng(data.lng);
+                        self.name(data.name);
                     }
+                }
 
-                    var vm = new StationListViewModel(stationsData);
-                    ko.applyBindings(vm);
-                });
+                function StationListViewModel(json) {
+                    var self = this;
+                    self.stations = ko.observableArray([]);
+                    self.points = ko.observableArray([]);
+
+                    if (json != null) {
+                        self.stations(json.stations.map(function(x) { return new StationViewModel(x); }));
+                        self.points(json.points.map(function(x) { return new PointViewModel(x); }));
+                    }
+                }
+
+                var vm = new StationListViewModel(stationsData);
+                ko.applyBindings(vm);
             });
         </script>
     </body>

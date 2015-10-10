@@ -11,9 +11,9 @@
             var markers = [];
 
             self.registerExtensions = function () {
-                if (ko == null)
-                    throw "knockout ko global variable has to be defined in order to use the bindings";
-
+              if(ko === null){
+                  throw "If you want to use KoExtensions with Knockout, please reference Knockout before calling registerExtensions";
+              }
                 ko.bindingHandlers.map = {
                     init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
 
@@ -229,7 +229,7 @@
                 return fValue;
             }
 
-            
+
 
             function getValue(val) {
                 if (val != null && typeof (val) == 'function')
@@ -240,4 +240,3 @@
 
         return new koextensions();
     });
-

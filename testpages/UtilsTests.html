@@ -24,30 +24,27 @@
             baseUrl: "../Scripts"
         });
 
-        require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {
+        var ko;
+        require(['KoExtensions/koextensions','knockout-3.2.0.debug'], function(koext,kol) {
             ko = kol;
-            d3 = d3l;
-            require(['KoExtensions/koextensions'], function(koext) {
-                koextensions = koext;
-                koext.registerExtensions();
-                function CarViewModel() {
-                    var self = this;
-                    self.efficiency = ko.observable(0.95);
-                    self.price = ko.observable(1000000);
-                    self.priceCurrency = ko.observable('EUR');
-                    self.power = ko.observable(120);
-                    self.consumption100 = ko.observable(7);
-                    self.distance = ko.observable();
-                    self.totalConsumption = ko.computed(function() {
-                        return self.distance() * self.consumption100();
-                    });
-                }
+            koextensions = koext;
+            koext.registerExtensions();
+            function CarViewModel() {
+                var self = this;
+                self.efficiency = ko.observable(0.95);
+                self.price = ko.observable(1000000);
+                self.priceCurrency = ko.observable('EUR');
+                self.power = ko.observable(120);
+                self.consumption100 = ko.observable(7);
+                self.distance = ko.observable();
+                self.totalConsumption = ko.computed(function() {
+                    return self.distance() * self.consumption100();
+                });
+            }
 
-                var vm = new CarViewModel();
-                ko.applyBindings(vm);
-            });
+            var vm = new CarViewModel();
+            ko.applyBindings(vm);
         });
-
     </script>
 </body>
 </html>

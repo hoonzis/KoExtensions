@@ -444,10 +444,7 @@ var requirejs, require, define;
 define("../src/almond", function(){});
 
 
-define('KoExtensions/kotools',[],function () {
-    if (d3 == null) {
-        throw "KoTools need d3";
-    }
+define('KoExtensions/kotools',['d3'],function (d3) {
     function KoTools() {
 
         var self = this;
@@ -467,7 +464,7 @@ define('KoExtensions/kotools',[],function () {
         };
 
         Array.prototype.setOrAdd = function (x, y, value) {
-            if (this[x] === null)
+            if (this[x] === null || this[x] === undefined)
                 this[x] = [];
             if (this[x][y] === null || isNaN(this[x][y]))
                 this[x][y] = value;
@@ -476,7 +473,7 @@ define('KoExtensions/kotools',[],function () {
         };
 
         Array.prototype.set = function (x, y, value) {
-            if (this[x] === null)
+            if (this[x] === null || this[x] === undefined)
                 this[x] = [];
             this[x][y] = value;
         };
@@ -715,7 +712,7 @@ define('KoExtensions/kotools',[],function () {
                 }
             }
             return newarray;
-        }
+        };
 
         String.prototype.endsWith = function(suffix) {
             return this.indexOf(suffix, this.length - suffix.length) !== -1;
@@ -749,7 +746,7 @@ define('KoExtensions/kotools',[],function () {
             default:
                 return Boolean(string);
             }
-        }
+        };
 
         self.transpose = function(a, xcoord) {
             if (a === null)
@@ -797,12 +794,12 @@ define('KoExtensions/kotools',[],function () {
                 year: self.tryConvertToNumber(monthAndYear.substring(0, 4)),
                 month: self.tryConvertToNumber(monthAndYear.substring(4, 6))
             };
-        }
+        };
 
         self.distinct = function(data, mapper) {
             var mapped = data.map(mapper);
             return mapped.filter(function(v, i) { return mapped.indexOf(v) == i; });
-        }
+        };
 
         self.normalizeSeries = function (data) {
             if (data == null) {
@@ -835,7 +832,7 @@ define('KoExtensions/kotools',[],function () {
 
                             data[i].values[j] = {
                                 x: j,
-                                y: data[i].values[j].y = (data[i].values[j] / baseValue) * 100
+                                y: (data[i].values[j] / baseValue) * 100
                             };
                         }
                     } else if (minCommonKey != null) {
@@ -845,7 +842,7 @@ define('KoExtensions/kotools',[],function () {
                         });
                         //if the min common item was found, than we can get the y, which will be the base value
                         //used to normalize all values
-                        if (commonItem != null) {
+                        if (commonItem !== undefined && commonItem!==null) {
                             baseValue = commonItem.y;
                             for (var j = 0; j < data[i].values.length; j++) {
                                 data[i].values[j].y = (data[i].values[j].y / baseValue) * 100;
@@ -860,7 +857,7 @@ define('KoExtensions/kotools',[],function () {
             return data.filter(function (series) {
                 return series.removeIt == null || series.removeIt == false;
             });
-        }
+        };
 
         self.convertSeriesToXYPairs = function(data) {
             var converted = [];
@@ -868,7 +865,7 @@ define('KoExtensions/kotools',[],function () {
                 converted.push({ x: i, y: data[i] });
             }
             return converted;
-        }
+        };
 
         self.convertAllSeriesToXYPairs = function (data) {
             if (data == null) {
@@ -882,7 +879,7 @@ define('KoExtensions/kotools',[],function () {
                 }
             }
             return data;
-        }
+        };
 
         self.minCommonValue = function (data, accessor) {
             var commonValues = {};
@@ -907,7 +904,7 @@ define('KoExtensions/kotools',[],function () {
             }
 
             return maxKey;
-        }
+        };
 
         self.setDefaultOptions = function (defaultConfig, config) {
             config = config || {};
@@ -915,7 +912,7 @@ define('KoExtensions/kotools',[],function () {
                 config[key] = config[key] != null ? config[key] : defaultConfig[key];
             }
             return config;
-        }
+        };
 
         self.throttle = function(delay, callback) {
             var previousCall = new Date().getTime();
@@ -932,18 +929,13 @@ define('KoExtensions/kotools',[],function () {
                     callback.apply(null, arguments);
                 }
             };
+          };
         }
-
-    };
-
     return new KoTools();
 });
 
 
-define('KoExtensions/charting',['./kotools'],function (koTools) {
-    if (d3 == null) {
-        throw "KoExtensions need d3";
-    }
+define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
     var charting = {};
 
     charting.getElementAndCheckData = function(element, data) {
@@ -1105,17 +1097,17 @@ define('KoExtensions/charting',['./kotools'],function (koTools) {
         .attr("transform", "translate(" + dims.margin.left + "," + dims.margin.top + ")");
 
         return svg;
-    }
+    };
 
     charting.createXAxis = function(svg,options,x,dims) {
         var xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom");
 
-        if (options.xUnitFormat != null)
+        if (options.xUnitFormat !== null && options.xUnitFormat!== undefined)
             xAxis.tickFormat(options.xUnitFormat);
 
-        if (options.tickValues!=null)
+        if (options.tickValues!==null && options.tickValues!==undefined)
             xAxis.tickValues(options.tickValues);
 
         var xAxisEl = svg.append("g")
@@ -1167,7 +1159,7 @@ define('KoExtensions/charting',['./kotools'],function (koTools) {
                 .text(options.yAxisLabel)
                 .attr("transform", "translate(" + dims.width + "," + 40 + ")rotate(-90)");
         }
-    }
+    };
 
     charting.determineXScale = function (data, def) {
         if (def == null) {
@@ -1243,13 +1235,13 @@ define('KoExtensions/charting',['./kotools'],function (koTools) {
 });
 
 
-define('KoExtensions/Charts/barchart',['./../charting','./../kotools'], function (charting,koTools) {
-    //accepts and array of objects. one property of each object is used as the x-coordinate 
+define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
+    //accepts and array of objects. one property of each object is used as the x-coordinate
     //(determined by the xcoord option, which by default is set to 'x')
     //the rest of the properties is stacked to the chart
     charting.barChart = function (data, element, options, lineData) {
         var el = charting.getElementAndCheckData(element, data);
-        if (el == null)
+        if (el === null || el === undefined)
             return;
 
         var defaultOptions = {
@@ -1263,7 +1255,7 @@ define('KoExtensions/Charts/barchart',['./../charting','./../kotools'], function
 
         options = koTools.setDefaultOptions(defaultOptions, options);
         var xcoord = options.xcoord;
-        
+
         // not all the items do have the same set of properties, therefor scan them all and concatenate the result
         var keys = [];
         data.map(function (i) {
@@ -1283,7 +1275,7 @@ define('KoExtensions/Charts/barchart',['./../charting','./../kotools'], function
         var y = d3.scale.linear()
             .rangeRound([dims.height, 0]);
 
-        
+
         //runs overs all the data. copies the result to a new array
         var arranged = [];
         var arrangedByX = {};
@@ -1358,7 +1350,7 @@ define('KoExtensions/Charts/barchart',['./../charting','./../kotools'], function
 
         charting.createXAxis(svg, options, x, dims);
         charting.createYAxis(svg, options, y, dims);
-        
+
 
         var onBarOver = function (d) {
             var column = arrangedByX[d.x];
@@ -1502,7 +1494,8 @@ define('KoExtensions/Charts/barchart',['./../charting','./../kotools'], function
     }
 });
 
-define('KoExtensions/Charts/piechart',['./../charting','./../kotools'], function (charting,koTools) {
+
+define('KoExtensions/Charts/piechart',['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
     //Takes as input collection of items [data]. Each item has two values [x] and [y].
     //x is the label and y the value which determines the size of the slice of the pie chart.
     charting.pieChart = function(data, element,options) {
@@ -1538,7 +1531,7 @@ define('KoExtensions/Charts/piechart',['./../charting','./../kotools'], function
             });
             color.domain(keys);
         }
-   
+
         var xKeys = data.map(function (i) { return i.x; });
         var dims = charting.getDimensions(options, el, xKeys);
 
@@ -1585,7 +1578,7 @@ define('KoExtensions/Charts/piechart',['./../charting','./../kotools'], function
             .on("mouseout", arcMouseOut)
             .style("cursor", "pointer")
             .style("opacity",0.7)
-            .each(function(d) { 
+            .each(function(d) {
                 d.percentage = d.data.y / sum;
                 d.formatted = options.unitTransform ? options.unitTransform(d.data.y) : d.data.y;
         });
@@ -1593,9 +1586,7 @@ define('KoExtensions/Charts/piechart',['./../charting','./../kotools'], function
 });
 
 
-
-
-define('KoExtensions/Charts/linechart',['./../charting','./../kotools'], function (charting,koTools) {
+define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
     //Takes as input collection of items [data]. Each item has two values [x] and [y].
     //[{x:1, receivedEtf:123, tradedEtf:100},{x:2, receivedEtf:200, tradedEtf:100}]
@@ -1722,7 +1713,7 @@ define('KoExtensions/Charts/linechart',['./../charting','./../kotools'], functio
             coordinates = d3.mouse(this);
             var x1 = coordinates[0];
             var y1 = coordinates[1];
-            
+
             if (verticalLine == null) {
                 verticalLine = svg.append("line")
                     .attr("x1",x1)
@@ -1735,7 +1726,7 @@ define('KoExtensions/Charts/linechart',['./../charting','./../kotools'], functio
                 var current = verticalLine.attr("x1");
                 var trans = x1 - current;
                 verticalLine.attr("transform", "translate(" + trans + ",0)");
-                
+
                 var realY = y.invert(y1);
                 var info = { y: realY };
                 if (x.invert != null) {
@@ -1816,11 +1807,7 @@ define('KoExtensions/Charts/linechart',['./../charting','./../kotools'], functio
 });
 
 
-
-
-
-
-define('KoExtensions/Charts/histogramchart',['./../charting', './../kotools'], function (charting, koTools) {
+define('KoExtensions/Charts/histogramchart',['d3','./../charting', './../kotools'], function (d3,charting, koTools) {
     charting.histogram = function(data, element, options) {
         var defaultOptions = {
             bins: 80,
@@ -1834,13 +1821,13 @@ define('KoExtensions/Charts/histogramchart',['./../charting', './../kotools'], f
 
         options = koTools.setDefaultOptions(defaultOptions, options);
         var dims = charting.getDimensions(options,el);
-    
+
         var histogramData = d3.layout.histogram()
             .frequency(false)
             .bins(options.bins)(data);
 
         var minX = koTools.isValidNumber(options.min) ? options.min : d3.min(histogramData, function (d) { return d.x; });
-    
+
         var x = d3.scale.linear()
             .domain([
                 minX,
@@ -1876,7 +1863,7 @@ define('KoExtensions/Charts/histogramchart',['./../charting', './../kotools'], f
             });
 
         charting.createXAxis(svg,options,x,dims);
-    
+
         var gy = svg.append("g")
             .attr("class", "y axis")
             .call(yAxis);
@@ -1889,13 +1876,13 @@ define('KoExtensions/Charts/histogramchart',['./../charting', './../kotools'], f
             .interpolate("linear")
             .x(function (d) { return x(d.x) + x.rangeBand() / 2; })
             .y(function (d) { return y(d.y); });
-  
+
         if(options.showProbabilityDistribution){
 
             var min = koTools.isValidNumber(options.min) ? options.min : d3.min(data);
             var max = koTools.isValidNumber(options.max) ? options.max : d3.max(data);
             var total = d3.sum(data);
-        
+
             var step = (max - min)/500;
             var expected = total / data.length;
             if(options.expected == 'median'){
@@ -1916,7 +1903,7 @@ define('KoExtensions/Charts/histogramchart',['./../charting', './../kotools'], f
             }else{
                 variance= variance / data.length-1;
             }
- 
+
             var i = 0;
             var probData = [];
             for (i = min;i<max;i+=step) {
@@ -1938,16 +1925,16 @@ define('KoExtensions/Charts/histogramchart',['./../charting', './../kotools'], f
 
             x.domain([
                 minX,
-                maxX 
+                maxX
             ]);
 
             var lineFunction = d3.svg.line()
               .interpolate("linear")
-              .x(function(d) { 
-                  return x(d.x); 
+              .x(function(d) {
+                  return x(d.x);
               })
-              .y(function(d) { 
-                  return y(d.y); 
+              .y(function(d) {
+                  return y(d.y);
               });
 
             svg.append("path")
@@ -1976,7 +1963,7 @@ define('KoExtensions/Charts/histogramchart',['./../charting', './../kotools'], f
 });
 
 
-define('KoExtensions/Charts/scatterplot',['./../charting','./../kotools'], function (charting,koTools) {
+define('KoExtensions/Charts/scatterplot',['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
     charting.scatterPlot = function (data, element, options) {
         var defaultOptions = {
             bins: 80,
@@ -1991,7 +1978,7 @@ define('KoExtensions/Charts/scatterplot',['./../charting','./../kotools'], funct
         var dims = charting.getDimensions(options, el);
 
         var x = d3.scale.ordinal()
-            .rangeRoundBands([0, dims.width], .1);
+            .rangeRoundBands([0, dims.width], 0.1);
 
         var y = d3.scale.linear()
           .range([dims.height, 0]);
@@ -2045,9 +2032,7 @@ define('KoExtensions/Charts/scatterplot',['./../charting','./../kotools'], funct
 });
 
 
-
-
-define('KoExtensions/Charts/chordchart',['./../charting', './../kotools'], function(charting, koTools) {
+define('KoExtensions/Charts/chordchart',['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
     charting.chordChart = function(data, element, options) {
 
         var el = charting.getElementAndCheckData(element, data);
@@ -2173,7 +2158,7 @@ define('KoExtensions/Charts/chordchart',['./../charting', './../kotools'], funct
 });
 
 
-define('KoExtensions/Charts/bubblechart',['./../charting','./../kotools'], function (charting,koTools) {
+define('KoExtensions/Charts/bubblechart',['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
     charting.bubbleChart = function (data, element, options) {
         var el = charting.getElementAndCheckData(element, data);
         if (el == null)
@@ -2195,7 +2180,7 @@ define('KoExtensions/Charts/bubblechart',['./../charting','./../kotools'], funct
             xAxisLabel: false,
             yAxisLabel: false,
             xAxisTextAngle: null
-        }
+        };
 
         options = koTools.setDefaultOptions(defaultOptions, options);
 
@@ -2225,7 +2210,7 @@ define('KoExtensions/Charts/bubblechart',['./../charting','./../kotools'], funct
 
         charting.createXAxis(svg, options, xScale, dims);
         charting.createYAxis(svg, options, yScale, dims);
-        
+
         var bubblenodeMouseout = function () {
             charting.hideTooltip();
         };
@@ -2237,7 +2222,7 @@ define('KoExtensions/Charts/bubblechart',['./../charting','./../kotools'], funct
             info[options.sizeLabel] = options.bubbleSize(d);
             info[options.verticalLabel] = options.bubbleVertical(d);
             info[options.horizontalLabel] = options.bubbleHorizontal(d);
-                
+
             charting.showTooltip(info);
         }
 
@@ -2273,9 +2258,9 @@ define('KoExtensions/koextensions',['./charting', './kotools', './Charts/barchar
             var markers = [];
 
             self.registerExtensions = function () {
-                if (ko == null)
-                    throw "knockout ko global variable has to be defined in order to use the bindings";
-
+              if(ko === null){
+                  throw "If you want to use KoExtensions with Knockout, please reference Knockout before calling registerExtensions";
+              }
                 ko.bindingHandlers.map = {
                     init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
 
@@ -2491,7 +2476,7 @@ define('KoExtensions/koextensions',['./charting', './kotools', './Charts/barchar
                 return fValue;
             }
 
-            
+
 
             function getValue(val) {
                 if (val != null && typeof (val) == 'function')
@@ -2502,7 +2487,6 @@ define('KoExtensions/koextensions',['./charting', './kotools', './Charts/barchar
 
         return new koextensions();
     });
-
 
    //The modules for your project will be inlined above
     //this snippet. Ask almond to synchronously require the

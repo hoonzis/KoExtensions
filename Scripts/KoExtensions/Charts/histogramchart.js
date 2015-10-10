@@ -1,5 +1,5 @@
 "use strict";
-define(['./../charting', './../kotools'], function (charting, koTools) {
+define(['d3','./../charting', './../kotools'], function (d3,charting, koTools) {
     charting.histogram = function(data, element, options) {
         var defaultOptions = {
             bins: 80,
@@ -13,13 +13,13 @@ define(['./../charting', './../kotools'], function (charting, koTools) {
 
         options = koTools.setDefaultOptions(defaultOptions, options);
         var dims = charting.getDimensions(options,el);
-    
+
         var histogramData = d3.layout.histogram()
             .frequency(false)
             .bins(options.bins)(data);
 
         var minX = koTools.isValidNumber(options.min) ? options.min : d3.min(histogramData, function (d) { return d.x; });
-    
+
         var x = d3.scale.linear()
             .domain([
                 minX,
@@ -55,7 +55,7 @@ define(['./../charting', './../kotools'], function (charting, koTools) {
             });
 
         charting.createXAxis(svg,options,x,dims);
-    
+
         var gy = svg.append("g")
             .attr("class", "y axis")
             .call(yAxis);
@@ -68,13 +68,13 @@ define(['./../charting', './../kotools'], function (charting, koTools) {
             .interpolate("linear")
             .x(function (d) { return x(d.x) + x.rangeBand() / 2; })
             .y(function (d) { return y(d.y); });
-  
+
         if(options.showProbabilityDistribution){
 
             var min = koTools.isValidNumber(options.min) ? options.min : d3.min(data);
             var max = koTools.isValidNumber(options.max) ? options.max : d3.max(data);
             var total = d3.sum(data);
-        
+
             var step = (max - min)/500;
             var expected = total / data.length;
             if(options.expected == 'median'){
@@ -95,7 +95,7 @@ define(['./../charting', './../kotools'], function (charting, koTools) {
             }else{
                 variance= variance / data.length-1;
             }
- 
+
             var i = 0;
             var probData = [];
             for (i = min;i<max;i+=step) {
@@ -117,16 +117,16 @@ define(['./../charting', './../kotools'], function (charting, koTools) {
 
             x.domain([
                 minX,
-                maxX 
+                maxX
             ]);
 
             var lineFunction = d3.svg.line()
               .interpolate("linear")
-              .x(function(d) { 
-                  return x(d.x); 
+              .x(function(d) {
+                  return x(d.x);
               })
-              .y(function(d) { 
-                  return y(d.y); 
+              .y(function(d) {
+                  return y(d.y);
               });
 
             svg.append("path")

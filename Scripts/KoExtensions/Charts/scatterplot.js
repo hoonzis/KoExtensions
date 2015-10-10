@@ -1,5 +1,5 @@
 "use strict";
-define(['./../charting','./../kotools'], function (charting,koTools) {
+define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
     charting.scatterPlot = function (data, element, options) {
         var defaultOptions = {
             bins: 80,
@@ -14,7 +14,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
         var dims = charting.getDimensions(options, el);
 
         var x = d3.scale.ordinal()
-            .rangeRoundBands([0, dims.width], .1);
+            .rangeRoundBands([0, dims.width], 0.1);
 
         var y = d3.scale.linear()
           .range([dims.height, 0]);
@@ -66,5 +66,3 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             .style("cursor", "pointer");
     }
 });
-
-

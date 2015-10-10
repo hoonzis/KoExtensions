@@ -1,11 +1,11 @@
 "use strict";
-define(['./../charting','./../kotools'], function (charting,koTools) {
-    //accepts and array of objects. one property of each object is used as the x-coordinate 
+define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
+    //accepts and array of objects. one property of each object is used as the x-coordinate
     //(determined by the xcoord option, which by default is set to 'x')
     //the rest of the properties is stacked to the chart
     charting.barChart = function (data, element, options, lineData) {
         var el = charting.getElementAndCheckData(element, data);
-        if (el == null)
+        if (el === null || el === undefined)
             return;
 
         var defaultOptions = {
@@ -19,7 +19,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
 
         options = koTools.setDefaultOptions(defaultOptions, options);
         var xcoord = options.xcoord;
-        
+
         // not all the items do have the same set of properties, therefor scan them all and concatenate the result
         var keys = [];
         data.map(function (i) {
@@ -39,7 +39,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
         var y = d3.scale.linear()
             .rangeRound([dims.height, 0]);
 
-        
+
         //runs overs all the data. copies the result to a new array
         var arranged = [];
         var arrangedByX = {};
@@ -114,7 +114,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
 
         charting.createXAxis(svg, options, x, dims);
         charting.createYAxis(svg, options, y, dims);
-        
+
 
         var onBarOver = function (d) {
             var column = arrangedByX[d.x];

@@ -15,7 +15,6 @@
 
         require.config({
             baseUrl: "../Scripts",
-            urlArgs: "bust=2" + (new Date()).getTime(),
             paths: {
                 'd3.chart.eventDrops': 'eventDrops'
             },
@@ -27,66 +26,63 @@
             }
         });
 
-        require(['knockout-3.2.0.debug', 'd3', 'd3.chart.eventDrops'], function (kol, d3l) {
+        var ko;
+        require(['KoExtensions/koextensions','knockout-3.2.0.debug','d3.chart.eventDrops'], function(koext,kol) {
             ko = kol;
-            d3 = d3l;
+            function createRundomSales(country) {
+                var event = {};
+                var marks = ['Audi', 'BMW', 'Peugot', 'Skoda'];
 
-            require(['KoExtensions/koextensions'], function() {
+                event.name = country;
+                event.dates = [];
 
-                function createRundomSales(country) {
-                    var event = {};
-                    var marks = ['Audi', 'BMW', 'Peugot', 'Skoda'];
+                var endTime = Date.now();
+                var oneMonth = 30 * 24 * 60 * 60 * 1000;
+                var startTime = endTime - oneMonth;
 
-                    event.name = country;
-                    event.dates = [];
-
-                    var endTime = Date.now();
-                    var oneMonth = 30 * 24 * 60 * 60 * 1000;
-                    var startTime = endTime - oneMonth;
-
-                    var max = Math.floor(Math.random() * 80);
-                    for (var j = 0; j < max; j++) {
-                        var time = Math.floor((Math.random() * oneMonth)) + startTime;
-                        event.dates.push({
-                            timestamp: new Date(time),
-                            carMark: marks[Math.floor(Math.random() * 100) % 4],
-                            price: Math.random() * 100000
-                        });
-                    }
-
-                    return event;
-                }
-
-
-                function createSales() {
-                    var sales = [];
-                    var countries = ['France', 'Germany', 'Czech Republic', 'Spain'];
-                    countries.forEach(function(country) {
-                        var countrySales = createRundomSales(country);
-                        sales.push(countrySales);
+                var max = Math.floor(Math.random() * 80);
+                for (var j = 0; j < max; j++) {
+                    var time = Math.floor((Math.random() * oneMonth)) + startTime;
+                    event.dates.push({
+                        timestamp: new Date(time),
+                        carMark: marks[Math.floor(Math.random() * 100) % 4],
+                        price: Math.random() * 100000
                     });
-                    return sales;
                 }
 
-                function TestViewModels() {
-                    var self = this;
+                return event;
+            }
 
-                    self.carSales = ko.observableArray([]);
-                    self.carSales(createSales());
 
-                    self.carSalesOptions = {
-                        eventColor: function(d) { return d.carMark; },
-                        eventSize: function(d) { return d.price; },
-                        eventDate: function(d) { return d.timestamp; },
-                        start: new Date(2014, 8, 1)
-                    };
-                }
+            function createSales() {
+                var sales = [];
+                var countries = ['France', 'Germany', 'Czech Republic', 'Spain'];
+                countries.forEach(function(country) {
+                    var countrySales = createRundomSales(country);
+                    sales.push(countrySales);
+                });
+                return sales;
+            }
 
-                var vm = new TestViewModels();
+            function TestViewModels() {
+                var self = this;
 
-                ko.applyBindings(vm);
-            });
+                self.carSales = ko.observableArray([]);
+                self.carSales(createSales());
+
+                self.carSalesOptions = {
+                    eventColor: function(d) { return d.carMark; },
+                    eventSize: function(d) { return d.price; },
+                    eventDate: function(d) { return d.timestamp; },
+                    start: new Date(2014, 8, 1)
+                };
+            }
+
+            var vm = new TestViewModels();
+
+            ko.applyBindings(vm);
         });
+
     </script>
 </body>
 </html>

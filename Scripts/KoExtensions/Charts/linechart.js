@@ -1,5 +1,5 @@
 "use strict";
-define(['./../charting','./../kotools'], function (charting,koTools) {
+define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
     //Takes as input collection of items [data]. Each item has two values [x] and [y].
     //[{x:1, receivedEtf:123, tradedEtf:100},{x:2, receivedEtf:200, tradedEtf:100}]
@@ -126,7 +126,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             coordinates = d3.mouse(this);
             var x1 = coordinates[0];
             var y1 = coordinates[1];
-            
+
             if (verticalLine == null) {
                 verticalLine = svg.append("line")
                     .attr("x1",x1)
@@ -139,7 +139,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
                 var current = verticalLine.attr("x1");
                 var trans = x1 - current;
                 verticalLine.attr("transform", "translate(" + trans + ",0)");
-                
+
                 var realY = y.invert(y1);
                 var info = { y: realY };
                 if (x.invert != null) {
@@ -218,7 +218,3 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
         }
     }
 });
-
-
-
-

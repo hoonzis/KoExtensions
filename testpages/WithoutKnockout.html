@@ -15,21 +15,17 @@
                 baseUrl: "../Scripts"
             });
 
-            require(['d3'], function (d3l) {
-                d3 = d3l;
-                require(['KoExtensions/koextensions'], function (koext) {
-                    //without knockout, don't register extensions!
-                    //koext.registerExtensions();
-                    var testData = [
-                        { linename: "Price:", values: [100.0, 125.0, 130, 145, 101] },
-                        { linename: "Consumption", values: [1, 0.5, 0.8, 0.2, 0.1] }
-                    ];
-                    var chartOptions = {height:100, normalizeSeries:true}
-                    var el = document.getElementById("lineChartDiv");
+            require(['KoExtensions/koextensions'], function (koext) {
+                //without knockout, don't register extensions!
+                //koext.registerExtensions();
+                var testData = [
+                    { linename: "Price:", values: [100.0, 125.0, 130, 145, 101] },
+                    { linename: "Consumption", values: [1, 0.5, 0.8, 0.2, 0.1] }
+                ];
+                var chartOptions = {height:100, normalizeSeries:true}
+                var el = document.getElementById("lineChartDiv");
 
-                    koext.charting.lineChart(testData, el, chartOptions);
-
-                });
+                koext.charting.lineChart(testData, el, chartOptions);
             });
     </script>
 </body>

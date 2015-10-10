@@ -1,5 +1,5 @@
 "use strict";
-define(['./../charting','./../kotools'], function (charting,koTools) {
+define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
     charting.bubbleChart = function (data, element, options) {
         var el = charting.getElementAndCheckData(element, data);
         if (el == null)
@@ -21,7 +21,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             xAxisLabel: false,
             yAxisLabel: false,
             xAxisTextAngle: null
-        }
+        };
 
         options = koTools.setDefaultOptions(defaultOptions, options);
 
@@ -51,7 +51,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
 
         charting.createXAxis(svg, options, xScale, dims);
         charting.createYAxis(svg, options, yScale, dims);
-        
+
         var bubblenodeMouseout = function () {
             charting.hideTooltip();
         };
@@ -63,7 +63,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             info[options.sizeLabel] = options.bubbleSize(d);
             info[options.verticalLabel] = options.bubbleVertical(d);
             info[options.horizontalLabel] = options.bubbleHorizontal(d);
-                
+
             charting.showTooltip(info);
         }
 

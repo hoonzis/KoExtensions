@@ -15,36 +15,38 @@
             }
 
             require.config({
-                baseUrl: "../Scripts"
+                baseUrl: "../Scripts",
+                paths:{
+                  'ko':'knockout-3.2.0.debug'
+                }
             });
 
-            require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {
+            var ko;
+            require(['ko','KoExtensions/koextensions'], function(kol,koext) {
                 ko = kol;
-                d3 = d3l;
-                require(['KoExtensions/koextensions'], function(koext) {
-                    koext.registerExtensions();
-                    var matrix = [
-                        [0, 20, 10, 30,5],
-                        [20, 0, 20, 30,15],
-                        [10, 20, 0, 10,25],
-                        [30, 30, 10, 0,30],
-                        [5, 15 ,25 ,30,0]
-                    ];
+                var matrix = [
+                    [0, 20, 10, 30,5],
+                    [20, 0, 20, 30,15],
+                    [10, 20, 0, 10,25],
+                    [30, 30, 10, 0,30],
+                    [5, 15 ,25 ,30,0]
+                ];
 
-                    var names = ['CZ', 'FR', 'PL', 'RU','DE'];
+                var names = ['CZ', 'FR', 'PL', 'RU','DE'];
 
-                    function TestViewModel() {
-                        var self = this;
-                        self.chordChartData = ko.observable();
-                    }
+                function TestViewModel() {
+                    var self = this;
+                    self.chordChartData = ko.observable();
+                }
 
-                    var vm = new TestViewModel();
-                    ko.applyBindings(vm);
+                var vm = new TestViewModel();
 
-                    vm.chordChartData({
-                        matrix: matrix,
-                        names: names
-                    });
+                koext.registerExtensions();
+                ko.applyBindings(vm);
+
+                vm.chordChartData({
+                    matrix: matrix,
+                    names: names
                 });
             });
     </script>

@@ -1,5 +1,5 @@
 "use strict";
-define(['./../charting','./../kotools'], function (charting,koTools) {
+define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
     //Takes as input collection of items [data]. Each item has two values [x] and [y].
     //x is the label and y the value which determines the size of the slice of the pie chart.
     charting.pieChart = function(data, element,options) {
@@ -35,7 +35,7 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             });
             color.domain(keys);
         }
-   
+
         var xKeys = data.map(function (i) { return i.x; });
         var dims = charting.getDimensions(options, el, xKeys);
 
@@ -82,11 +82,9 @@ define(['./../charting','./../kotools'], function (charting,koTools) {
             .on("mouseout", arcMouseOut)
             .style("cursor", "pointer")
             .style("opacity",0.7)
-            .each(function(d) { 
+            .each(function(d) {
                 d.percentage = d.data.y / sum;
                 d.formatted = options.unitTransform ? options.unitTransform(d.data.y) : d.data.y;
         });
     }
 });
-
-

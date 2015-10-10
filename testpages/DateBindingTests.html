@@ -45,54 +45,52 @@
         urlArgs: "bust=2" + (new Date()).getTime()
     });
 
-    require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {
+    var ko;
+    require(['KoExtensions/koextensions','knockout-3.2.0.debug', 'jquery-2.1.1',], function (koext,kol) {
         ko = kol;
-        d3 = d3l;
-        require(['KoExtensions/koextensions', 'jquery-2.1.1'], function (koext) {
-            koext.registerExtensions();
-            require(['bootstrap', 'bootstrap-datepicker'], function() {
-                //taken from StackOverflow
-                function daysBetween(first, second) {
+        koext.registerExtensions();
+        require(['bootstrap', 'bootstrap-datepicker'], function() {
+            //taken from StackOverflow
+            function daysBetween(first, second) {
 
-                    if (first == null || second == null)
-                        return null;
+                if (first == null || second == null)
+                    return null;
 
-                    // Copy date parts of the timestamps, discarding the time parts.
-                    var one = new Date(first.getFullYear(), first.getMonth(), first.getDate());
-                    var two = new Date(second.getFullYear(), second.getMonth(), second.getDate());
+                // Copy date parts of the timestamps, discarding the time parts.
+                var one = new Date(first.getFullYear(), first.getMonth(), first.getDate());
+                var two = new Date(second.getFullYear(), second.getMonth(), second.getDate());
 
-                    // Do the math.
-                    var millisecondsPerDay = 1000 * 60 * 60 * 24;
-                    var millisBetween = two.getTime() - one.getTime();
-                    var days = millisBetween / millisecondsPerDay;
+                // Do the math.
+                var millisecondsPerDay = 1000 * 60 * 60 * 24;
+                var millisBetween = two.getTime() - one.getTime();
+                var days = millisBetween / millisecondsPerDay;
 
-                    // Round down.
-                    return Math.floor(days);
+                // Round down.
+                return Math.floor(days);
+            }
+
+            function VoyageViewModel(data) {
+                var self = this;
+                self.start = ko.observable();
+                self.end = ko.observable();
+                self.destination = ko.observable();
+
+                self.duration = ko.computed(function() { return daysBetween(self.start(), self.end()); }, self);
+
+                if (data != null) {
+                    self.start(data.start);
+                    self.end(data.end);
+                    self.destination(data.destination);
                 }
+            }
 
-                function VoyageViewModel(data) {
-                    var self = this;
-                    self.start = ko.observable();
-                    self.end = ko.observable();
-                    self.destination = ko.observable();
-
-                    self.duration = ko.computed(function() { return daysBetween(self.start(), self.end()); }, self);
-
-                    if (data != null) {
-                        self.start(data.start);
-                        self.end(data.end);
-                        self.destination(data.destination);
-                    }
-                }
-
-                var voyage = new VoyageViewModel({
-                    "start": new Date(),
-                    "end": null,
-                    "destination": "Paris"
-                });
-
-                ko.applyBindings(voyage);
+            var voyage = new VoyageViewModel({
+                "start": new Date(),
+                "end": null,
+                "destination": "Paris"
             });
+
+            ko.applyBindings(voyage);
         });
     });
     </script>

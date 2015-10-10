@@ -14,33 +14,31 @@
                 baseUrl: "../Scripts"
             });
 
-            require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {
+            var ko;
+            require(['KoExtensions/koextensions','knockout-3.2.0.debug'], function(koext,kol) {
                 ko = kol;
-                d3 = d3l;
-                require(['KoExtensions/koextensions'], function (koext) {
-                    koext.registerExtensions();
-                    var hours = [30, 35, 40, 45, 50, 55, 60, 65, 70];
-                    var result = [5, 6, 9, 12, 14, 18, 23, 27, 34, 40];
+                koext.registerExtensions();
+                var hours = [30, 35, 40, 45, 50, 55, 60, 65, 70];
+                var result = [5, 6, 9, 12, 14, 18, 23, 27, 34, 40];
 
-                    function TestViewModel() {
-                        var self = this;
-                        self.data = ko.computed(function() {
-                            var values = [];
-                            var i = 0;
-                            for (i = 0; i < hours.length; i++) {
-                                values.push({
-                                    x: hours[i],
-                                    y: result[i]
-                                });
-                            }
-                            return values;
-                        });
-                    }
+                function TestViewModel() {
+                    var self = this;
+                    self.data = ko.computed(function() {
+                        var values = [];
+                        var i = 0;
+                        for (i = 0; i < hours.length; i++) {
+                            values.push({
+                                x: hours[i],
+                                y: result[i]
+                            });
+                        }
+                        return values;
+                    });
+                }
 
-                    var vm = new TestViewModel();
+                var vm = new TestViewModel();
 
-                    ko.applyBindings(vm);
-                });
+                ko.applyBindings(vm);
             });
         </script>
 </body>
