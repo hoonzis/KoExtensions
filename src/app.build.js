@@ -22,8 +22,7 @@
 	paths: {
 		
 	},
-	exclude: ["d3"],
-	include: ["../src/almond"],
+	include: ["d3","../src/almond"],
 	optimize: "none",
 	name:"KoExtensions/koextensions",
 	out:"KoExtensions.js",
