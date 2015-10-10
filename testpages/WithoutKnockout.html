@@ -12,8 +12,7 @@
     </div>
     <script>
             require.config({
-                baseUrl: "/Scripts",
-                urlArgs: "bust=2" + (new Date()).getTime()
+                baseUrl: "../Scripts"
             });
 
             require(['d3'], function (d3l) {
@@ -27,9 +26,9 @@
                     ];
                     var chartOptions = {height:100, normalizeSeries:true}
                     var el = document.getElementById("lineChartDiv");
-        
+
                     koext.charting.lineChart(testData, el, chartOptions);
-                    
+
                 });
             });
     </script>

@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"> 
+<html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="content-type" content="text/html; charset=UTF8">
         <title>Charting Test Page</title>
@@ -37,7 +37,7 @@
 			<div data-bind="piechart: salesChart">
 
 			</div>
-	 	</div> 
+	 	</div>
 	 <!-- /ko -->
         <script>
 
@@ -46,7 +46,7 @@
             }
 
             require.config({
-                baseUrl: "/Scripts",
+                baseUrl: "../Scripts",
                 urlArgs: "bust=2" + (new Date()).getTime()
             });
 
@@ -142,7 +142,7 @@
 
                         self.cars = ko.observableArray([]);
                         self.salesPerMonth = ko.observableArray([]);
-                                               
+
                         //first chart with month x-axis
                         self.salesPerMonthChart = ko.computed(function () {
                             return self.salesPerMonth().map(function (i) {
@@ -167,7 +167,7 @@
                             });
                         });
 
-                        
+
                         var keys = d3.keys(data[0]).filter(function(i) { return i != 'month' && i!= 'id'; });
                         var perMonth = keys.map(function(key) {
                             return {
@@ -184,7 +184,7 @@
                         self.valueToLabel = function (x) {
                             return x + " cars sold";
                         }
-                        
+
                         var simpleData = [];
                         for(var i=0;i<100;i++){
                             simpleData.push({
@@ -205,4 +205,4 @@
             });
     </script>
 </body>
-</html> 
+</html>

@@ -457,39 +457,38 @@ define('KoExtensions/kotools',[],function () {
         self.currentMonth = today.getMonth();
         self.isEmpty = function(str) {
             return (!str || 0 === str.length);
-        }
+        };
 
         Date.prototype.toFormattedString = function() {
-
             var cDate = this.getDate();
             var cMonth = this.getMonth() + 1; //Months are zero based
             var cYear = this.getFullYear();
             return cDate + "/" + cMonth + "/" + cYear;
-        }
+        };
 
         Array.prototype.setOrAdd = function (x, y, value) {
-            if (this[x] == null)
+            if (this[x] === null)
                 this[x] = [];
-            if (this[x][y] == null || isNaN(this[x][y]))
+            if (this[x][y] === null || isNaN(this[x][y]))
                 this[x][y] = value;
             else
                 this[x][y] += value;
-        }
+        };
 
         Array.prototype.set = function (x, y, value) {
-            if (this[x] == null)
+            if (this[x] === null)
                 this[x] = [];
             this[x][y] = value;
-        }
+        };
 
         Date.prototype.addDays = function (days) {
             var dat = new Date(this.valueOf());
             dat.setDate(dat.getDate() + days);
             return dat;
-        }
+        };
 
         self.getQuarter = function(item) {
-            if (item.Year != null && item.Quarter != null) {
+            if (item.Year !== null && item.Quarter !== null) {
                 return "Q" + item.Quarter + item.Year;
             }
             return null;
@@ -499,10 +498,10 @@ define('KoExtensions/kotools',[],function () {
             var pad_char = typeof c !== 'undefined' ? c : '0';
             var pad = new Array(1 + p).join(pad_char);
             return (pad + n).slice(-pad.length);
-        }
+        };
 
         self.getMonth = function(item) {
-            if (item.Year != null && item.Month != null) {
+            if (item.Year !== null && item.Month !== null) {
                 return item.Year + '' + self.paddy(item.Month, 2);
             }
             return null;
@@ -569,31 +568,42 @@ define('KoExtensions/kotools',[],function () {
             } else {
                 return d[key];
             }
-        }
+        };
+
+        self.getWidth = function(el)
+        {
+            if (el.clientWidth !== null && el.clientWidth !== undefined)
+                return el.clientWidth;
+
+            if (Array.isArray(el) && el.length > 0) {
+                return self.getWidth(el[0]);
+            }
+            return null;
+        };
 
         self.find = function(data, predicate) {
             for (var i = 0; i < data.length; i++)
                 if (predicate(data[i]))
                     return data[i];
             return null;
-        }
+        };
 
         self.isString = function(x) {
             return typeof (x) == 'string';
-        }
+        };
 
         self.isNumber = function(n) {
             return !isNaN(parseFloat(n)) && isFinite(n);
-        }
+        };
 
         self.isValidNumber = function(n) {
-            return n != null && !isNaN(n);
-        }
+            return n !== null && !isNaN(n);
+        };
 
         self.isDate = function(d) {
             return Object.prototype.toString.call(d) == "[object Date]";
-        }
 
+        };
         Number.prototype.formatMoney = function(c, d, t) {
             var n = this,
                 c = isNaN(c = Math.abs(c)) ? 2 : c,
@@ -634,7 +644,7 @@ define('KoExtensions/kotools',[],function () {
             if (!self.isDate(d))
                 return false;
             return !isNaN(d.getTime());
-        }
+        };
 
         self.compare = function(x, y) {
             for (var propertyName in x) {
@@ -643,7 +653,7 @@ define('KoExtensions/kotools',[],function () {
                 }
             }
             return true;
-        }
+        };
 
         self.toLength = function(val, length) {
             if (val.length >= length) {
@@ -655,20 +665,20 @@ define('KoExtensions/kotools',[],function () {
                 returnVal += val[i % val.length];
             }
             return returnVal;
-        }
+        };
 
         Number.prototype.toCurrencyString = function(cur, decSpaces) {
             var formatted = this.toFixed(decSpaces).replace(/(\d)(?=(\d{3})+\b)/g, '$1 ');
             if (cur != null)
                 formatted += ' ' + cur;
             return formatted;
-        }
+        };
 
         self.toPercent = function(val) {
-            if (val == null)
+            if (val === null)
                 return 0;
             return (val * 100).toFixed(1) + " %";
-        }
+        };
 
         //Size of the object - equivalent of array length
         Object.size = function(obj) {
@@ -742,9 +752,10 @@ define('KoExtensions/kotools',[],function () {
         }
 
         self.transpose = function(a, xcoord) {
-            if (a == null)
+            if (a === null)
                 return null;
-            if (a.length == 0)
+
+            if (a.length === 0)
                 return [];
 
             var keys = d3.keys(a[0]).filter(function(k) { return k != xcoord; });
@@ -752,17 +763,18 @@ define('KoExtensions/kotools',[],function () {
             var horizontalKeys = d3.keys(a);
             var result = [];
 
-            for (k in keys) {
+            for (var k in keys) {
                 var key = keys[k];
-                var newItem = new Object();
-                newItem.name = key;
+                var newItem = {
+                    name: key
+                };
                 horizontalKeys.map(function(hKey) {
                     newItem[a[hKey][xcoord]] = a[hKey][key];
                 });
                 result.push(newItem);
             }
             return result;
-        }
+        };
 
         self.dateToFrenchString = function(date) {
             var month = date.getMonth() + 1;
@@ -936,7 +948,7 @@ define('KoExtensions/charting',['./kotools'],function (koTools) {
 
     charting.getElementAndCheckData = function(element, data) {
         var el = d3.select(element);
-        if (data == null || data.length === 0) {
+        if (data === null || data === undefined || data.length === 0) {
             element.innerHTML = "No data available";
             return null;
         }
@@ -946,16 +958,16 @@ define('KoExtensions/charting',['./kotools'],function (koTools) {
 
     charting.getLegendWidth = function (data) {
         //when there is no legend, just return 0 pixels
-        if (data == null || data.length === 0)
+        if (data === null || data.length === 0)
             return 0;
         var maxWidth = d3.max(data, function (el) {
             return el.length;
         });
         return maxWidth;
-    }
+    };
 
     charting.showStandardLegend = function(parent, data, color, showLegend, height) {
-        
+
         var maxWidth = charting.getLegendWidth(data);
 
         //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
@@ -989,7 +1001,7 @@ define('KoExtensions/charting',['./kotools'],function (koTools) {
         for (var key in info) {
             var value = info[key];
             d3.select("#info" + i + "header").text(key);
-            if (value != null) {
+            if (value !== null) {
                 if (koTools.isDate(value)) {
                     d3.select("#info" + i).text(value.toFormattedString());
                 } else {
@@ -1069,7 +1081,7 @@ define('KoExtensions/charting',['./kotools'],function (koTools) {
     charting.getDimensions = function (options, el, legenKeys) {
 
         if (options.fillParentController) {
-            options.width = el.width;
+            options.width = koTools.getWidth(el);
             options.height = el.height;
         }
         var margin = { top: 20, right: 80, bottom: 50, left: 50 };
@@ -1084,7 +1096,7 @@ define('KoExtensions/charting',['./kotools'],function (koTools) {
             margin: margin
         };
     };
-    
+
     charting.appendContainer = function(el, dims) {
         var svg = el.append("svg")
         .attr("width", dims.width + dims.margin.left + dims.margin.right)
@@ -1165,7 +1177,7 @@ define('KoExtensions/charting',['./kotools'],function (koTools) {
                 min: 100000000000000000000,
                 max: -1000000000000000000000,
                 xKeys:[]
-            }    
+            }
         }
 
         var newKeys = data.map(function(v) {
@@ -1229,6 +1241,7 @@ define('KoExtensions/charting',['./kotools'],function (koTools) {
 
     return charting;
 });
+
 
 define('KoExtensions/Charts/barchart',['./../charting','./../kotools'], function (charting,koTools) {
     //accepts and array of objects. one property of each object is used as the x-coordinate 
@@ -2043,7 +2056,8 @@ define('KoExtensions/Charts/chordchart',['./../charting', './../kotools'], funct
 
         var defaultOptions = {
             width: 800,
-            height: 800
+            height: 800,
+            fillParentController:false,
         };
 
         options = koTools.setDefaultOptions(defaultOptions, options);
@@ -2125,7 +2139,7 @@ define('KoExtensions/Charts/chordchart',['./../charting', './../kotools'], funct
             .enter().append("g")
             .attr("class", "group");
 
-        
+
         group.append("path")
             .attr("id", function(d, i) { return "group" + i; })
             .attr("d", arc)
@@ -2154,10 +2168,10 @@ define('KoExtensions/Charts/chordchart',['./../charting', './../kotools'], funct
             .style("fill", function(d) { return color(d.source.index); })
             .attr("d", path)
             .on("mouseover", chord_mouse_over)
-            .on("mouseout", chord_mouse_out);   
+            .on("mouseout", chord_mouse_out);
     }
 });
-    
+
 
 define('KoExtensions/Charts/bubblechart',['./../charting','./../kotools'], function (charting,koTools) {
     charting.bubbleChart = function (data, element, options) {

@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
- 
-<html xmlns="http://www.w3.org/1999/xhtml"> 
+
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Datepicker binding tests</title>
     <link href="../Content/bootstrap.css" rel="stylesheet" />
@@ -12,14 +12,14 @@
 <body>
 <br/>
     <div class="container-fluid">
-        <div class="row"> 
+        <div class="row">
             <div class="col-md-3">
                 <form class="well form-horizontal">
                     <div class="form-group">
                         <label class="control-label">Destination</label>
                         <input type="text" data-bind="value:destination">
                     </div>
-				
+
                     <div class="form-group">
                         <label class="control-label">Start</label>
                         <input type="text" data-bind="datepicker:start">
@@ -29,7 +29,7 @@
                         <label class="control-label">End</label>
                         <input type="text" data-bind="datepicker:end">
                     </div>
-				
+
                     <div class="form-group">
                         <label class="control-label">Duration</label>
                         <input type="text" data-bind="value:duration">
@@ -41,7 +41,7 @@
     <script>
 
     require.config({
-        baseUrl: "/Scripts",
+        baseUrl: "../Scripts",
         urlArgs: "bust=2" + (new Date()).getTime()
     });
 

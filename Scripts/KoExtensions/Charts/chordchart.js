@@ -8,7 +8,8 @@ define(['./../charting', './../kotools'], function(charting, koTools) {
 
         var defaultOptions = {
             width: 800,
-            height: 800
+            height: 800,
+            fillParentController:false,
         };
 
         options = koTools.setDefaultOptions(defaultOptions, options);
@@ -90,7 +91,7 @@ define(['./../charting', './../kotools'], function(charting, koTools) {
             .enter().append("g")
             .attr("class", "group");
 
-        
+
         group.append("path")
             .attr("id", function(d, i) { return "group" + i; })
             .attr("d", arc)
@@ -119,7 +120,6 @@ define(['./../charting', './../kotools'], function(charting, koTools) {
             .style("fill", function(d) { return color(d.source.index); })
             .attr("d", path)
             .on("mouseover", chord_mouse_over)
-            .on("mouseout", chord_mouse_out);   
+            .on("mouseout", chord_mouse_out);
     }
 });
-    

@@ -7,12 +7,11 @@
     <body>
     <h2>Scatterplot</h2>
         <div id="scatterplot" data-bind="scatterplot: data">
-            
+
         </div>
         <script>
             require.config({
-                baseUrl: "/Scripts",
-                urlArgs: "bust=2" + (new Date()).getTime()
+                baseUrl: "../Scripts"
             });
 
             require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {

@@ -23,8 +23,7 @@
     <div id="histogram" data-bind="histogram: data, chartOptions : chartOptions"></div>
         <script>
             require.config({
-                baseUrl: "/Scripts",
-                urlArgs: "bust=2" + (new Date()).getTime()
+                baseUrl: "../Scripts"
             });
 
 
@@ -65,7 +64,7 @@
                                 width: 250,
                                 height:150,
                                 xAxisTextAngle: 45,
-                                fillParentController : false
+                                fillParentController : true
                             }
                         });
                     }

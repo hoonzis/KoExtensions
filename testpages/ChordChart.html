@@ -7,7 +7,7 @@
     <link type="text/css" rel="stylesheet" href="../styles/kostyles.css" />
 </head>
 <body>
-    <div id="chordChart" data-bind="chordChart: chordChartData, chartOptions:{height:400,width:400}"></div>
+    <div id="chordChart" data-bind="chordChart: chordChartData, chartOptions:{height:400,width:400,fillParentController:true}"></div>
     <script>
 
             window.document.onload = function (e) {
@@ -15,8 +15,7 @@
             }
 
             require.config({
-                baseUrl: "/Scripts",
-                urlArgs: "bust=2" + (new Date()).getTime()
+                baseUrl: "../Scripts"
             });
 
             require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {
@@ -50,4 +49,4 @@
             });
     </script>
 </body>
-</html> 
+</html>

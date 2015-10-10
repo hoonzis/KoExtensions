@@ -12,39 +12,38 @@ define(function () {
         self.currentMonth = today.getMonth();
         self.isEmpty = function(str) {
             return (!str || 0 === str.length);
-        }
+        };
 
         Date.prototype.toFormattedString = function() {
-
             var cDate = this.getDate();
             var cMonth = this.getMonth() + 1; //Months are zero based
             var cYear = this.getFullYear();
             return cDate + "/" + cMonth + "/" + cYear;
-        }
+        };
 
         Array.prototype.setOrAdd = function (x, y, value) {
-            if (this[x] == null)
+            if (this[x] === null || this[x] === undefined)
                 this[x] = [];
-            if (this[x][y] == null || isNaN(this[x][y]))
+            if (this[x][y] === null || isNaN(this[x][y]))
                 this[x][y] = value;
             else
                 this[x][y] += value;
-        }
+        };
 
         Array.prototype.set = function (x, y, value) {
-            if (this[x] == null)
+            if (this[x] === null || this[x] === undefined)
                 this[x] = [];
             this[x][y] = value;
-        }
+        };
 
         Date.prototype.addDays = function (days) {
             var dat = new Date(this.valueOf());
             dat.setDate(dat.getDate() + days);
             return dat;
-        }
+        };
 
         self.getQuarter = function(item) {
-            if (item.Year != null && item.Quarter != null) {
+            if (item.Year !== null && item.Quarter !== null) {
                 return "Q" + item.Quarter + item.Year;
             }
             return null;
@@ -54,10 +53,10 @@ define(function () {
             var pad_char = typeof c !== 'undefined' ? c : '0';
             var pad = new Array(1 + p).join(pad_char);
             return (pad + n).slice(-pad.length);
-        }
+        };
 
         self.getMonth = function(item) {
-            if (item.Year != null && item.Month != null) {
+            if (item.Year !== null && item.Month !== null) {
                 return item.Year + '' + self.paddy(item.Month, 2);
             }
             return null;
@@ -124,31 +123,42 @@ define(function () {
             } else {
                 return d[key];
             }
-        }
+        };
+
+        self.getWidth = function(el)
+        {
+            if (el.clientWidth !== null && el.clientWidth !== undefined)
+                return el.clientWidth;
+
+            if (Array.isArray(el) && el.length > 0) {
+                return self.getWidth(el[0]);
+            }
+            return null;
+        };
 
         self.find = function(data, predicate) {
             for (var i = 0; i < data.length; i++)
                 if (predicate(data[i]))
                     return data[i];
             return null;
-        }
+        };
 
         self.isString = function(x) {
             return typeof (x) == 'string';
-        }
+        };
 
         self.isNumber = function(n) {
             return !isNaN(parseFloat(n)) && isFinite(n);
-        }
+        };
 
         self.isValidNumber = function(n) {
-            return n != null && !isNaN(n);
-        }
+            return n !== null && !isNaN(n);
+        };
 
         self.isDate = function(d) {
             return Object.prototype.toString.call(d) == "[object Date]";
-        }
 
+        };
         Number.prototype.formatMoney = function(c, d, t) {
             var n = this,
                 c = isNaN(c = Math.abs(c)) ? 2 : c,
@@ -189,7 +199,7 @@ define(function () {
             if (!self.isDate(d))
                 return false;
             return !isNaN(d.getTime());
-        }
+        };
 
         self.compare = function(x, y) {
             for (var propertyName in x) {
@@ -198,7 +208,7 @@ define(function () {
                 }
             }
             return true;
-        }
+        };
 
         self.toLength = function(val, length) {
             if (val.length >= length) {
@@ -210,20 +220,20 @@ define(function () {
                 returnVal += val[i % val.length];
             }
             return returnVal;
-        }
+        };
 
         Number.prototype.toCurrencyString = function(cur, decSpaces) {
             var formatted = this.toFixed(decSpaces).replace(/(\d)(?=(\d{3})+\b)/g, '$1 ');
             if (cur != null)
                 formatted += ' ' + cur;
             return formatted;
-        }
+        };
 
         self.toPercent = function(val) {
-            if (val == null)
+            if (val === null)
                 return 0;
             return (val * 100).toFixed(1) + " %";
-        }
+        };
 
         //Size of the object - equivalent of array length
         Object.size = function(obj) {
@@ -260,7 +270,7 @@ define(function () {
                 }
             }
             return newarray;
-        }
+        };
 
         String.prototype.endsWith = function(suffix) {
             return this.indexOf(suffix, this.length - suffix.length) !== -1;
@@ -294,12 +304,13 @@ define(function () {
             default:
                 return Boolean(string);
             }
-        }
+        };
 
         self.transpose = function(a, xcoord) {
-            if (a == null)
+            if (a === null)
                 return null;
-            if (a.length == 0)
+
+            if (a.length === 0)
                 return [];
 
             var keys = d3.keys(a[0]).filter(function(k) { return k != xcoord; });
@@ -307,17 +318,18 @@ define(function () {
             var horizontalKeys = d3.keys(a);
             var result = [];
 
-            for (k in keys) {
+            for (var k in keys) {
                 var key = keys[k];
-                var newItem = new Object();
-                newItem.name = key;
+                var newItem = {
+                    name: key
+                };
                 horizontalKeys.map(function(hKey) {
                     newItem[a[hKey][xcoord]] = a[hKey][key];
                 });
                 result.push(newItem);
             }
             return result;
-        }
+        };
 
         self.dateToFrenchString = function(date) {
             var month = date.getMonth() + 1;
@@ -340,12 +352,12 @@ define(function () {
                 year: self.tryConvertToNumber(monthAndYear.substring(0, 4)),
                 month: self.tryConvertToNumber(monthAndYear.substring(4, 6))
             };
-        }
+        };
 
         self.distinct = function(data, mapper) {
             var mapped = data.map(mapper);
             return mapped.filter(function(v, i) { return mapped.indexOf(v) == i; });
-        }
+        };
 
         self.normalizeSeries = function (data) {
             if (data == null) {
@@ -378,7 +390,7 @@ define(function () {
 
                             data[i].values[j] = {
                                 x: j,
-                                y: data[i].values[j].y = (data[i].values[j] / baseValue) * 100
+                                y: (data[i].values[j] / baseValue) * 100
                             };
                         }
                     } else if (minCommonKey != null) {
@@ -388,7 +400,7 @@ define(function () {
                         });
                         //if the min common item was found, than we can get the y, which will be the base value
                         //used to normalize all values
-                        if (commonItem != null) {
+                        if (commonItem !== undefined && commonItem!==null) {
                             baseValue = commonItem.y;
                             for (var j = 0; j < data[i].values.length; j++) {
                                 data[i].values[j].y = (data[i].values[j].y / baseValue) * 100;
@@ -403,7 +415,7 @@ define(function () {
             return data.filter(function (series) {
                 return series.removeIt == null || series.removeIt == false;
             });
-        }
+        };
 
         self.convertSeriesToXYPairs = function(data) {
             var converted = [];
@@ -411,7 +423,7 @@ define(function () {
                 converted.push({ x: i, y: data[i] });
             }
             return converted;
-        }
+        };
 
         self.convertAllSeriesToXYPairs = function (data) {
             if (data == null) {
@@ -425,7 +437,7 @@ define(function () {
                 }
             }
             return data;
-        }
+        };
 
         self.minCommonValue = function (data, accessor) {
             var commonValues = {};
@@ -450,7 +462,7 @@ define(function () {
             }
 
             return maxKey;
-        }
+        };
 
         self.setDefaultOptions = function (defaultConfig, config) {
             config = config || {};
@@ -458,7 +470,7 @@ define(function () {
                 config[key] = config[key] != null ? config[key] : defaultConfig[key];
             }
             return config;
-        }
+        };
 
         self.throttle = function(delay, callback) {
             var previousCall = new Date().getTime();
@@ -475,9 +487,7 @@ define(function () {
                     callback.apply(null, arguments);
                 }
             };
+          };
         }
-
-    };
-
     return new KoTools();
 });

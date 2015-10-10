@@ -7,7 +7,7 @@ define(['./kotools'],function (koTools) {
 
     charting.getElementAndCheckData = function(element, data) {
         var el = d3.select(element);
-        if (data == null || data.length === 0) {
+        if (data === null || data === undefined || data.length === 0) {
             element.innerHTML = "No data available";
             return null;
         }
@@ -17,16 +17,16 @@ define(['./kotools'],function (koTools) {
 
     charting.getLegendWidth = function (data) {
         //when there is no legend, just return 0 pixels
-        if (data == null || data.length === 0)
+        if (data === null || data.length === 0)
             return 0;
         var maxWidth = d3.max(data, function (el) {
             return el.length;
         });
         return maxWidth;
-    }
+    };
 
     charting.showStandardLegend = function(parent, data, color, showLegend, height) {
-        
+
         var maxWidth = charting.getLegendWidth(data);
 
         //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
@@ -60,7 +60,7 @@ define(['./kotools'],function (koTools) {
         for (var key in info) {
             var value = info[key];
             d3.select("#info" + i + "header").text(key);
-            if (value != null) {
+            if (value !== null) {
                 if (koTools.isDate(value)) {
                     d3.select("#info" + i).text(value.toFormattedString());
                 } else {
@@ -140,7 +140,7 @@ define(['./kotools'],function (koTools) {
     charting.getDimensions = function (options, el, legenKeys) {
 
         if (options.fillParentController) {
-            options.width = el.width;
+            options.width = koTools.getWidth(el);
             options.height = el.height;
         }
         var margin = { top: 20, right: 80, bottom: 50, left: 50 };
@@ -155,7 +155,7 @@ define(['./kotools'],function (koTools) {
             margin: margin
         };
     };
-    
+
     charting.appendContainer = function(el, dims) {
         var svg = el.append("svg")
         .attr("width", dims.width + dims.margin.left + dims.margin.right)
@@ -236,7 +236,7 @@ define(['./kotools'],function (koTools) {
                 min: 100000000000000000000,
                 max: -1000000000000000000000,
                 xKeys:[]
-            }    
+            }
         }
 
         var newKeys = data.map(function(v) {

@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
- 
-<html xmlns="http://www.w3.org/1999/xhtml"> 
+
+<html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>Map Test Page</title>
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
@@ -28,12 +28,12 @@
             <div data-bind="latitude: lat, longitude:lng, map:map, selected:selected">
             </div>
         </div>
-	
+
         <div data-bind="foreach: points">
             <div data-bind="latitude: lat, longitude:lng, map:map, selected:selected">
             </div>
         </div>
-	
+
         <div style="margin: 5px; float:left">
             <h3>Stations</h3>
             <table>
@@ -76,7 +76,7 @@
             var map = null;
 
             require.config({
-                baseUrl: "/Scripts",
+                baseUrl: "../Scripts",
                 urlArgs: "bust=2" + (new Date()).getTime()
             });
 
@@ -95,7 +95,7 @@
             require(['knockout-3.2.0', 'd3'], function (kol, d3l) {
                 ko = kol;
                 d3 = d3l;
-                
+
                 require(['KoExtensions/koextensions'], function (koext) {
                     koext.registerExtensions();
                     initialize();

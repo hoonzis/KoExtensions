@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
- 
-<html xmlns="http://www.w3.org/1999/xhtml"> 
+
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Map Test Page</title>
     <script src="../Scripts/require.js"></script>
@@ -21,8 +21,7 @@
     <script type="text/javascript">
         var koextensions;
         require.config({
-            baseUrl: "/Scripts",
-            urlArgs: "bust=2" + (new Date()).getTime()
+            baseUrl: "../Scripts"
         });
 
         require(['knockout-3.2.0.debug', 'd3'], function(kol, d3l) {
