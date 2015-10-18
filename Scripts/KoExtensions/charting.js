@@ -135,22 +135,23 @@ define(['d3','./kotools'],function (d3,koTools) {
     };
 
     charting.getDimensions = function (options, el, legenKeys) {
-
         if (options.fillParentController) {
             options.width = koTools.getWidth(el);
             options.height = el.height;
         }
-        var margin = { top: 20, right: 80, bottom: 50, left: 50 };
-        var width = options.width == null ? (960 - margin.left - margin.right) : options.width;
+        var dims = {};
+        dims.margin = { top: 20, right: 80, bottom: 50 , left: 50 };
+        dims.width = options.width ? options.width : (960 - dims.margin.left - dims.margin.right);
         if (options.legend) {
-            width = width - charting.getLegendWidth(legenKeys);
+            dims.width = dims.width - charting.getLegendWidth(legenKeys);
         }
-        var height = options.height == null ? (500 - margin.top - margin.bottom) : options.height;
-        return {
-            width: width,
-            height: height,
-            margin: margin
-        };
+        dims.height = options.height ? options.height : (500 - dims.margin.top - dims.margin.bottom);
+
+        if(options.horizontalSlider){
+            dims.sliderHeight = 40;
+            dims.height = dims.height + dims.sliderHeight;
+        }
+        return dims;
     };
 
     charting.appendContainer = function(el, dims) {
@@ -179,7 +180,7 @@ define(['d3','./kotools'],function (d3,koTools) {
             .attr("transform", "translate(0," + dims.height + ")")
             .call(xAxis);
 
-        if (options.xAxisTextAngle != null) {
+        if (options.xAxisTextAngle) {
             xAxisEl.selectAll("text")
                 .attr("y", 0)
                 .attr("x", 9)
@@ -197,7 +198,8 @@ define(['d3','./kotools'],function (d3,koTools) {
                 .attr("y", dims.height + 40)
                 .text(options.xAxisLabel);
         }
-    }
+        return xAxis;
+    };
 
     charting.createYAxis = function (svg, options, yScale, dims) {
         var yAxis = d3.svg.axis().scale(yScale).tickSize(dims.width).orient("right");
@@ -223,17 +225,18 @@ define(['d3','./kotools'],function (d3,koTools) {
                 .text(options.yAxisLabel)
                 .attr("transform", "translate(" + dims.width + "," + 40 + ")rotate(-90)");
         }
+        return yAxis;
     };
 
     charting.determineXScale = function (data, def) {
-        if (def == null) {
+        if (!def) {
             def = {
                 allNumbers: true,
                 allDates: true,
                 min: 100000000000000000000,
                 max: -1000000000000000000000,
                 xKeys:[]
-            }
+            };
         }
 
         var newKeys = data.map(function(v) {
@@ -251,7 +254,7 @@ define(['d3','./kotools'],function (d3,koTools) {
         def.xKeys = def.xKeys.concat(newKeys);
         def.scaleType = def.allNumbers ? 'linear' : def.allDates ? 'date' : 'ordinal';
         return def;
-    }
+    };
 
     charting.determineXScaleForMultipleLines = function (data) {
         var def = null;
@@ -262,28 +265,52 @@ define(['d3','./kotools'],function (d3,koTools) {
         });
 
         return def;
-    }
+    };
+
+    charting.getYScaleDefForMultiline = function(data,options){
+      var def = {
+          min: 100000000000000000000,
+          max: -1000000000000000000000
+      };
+
+      data.forEach(function(line){
+        line.values.forEach(function(v){
+          if(v.y>def.max)
+            def.max = v.y;
+          if(v.y<def.min)
+            def.min = v.y;
+        });
+      });
+
+      //setting up margings. how much more on the bottom and on the top of the chart should be shown
+      //bellow or above the max and minimum value - carefull to handle negative max values
+      var reversedCoef = 2.0 - options.marginCoef;
+      def.max = def.max > 0 ? def.max * options.marginCoef : def.max * reversedCoef;
+      def.min = def.min < 0 ? def.min * options.marginCoef : def.min * reversedCoef;
+
+      return def;
+    };
 
     //takes the result of determineXScale and creates D3 scale
     charting.getXScaleFromConfig = function(def,dims) {
         var x;
 
         if (def.scaleType === 'linear') {
-            x = d3.scale.linear().range([0, dims.width], .1);
+            x = d3.scale.linear().range([0, dims.width], 0.1);
             x.domain([def.min, def.max]);
         } else if (def.scaleType === 'ordinal') {
             x = d3.scale.ordinal()
-                .rangeRoundBands([0, dims.width], .1);
+                .rangeRoundBands([0, dims.width], 0.1);
             x.domain(def.xKeys);
         } else if (def.scaleType === 'date') {
-            x = d3.time.scale().range([0, dims.width], .1);
+            x = d3.time.scale().range([0, dims.width], 0.1);
             x.domain([def.min, def.max]);
             x.ticks(10);
         } else {
             throw "invalid scale type";
         }
         return x;
-    }
+    };
 
     charting.xGetter = function (scaleDef, x) {
         return function(d) {
@@ -292,8 +319,51 @@ define(['d3','./kotools'],function (d3,koTools) {
             else if (scaleDef.scaleType === 'date' || scaleDef.scaleType === 'linear')
                 return x(d);
             throw "invalid Scale Type";
-        }
-    }
+        };
+    };
+
+    charting.createVerticalLine = function(svg,x,y){
+      return svg.append("line")
+          .attr("x1",x)
+          .attr("y1", 0)
+          .attr("x2", x)
+          .attr("y2", y)
+          .attr("stroke-width", 2)
+          .attr("stroke", "black");
+    };
+
+    charting.mouseCoordinates = function(context,x,y){
+      var coordinates = d3.mouse(context);
+      return {
+          x : coordinates[0],
+          y : coordinates[1],
+          rY: y.invert(coordinates[1]),
+          rX: x.invert(coordinates[0])
+      };
+    };
+
+    charting.moveLine = function(line, x){
+      var current = line.attr("x1");
+      var trans = x - current;
+      line.attr("transform", "translate(" + trans + ",0)");
+    };
+
+    charting.createMouseMoveListener = function(svg,dims,callback){
+      svg.append("rect")
+        .attr("class", "overlay")
+        .attr("width", dims.width)
+        .attr("height", dims.height)
+        .on("mousemove", callback);
+    };
+
+    charting.createOrMoveVerticalLine = function(line,svg,dims,x){
+      if (!line) {
+          return charting.createVerticalLine(svg,x,dims.height);
+      } else {
+          charting.moveLine(line,x);
+          return line;
+      }
+    };
 
     return charting;
 });

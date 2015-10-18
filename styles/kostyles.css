@@ -52,3 +52,7 @@ div.header2{
   fill: none;
   pointer-events: all;
 }
+
+.context {
+  fill:#333
+}
