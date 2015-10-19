@@ -165,7 +165,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
             if(options.horizontalSlider){
                 var context = svg.append("g")
-                  .attr("transform", "translate(" + 0 + "," + dims.height + ")")
+                  .attr("transform", "translate(" + 0 + "," + dims.sliderOffset + ")")
                   .attr("class", "context");
 
                 var slidderScale = charting.getXScaleFromConfig(scaleDef,dims);
@@ -178,15 +178,16 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                    .scale(slidderScale)
                    .orient("bottom");
 
+
                 context.append("g") // Create brushing xAxis
-                   .attr("class", "x axis1")
-                   .attr("transform", "translate(0," + dims.height + ")")
+                   .attr("class", "x axis")
+                   .attr("transform", "translate(0," + dims.sliderHeight + ")")
                    .call(sliderAxis);
 
                 var contextArea = d3.svg.area() // Set attributes for area chart in brushing context graph
                  .interpolate("monotone")
                  .x(function(d) { return slidderScale(d.x); }) // x is scaled to xScale2
-                 .y0(dims.height) // Bottom line begins at height2 (area chart not inverted)
+                 .y0(dims.sliderHeight) // Bottom line begins at height2 (area chart not inverted)
                  .y1(0); // Top line of area, 0 (area chart not inverted)
 
                //plot the rect as the bar at the bottom
@@ -200,8 +201,9 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                  .attr("class", "x brush")
                  .call(brush)
                  .selectAll("rect")
-                 .attr("height", dims.height) // Make brush rects same height
-                   .attr("fill", "#E6E7E8");
+                 .attr("height", dims.sliderHeight) // Make brush rects same height
+                 .attr("fill", "#1f77b4")
+                 .attr("rx", "5");
 
                    //for brusher of the slider bar at the bottom
                   function brushed() {

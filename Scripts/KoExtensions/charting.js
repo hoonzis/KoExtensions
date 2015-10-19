@@ -146,10 +146,13 @@ define(['d3','./kotools'],function (d3,koTools) {
             dims.width = dims.width - charting.getLegendWidth(legenKeys);
         }
         dims.height = options.height ? options.height : (500 - dims.margin.top - dims.margin.bottom);
+        dims.containerHeight = dims.height;
 
         if(options.horizontalSlider){
-            dims.sliderHeight = 40;
-            dims.height = dims.height + dims.sliderHeight;
+           var sliderSpace = 25;
+            dims.sliderHeight = 20;
+            dims.height = dims.containerHeight - dims.sliderHeight - sliderSpace - 25;
+            dims.sliderOffset = dims.height + sliderSpace;
         }
         return dims;
     };
@@ -157,7 +160,7 @@ define(['d3','./kotools'],function (d3,koTools) {
     charting.appendContainer = function(el, dims) {
         var svg = el.append("svg")
         .attr("width", dims.width + dims.margin.left + dims.margin.right)
-        .attr("height", dims.height + dims.margin.top + dims.margin.bottom)
+        .attr("height", dims.containerHeight + dims.margin.top + dims.margin.bottom)
       .append("g")
         .attr("transform", "translate(" + dims.margin.left + "," + dims.margin.top + ")");
 
@@ -169,10 +172,10 @@ define(['d3','./kotools'],function (d3,koTools) {
         .scale(x)
         .orient("bottom");
 
-        if (options.xUnitFormat !== null && options.xUnitFormat!== undefined)
+        if (options.xUnitFormat)
             xAxis.tickFormat(options.xUnitFormat);
 
-        if (options.tickValues!==null && options.tickValues!==undefined)
+        if (options.tickValues)
             xAxis.tickValues(options.tickValues);
 
         var xAxisEl = svg.append("g")
