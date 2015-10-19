@@ -40,7 +40,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         var xScaleDef = charting.determineXScale(horizontalValues, null);
         var xScale = charting.getXScaleFromConfig(xScaleDef,dims);
         var yScale = d3.scale.linear().domain([0, maxY]).range([dims.height, 0]);
-        var radiusScale = d3.scale.pow().exponent(.4).domain([minBubbleSize, maxBubbleSize]).range([2, options.maxBubbleSize]).clamp(true);
+        var radiusScale = d3.scale.pow().exponent(0.4).domain([minBubbleSize, maxBubbleSize]).range([2, options.maxBubbleSize]).clamp(true);
 
         var colors = koTools.distinct(data, options.bubbleColor);
         var colorScale = d3.scale.category20().domain(colors);

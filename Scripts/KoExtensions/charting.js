@@ -228,7 +228,7 @@ define(['d3','./kotools'],function (d3,koTools) {
         return yAxis;
     };
 
-    charting.determineXScale = function (data, def) {
+    charting.determineXScale = function (data, def,linename) {
         if (!def) {
             def = {
                 allNumbers: true,
@@ -256,18 +256,18 @@ define(['d3','./kotools'],function (d3,koTools) {
         return def;
     };
 
-    charting.determineXScaleForMultipleLines = function (data) {
+    charting.getXScaleForMultiLines = function (data) {
         var def = null;
         data.forEach(function(i) {
             def = charting.determineXScale(i.values.map(function(v) {
                 return v.x;
-            }), def);
+            }), def,i.linename);
         });
 
         return def;
     };
 
-    charting.getYScaleDefForMultiline = function(data,options){
+    charting.getYScaleDefForMultiline = function(data,options,filteredDomain){
       var def = {
           min: 100000000000000000000,
           max: -1000000000000000000000
@@ -275,10 +275,13 @@ define(['d3','./kotools'],function (d3,koTools) {
 
       data.forEach(function(line){
         line.values.forEach(function(v){
-          if(v.y>def.max)
-            def.max = v.y;
-          if(v.y<def.min)
-            def.min = v.y;
+          //if filtered domain is specififed consider only certain Y values in the given X range
+          if(!filteredDomain || (v.x>=filteredDomain[0] && v.x <= filteredDomain[1])){
+            if(v.y>def.max)
+              def.max = v.y;
+            if(v.y<def.min)
+              def.min = v.y;
+          }
         });
       });
 
