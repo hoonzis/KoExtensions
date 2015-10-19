@@ -196,6 +196,11 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                  .attr("d", contextArea(data[0].values)) // pass first categories data .values to area path generator
                  .attr("fill", "#F1F1F2");
 
+               var currentDomain = x.domain();
+               var startMin = currentDomain[0]===0?1:currentDomain[0]*1.15;
+               var startMax = currentDomain[1]*0.95;
+               brush.extent(startMin,startMax);
+
                //append the brush for the selection of subsection
                context.append("g")
                  .attr("class", "x brush")
@@ -204,6 +209,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                  .attr("height", dims.sliderHeight) // Make brush rects same height
                  .attr("fill", "#1f77b4")
                  .attr("rx", "5");
+
 
                    //for brusher of the slider bar at the bottom
                   function brushed() {
