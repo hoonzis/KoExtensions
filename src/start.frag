@@ -6,8 +6,6 @@
         //the closure below.
         define([], factory);
     } else {
-        //Browser globals case. Just assign the
-        //result to a property on the global.
         root.koExtensions = factory();
     }
 }(this, function () {

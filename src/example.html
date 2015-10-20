@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"> 
+<html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="content-type" content="text/html; charset=UTF8">
         <title>Charting Test Page</title>
@@ -36,7 +36,7 @@
 			<div data-bind="piechart: salesChart">
 
 			</div>
-	 	</div> 
+	 	</div>
 	 <!-- /ko -->
         <script>
 
@@ -92,8 +92,8 @@
 				]
 			}
 		];
-		
-		
+
+
 
 		function CarViewModel(data) {
 			var self = this;
@@ -146,7 +146,7 @@
 				});
 			});
 
-			
+
 			var keys = d3.keys(data[0]).filter(function(i) { return i != 'month'; });
 			var perMonth = keys.map(function(key) {
 				return {
@@ -172,4 +172,4 @@
 		});
     </script>
 </body>
-</html> 
+</html>
