@@ -170,8 +170,13 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
                 var slidderScale = charting.getXScaleFromConfig(scaleDef,dims);
 
+                var currentDomain = x.domain();
+                var startMin = currentDomain[0]===0?1.3:currentDomain[0]*1.3;
+                var startMax = currentDomain[1]*0.7;
+
                 var brush = d3.svg.brush()//for slider bar at the bottom
                    .x(slidderScale)
+                   .extent([startMin,startMax])
                    .on("brush", brushed);
 
                 var sliderAxis = d3.svg.axis() // xAxis for brush slider
@@ -195,11 +200,6 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                  .attr("class", "area")
                  .attr("d", contextArea(data[0].values)) // pass first categories data .values to area path generator
                  .attr("fill", "#F1F1F2");
-
-               var currentDomain = x.domain();
-               var startMin = currentDomain[0]===0?1:currentDomain[0]*1.15;
-               var startMax = currentDomain[1]*0.95;
-               brush.extent(startMin,startMax);
 
                //append the brush for the selection of subsection
                context.append("g")
