@@ -1832,9 +1832,9 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
 
                 var slidderScale = charting.getXScaleFromConfig(scaleDef,dims);
 
-                var currentDomain = x.domain();
-                var startMin = currentDomain[0]===0?1.3:currentDomain[0]*1.3;
-                var startMax = currentDomain[1]*0.7;
+                var allTicks = x.ticks();
+                var startMin = allTicks[2];
+                var startMax = allTicks[7];
 
                 var brush = d3.svg.brush()//for slider bar at the bottom
                    .x(slidderScale)
@@ -1892,12 +1892,14 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
 
                     lines.transition()
                       .attr("d", function(d){
-                          return line(d.values); // If d.visible is true then draw line for this d selection
+                          return line(d.values);
                       });
 
-                    points.transition()
-                        .attr("cx", getX)
-                        .attr("cy", function (d) { return y(d.y); });
+                      if(points){
+                        points.transition()
+                          .attr("cx", getX)
+                          .attr("cy", function (d) { return y(d.y); });
+                      }
                   }
             }
 
