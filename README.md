@@ -12,7 +12,8 @@ KoExtensions can be used as standalone JavaScript charting library basedo on D3J
 [histochart]: http://hoonzis.github.com/KoExtensions/img/small/histogram.PNG
 [simpleEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/GraphTests.html
 [cashFlowEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/CashFlowExample.html
-[normalizedLineEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/NormalizedLineChart.html.html
+[normalizedLineEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/NormalizedLineChart.html
+[lineSlidder]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/LineChartSlidder.html
 [chordEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/ChordChart.html
 [bubbleEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/BubbleChart.html
 [histoEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/HistogramExample.html
@@ -26,14 +27,14 @@ KoExtensions can be used as standalone JavaScript charting library basedo on D3J
 |         Pie Chart       | Bar Chart             | Line Chart             |
 | ------------------------|:---------------------:| ----------------------:|
 | ![alt text][piechart]   | ![alt text][cashflow] | ![alt text][linechart] |
-| [Example][simpleEx]     | [Example1][simpleEx] [Example2][cashFlowEx]  | [Example1][simpleEx] [Example2][normalizedLineEx] |
+| [Example][simpleEx]     | [Example1][simpleEx] [Example2][cashFlowEx]  | [Example1][simpleEx] [Example2][normalizedLineEx] [With Slidder][lineSlidder]|
 
 |         Chord Chart       | Bubble Chart             | Histogram             |
 | ------------------------|:---------------------:| ----------------------:|
 | ![alt text][chordchart]   | ![alt text][bubblechart] | ![alt text][histochart] |
 | [Example][chordEx]    | [Example][bubbleEx] | [Example][histoEx] |
 
- 
+
 **Other bindings useful for Knockout:**
 
 * Google maps binding [Example] [googleMapsEx]
@@ -83,7 +84,7 @@ phantomjs run-qunit.js Tests/Tests.html
  	<div style="float:left;margin-right:10px">
 	 	<h3 data-bind="text:name"></h3>
 		<div data-bind="piechart: data"></div>
- 	</div> 
+ 	</div>
  <!-- /ko -->
 ```
 
