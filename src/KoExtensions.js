@@ -1077,11 +1077,12 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
         var dims = {};
         dims.margin = { top: 20, right: 80, bottom: 50 , left: 50 };
         dims.width = options.width ? options.width : (960 - dims.margin.left - dims.margin.right);
-        if (options.legend) {
-            dims.width = dims.width - charting.getLegendWidth(legenKeys);
-        }
         dims.height = options.height ? options.height : (500 - dims.margin.top - dims.margin.bottom);
         dims.containerHeight = dims.height;
+        dims.containerWidth = dims.width;
+        if (options.legend) {
+            dims.width = dims.containerWidth - charting.getLegendWidth(legenKeys);
+        }
 
         if(options.horizontalSlider){
            var sliderSpace = 25;
@@ -1094,7 +1095,7 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
 
     charting.appendContainer = function(el, dims) {
         var svg = el.append("svg")
-        .attr("width", dims.width + dims.margin.left + dims.margin.right)
+        .attr("width", dims.containerWidth + dims.margin.left + dims.margin.right)
         .attr("height", dims.containerHeight + dims.margin.top + dims.margin.bottom)
       .append("g")
         .attr("transform", "translate(" + dims.margin.left + "," + dims.margin.top + ")");
