@@ -954,7 +954,8 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
         var maxWidth = d3.max(data, function (el) {
             return el.length;
         });
-        return maxWidth;
+        //asuming 7px per character
+        return maxWidth*7;
     };
 
     charting.showStandardLegend = function(parent, data, color, showLegend, height) {
@@ -962,7 +963,7 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
         var maxWidth = charting.getLegendWidth(data);
 
         //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
-        var legendWidth = 25 + maxWidth * 7;
+        var legendWidth = 25 + maxWidth;
 
         if (showLegend) {
             var legend = parent
