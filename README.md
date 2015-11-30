@@ -10,7 +10,8 @@ KoExtensions can be used as standalone JavaScript charting library basedo on D3J
 [chordchart]: http://hoonzis.github.com/KoExtensions/img/small/chordchart.PNG
 [bubblechart]: http://hoonzis.github.com/KoExtensions/img/small/bubblechart.PNG
 [histochart]: http://hoonzis.github.com/KoExtensions/img/small/histogram.PNG
-[simpleEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/GraphTests.html
+
+[piechartex]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/piecharts.html
 [cashFlowEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/CashFlowExample.html
 [normalizedLineEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/NormalizedLineChart.html
 [lineSlidder]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/LineChartSlidder.html
@@ -20,14 +21,14 @@ KoExtensions can be used as standalone JavaScript charting library basedo on D3J
 [googleMapsEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/MapTests.html
 [datepickerEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/DateBindingTests.html
 [formattingEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/UtilsTests.html
-
-
+[linechartex]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/linetests.html
+[barchartex]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/barcharttests.html
 
 
 |         Pie Chart       | Bar Chart             | Line Chart             |
 | ------------------------|:---------------------:| ----------------------:|
 | ![alt text][piechart]   | ![alt text][cashflow] | ![alt text][linechart] |
-| [Example][simpleEx]     | [Example1][simpleEx] [Example2][cashFlowEx]  | [Example1][simpleEx] [Example2][normalizedLineEx] [With Slidder][lineSlidder]|
+| [Example][piechartex]     | [Example1][barchartex] [Example2][cashFlowEx]  | [Example1][linechartex] [Example2][normalizedLineEx] [With Slidder][lineSlidder]|
 
 |         Chord Chart       | Bubble Chart             | Histogram             |
 | ------------------------|:---------------------:| ----------------------:|

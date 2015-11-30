@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF8">
+        <title>Charting Test Page</title>
+        <script src="../Scripts/require.js"></script>
+        <link type="text/css" rel="stylesheet" href="../styles/kostyles.css" />
+    </head>
+<body>
+	<h2>Simple piechart:</h2>
+	<div id="carsChart" data-bind="piechart: carsChart">
+	</div>
+
+  <h2>Chart in a foreach binding</h2>
+	 <!-- ko foreach: cars -->
+	 	<div style="float:left;margin-right:10px">
+		 	<h3 data-bind="text:name"></h3>
+			<div data-bind="piechart: salesChart">
+
+			</div>
+	 	</div>
+	 <!-- /ko -->
+        <script>
+
+            window.document.onload = function (e) {
+                initialize();
+            }
+
+            require.config({
+                baseUrl: "../Scripts"
+            });
+
+            var ko;
+            require(['KoExtensions/koextensions','knockout-3.2.0.debug','d3'], function(koext,kol,d3) {
+                ko = kol;
+                koext.registerExtensions();
+                var lastWeek = [
+                    {
+                        name: "peugot",
+                        sales: [
+                            { model: 'model1', amount: 100 },
+                            { model: 'model2', amount: 200 },
+                            { model: 'model3', amount: 300 }
+                        ]
+                    },
+                    {
+                        name: "audi",
+                        sales: [
+                            { model: 'a3', amount: 200 },
+                            { model: 'qutro', amount: 300 },
+                            { model: 'a8', amount: 100 }
+                        ]
+                    },
+                    {
+                        name: "bmw",
+                        sales: [
+                            { model: 'model5', amount: 200 },
+                            { model: 'model8', amount: 100 },
+                            { model: 'model3', amount: 150 }
+                        ]
+                    }
+                ];
+
+                function CarViewModel(data) {
+                    var self = this;
+                    self.sales = ko.observableArray([]);
+                    self.name = ko.observable();
+
+                    self.totalSales = ko.computed(function() {
+                        return d3.sum(self.sales().map(function(item) {
+                            return item.amount;
+                        }));
+                    }, self);
+
+                    if (data != null) {
+                        self.sales(data.sales);
+                        self.name(data.name);
+                    }
+
+                    self.salesChart = ko.computed(function () {
+                        return self.sales().map(function (car) {
+                            return { x: car.model, y: car.amount };
+                        });
+                    });
+                }
+
+                function TestViewModels() {
+                    var self = this;
+                    self.cars = ko.observableArray([]);
+
+                    self.carsChart = ko.computed(function () {
+                        return self.cars().map(function (car) {
+                            return { x: car.name(), y: car.totalSales() };
+                        });
+                    });
+
+                    var carsVMs = lastWeek.map(function(x) { return new CarViewModel(x); });
+                    self.cars(carsVMs);
+                }
+
+                var vm = new TestViewModels();
+                ko.applyBindings(vm);
+            });
+    </script>
+</body>
+</html>

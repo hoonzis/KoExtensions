@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF8">
+        <title>Charting Test Page</title>
+        <script src="../Scripts/require.js"></script>
+        <link type="text/css" rel="stylesheet" href="../styles/kostyles.css" />
+    </head>
+<body>
+  <!-- Testing some chart options, setting the min value specifically, setting the margin coeficients, not showing data points -->
+  <div id="lineChart2" data-bind="linechart: simpleLine, chartOptions:{height:300,width:800,showDataPoints:false,yMin:-100,xTick:10,marginCoef:2.0}">
+  </div>
+  <script>
+
+      window.document.onload = function (e) {
+          initialize();
+      }
+
+      require.config({
+          baseUrl: "../Scripts"
+      });
+
+      var ko;
+      require(['KoExtensions/koextensions','knockout-3.2.0.debug','d3'], function(koext,kol,d3) {
+          ko = kol;
+          koext.registerExtensions();
+
+          function TestViewModels() {
+              var self = this;
+              var simpleData = [];
+              for(var i=0;i<100;i++){
+                  simpleData.push({
+                      x:i,
+                      y:i*2
+                  });
+              }
+              self.simpleLine = ko.observableArray([{
+                  linename: "test",
+                  values: simpleData
+              }]);
+          }
+
+          var vm = new TestViewModels();
+
+          ko.applyBindings(vm);
+      });
+</script>
+</body>
+</html>

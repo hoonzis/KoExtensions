@@ -34,13 +34,15 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         var dims = charting.getDimensions(options, el,keys);
 
         var x = d3.scale.ordinal()
-            .rangeRoundBands([0, dims.width], .3);
+            .rangeRoundBands([0, dims.width], 0.3);
 
         var y = d3.scale.linear()
             .rangeRound([dims.height, 0]);
 
 
-        //runs overs all the data. copies the result to a new array
+        //runs overs all the data. copies the result to a new array.
+        //for each item we need y0 and y1 - are the y coordinates of the rectangle
+        //it is bit tricky to have a something that works for stacked and grouped chart
         var arranged = [];
         var arrangedByX = {};
         data.forEach(function (d) {
@@ -52,21 +54,39 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             var values = [];
             color.domain().forEach(function (m) {
 
-                if (d[m] == 0 || d[m] == null)
+                if (d[m] === 0 || d[m] === null)
                     return;
                 var xLabel = newD.x;
-                if (options.xUnitFormat != null)
+                if (options.xUnitFormat)
                     xLabel = options.xUnitFormat(newD.x);
                 var formattedValue = d[m];
-                if (options.unitTransform != null)
+                if (options.unitTransform)
                     formattedValue = options.unitTransform(d[m]);
 
-                if (d[m] > 0) {
-                    values.push({ name: m, y0: y0Pos, y1: y0Pos += +d[m], val: d[m], x: newD.x, xLabel: xLabel, xUnitName: options.xUnitName, formattedValue: formattedValue });
-                } else {
+                var value = {
+                    name:m,
+                    val: d[m],
+                    x: newD.x,
+                    xLabel: xLabel,
+                    xUnitName: options.xUnitName,
+                    formattedValue: formattedValue
+                };
+
+                if (d[m] > 0 && options.style == "stack") {
+                    value.y0 = y0Pos;
+                    value.y1 = y0Pos += +d[m];
+                } else if (d[m] < 0 && options.style == "stack"){
                     var y1 = y0Neg;
-                    values.push({ name: m, y0: y0Neg += d[m], y1: y1, val: d[m], x: newD.x, xLabel: xLabel, xUnitName: options.xUnitName, formattedValue: formattedValue });
+                    value.y0 = y0Neg += d[m];
+                    value.y1 =  y1;
+                } else if (d[m] > 0 && options.style != "stack"){
+                    value.y0 = 0;
+                    value.y1 = d[m];
+                } else if(d[m] < 0 && options.style != "stack"){
+                    value.y0 = d[m];
+                    value.y1 = 0;
                 }
+                values.push(value);
             });
 
             newD.values = values;
@@ -84,8 +104,10 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         x.domain(xKeys);
         if (options.style == "stack") {
             y.domain([
-                d3.min(arranged, function (d) { return d.totalNegative; }), d3.max(arranged, function (d) {
-                    if (d == null)
+                d3.min(arranged, function (d) {
+                  return d.totalNegative;
+                }), d3.max(arranged, function (d) {
+                    if (!d)
                         return 0;
                     return d.totalPositive;
                 })
@@ -124,35 +146,35 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             var info = {};
             info[options.xUnitName] = d.xLabel;
             info[d.name] = d.formattedValue;
-            if (column.totalNegative == 0)
+            if (column.totalNegative === 0)
                 info[d.name] += " (" + koTools.toPercent(d.val / column.totalPositive) + ")";
             charting.showTooltip(info);
-        }
+        };
 
         var onPointOver = function (d) {
             d3.select(this).style("fill", "blue");
             var info = {};
             var unitName = d.xUnitName;
-            if (unitName == null)
+            if (!unitName)
                 unitName = 'x';
             info[unitName] = d.xLabel;
-            if (options.lineFormatter != null)
+            if (options.lineFormatter)
                 info[d.name] = options.lineFormatter(d.y);
             else
                 info[d.name] = d.y;
             charting.showTooltip(info);
-        }
+        };
 
         var onPointOut = function () {
             d3.select(this).style("fill", "white");
             charting.hideTooltip();
-        }
+        };
 
         var onBarOut = function () {
             d3.select(this).style("stroke", 'none');
             d3.select(this).style("opacity", 0.8);
             charting.hideTooltip();
-        }
+        };
 
         var group = svg.selectAll(".xVal")
             .data(arranged)
@@ -160,45 +182,36 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             .attr("class", "g")
             .attr("transform", function (d) { return "translate(" + x(d.x) + ",0)"; });
 
-        if (options.style == "stack") {
-            group.selectAll("rect")
-                .data(function (d) { return d.values; })
-                .enter().append("rect")
-                .attr("width", x.rangeBand())
-                .attr("y", function (d) { return y(d.y1); })
-                .attr("height", function (d) { return y(d.y0) - y(d.y1); })
-                .on("mouseover", onBarOver)
-                .on("mouseout", onBarOut)
-                .style("opacity", 0.8)
-                .style("cursor", "pointer")
-                .style("fill", function (d) {
-                    return color(d.name);
-                });
+        var rectangles = group.selectAll("rect")
+            .data(function (d) { return d.values; })
+            .enter().append("rect");
 
+        if (options.style == "stack") {
+            rectangles.attr("width", x.rangeBand());
         } else {
-            group.selectAll("rect")
-                .data(function (d) {
-                    return d.values;
-                })
-                .enter().append("rect")
-                .attr("width", x1.rangeBand())
-                .attr("x", function (d) {
-                    return x1(d.name);
-                })
-                .attr("y", function (d) {
-                    return y(d.val);
-                })
-                .attr("height", function (d) {
-                    return dims.height - y(d.val);
-                })
-                .style("cursor", "pointer")
-                .on("mouseover", onBarOver)
-                .on("mouseout", onBarOut)
-                .style("fill", function (d) { return color(d.name); });
+            rectangles.attr("width", x1.rangeBand())
+              .attr("x", function (d) {
+                  return x1(d.name);
+              });
         }
 
+        rectangles.attr("y", function (d) {
+          return y(d.y1);
+        })
+        .attr("height", function (d) {
+          var height = Math.abs(y(d.y0) - y(d.y1));
+          return height;
+        })
+        .on("mouseover", onBarOver)
+        .on("mouseout", onBarOut)
+        .style("opacity", 0.8)
+        .style("cursor", "pointer")
+        .style("fill", function (d) {
+            return color(d.name);
+        });
+
         //Add the single line
-        if (lineData == null || lineData.length == 0)
+        if (!lineData || lineData.length === 0)
             return;
 
         var lineY = d3.scale.linear()
@@ -255,5 +268,5 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             .style("cursor", "pointer")
             .on("mouseover", onPointOver)
             .on("mouseout", onPointOut);
-    }
+    };
 });
