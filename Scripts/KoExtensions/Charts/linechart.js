@@ -38,6 +38,10 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                 if (a.x < b.x) return -1;
                 return 0;
             });
+
+            singleLine.values.forEach(function(d){
+              d.linename = singleLine.linename;
+            });
         });
 
         //define all the linenames to compute thed legen width approximation
