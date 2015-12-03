@@ -5,7 +5,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
     //the rest of the properties is stacked to the chart
     charting.barChart = function (data, element, options, lineData) {
         var el = charting.getElementAndCheckData(element, data);
-        if (el === null || el === undefined)
+        if (!el)
             return;
 
         var defaultOptions = {

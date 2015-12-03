@@ -3,7 +3,7 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
     charting.chordChart = function(data, element, options) {
 
         var el = charting.getElementAndCheckData(element, data);
-        if (el == null)
+        if (!el)
             return;
 
         var defaultOptions = {
@@ -32,7 +32,7 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
             .outerRadius(outerRadius);
 
         var layout = d3.layout.chord()
-            .padding(.04);
+            .padding(0.04);
 
         var path = d3.svg.chord()
             .radius(innerRadius);
@@ -60,7 +60,7 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
                 .style("opacity", 0.1);
 
             charting.showTooltip(info);
-        }
+        };
 
         var chord_mouse_out = function (g, i) {
             svg.selectAll(".chord")
@@ -68,7 +68,7 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
                 .style("opacity", 1);
 
             charting.hideTooltip();
-        }
+        };
 
         var fade = function(opacity) {
             return function (g, i) {
@@ -83,7 +83,7 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
                 info[descGetter(g)] = g.value;
                 charting.showTooltip(info);
             };
-        }
+        };
 
         layout.matrix(data.matrix);
         var group = svg.selectAll(".group")
@@ -96,16 +96,16 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
             .attr("id", function(d, i) { return "group" + i; })
             .attr("d", arc)
             .style("fill", function(d, i) { return color(i); })
-            .on("mouseover", fade(.1))
+            .on("mouseover", fade(0.1))
             .on("mouseout", fade(1));
 
         group.append("text")
             .each(function(d) { d.angle = (d.startAngle + d.endAngle) / 2; })
             .attr("dy", ".35em")
             .attr("transform", function(d) {
-                return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
-                    + "translate(" + (innerRadius + 26) + ")"
-                    + (d.angle > Math.PI ? "rotate(180)" : "");
+                return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")" +
+                "translate(" + (innerRadius + 26) + ")" +
+                (d.angle > Math.PI ? "rotate(180)" : "");
             })
             .style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
             .attr("font-family", "Open Sans, sans-serif")
@@ -121,5 +121,5 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
             .attr("d", path)
             .on("mouseover", chord_mouse_over)
             .on("mouseout", chord_mouse_out);
-    }
+    };
 });

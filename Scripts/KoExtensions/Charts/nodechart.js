@@ -3,8 +3,9 @@ var m = [20, 120, 20, 120],
 		h = 800 - m[0] - m[2],
 		i = 0,
 		root;
+		
 function drawNodeChart(data, elname) {
-	
+
 	var tree = d3.layout.tree()
 		.size([h, w]);
 
@@ -17,23 +18,23 @@ function drawNodeChart(data, elname) {
 	  .append("svg:g")
 		.attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
-	
+
 	  root = data;
 	  root.x0 = h / 2;
 	  root.y0 = 0;
 
 	  function toggleAll(d) {
-		if (d.children) {
-		  d.children.forEach(toggleAll);
-		  toggle(d);
-		}
+			if (d.children) {
+			  d.children.forEach(toggleAll);
+			  toggle(d);
+			}
 	  }
 
 	  // Initialize the display to show a few nodes.
 	  root.children.forEach(toggleAll);
 	  toggle(root.children[1]);
 	  toggle(root.children[9]);
-	  
+
 	  update(root);
 
 function update(source) {
@@ -124,7 +125,7 @@ function update(source) {
 	d.x0 = d.x;
 	d.y0 = d.y;
   });
-}	  
+}
 }
 
 // Toggle children.
@@ -137,4 +138,3 @@ function toggle(d) {
 	d._children = null;
   }
 }
-
