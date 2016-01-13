@@ -10,7 +10,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         var defaultOptions = {
             legend: true,
             width: 200,
-            height: 200
+            height: 150
         };
 
         options = koTools.setDefaultOptions(defaultOptions, options);

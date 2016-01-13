@@ -29,7 +29,10 @@ define(['d3','./kotools'],function (d3,koTools) {
 
         //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
         var legendWidth = 25 + maxWidth;
-
+		
+		var size = legendWidth > 70 ? 15 : 18;
+		var fontSize = legendWidth > 70 ? "13px" : "16px";
+				
         if (showLegend) {
             var legend = parent
                 .append("svg")
@@ -41,12 +44,13 @@ define(['d3','./kotools'],function (d3,koTools) {
                 .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
             legend.append("rect")
-                .attr("width", 18)
-                .attr("height", 18)
+                .attr("width", size)
+                .attr("height", size)
                 .style("fill", function(i) { return color(i); });
             legend.append("text")
                 .attr("x", 24)
                 .attr("y", 9)
+				.attr("font-size",fontSize)
                 .attr("dy", ".35em")
                 .text(function (t) { return t; });
         }
@@ -141,9 +145,9 @@ define(['d3','./kotools'],function (d3,koTools) {
             options.height = el.height;
         }
         var dims = {};
-        dims.margin = { top: 20, right: 80, bottom: 50 , left: 50 };
-        dims.width = options.width ? options.width : (960 - dims.margin.left - dims.margin.right);
-        dims.height = options.height ? options.height : (500 - dims.margin.top - dims.margin.bottom);
+        dims.margin = { top: 5, right: 5, bottom: 5 , left: 5 };
+        dims.width = options.width ? options.width : 200;
+        dims.height = options.height ? options.height : 100;
         dims.containerHeight = dims.height;
         dims.containerWidth = dims.width;
         if (options.legend) {
