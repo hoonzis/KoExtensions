@@ -11,38 +11,91 @@ define(['./charting', './kotools', './Charts/barchart', './Charts/piechart', './
             var markers = [];
 
             self.registerExtensions = function () {
-              if(ko === null){
-                  throw "If you want to use KoExtensions with Knockout, please reference Knockout before calling registerExtensions";
-              }
-                ko.bindingHandlers.map = {
-                    init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+                if(ko === null){
+                    throw "If you want to use KoExtensions with Knockout, please reference Knockout before calling registerExtensions";
+                }
 
-                        try {
-                            var position = new google.maps.LatLng(allBindingsAccessor().latitude(), allBindingsAccessor().longitude());
-
-                            var marker = new google.maps.Marker({
-                                map: allBindingsAccessor().map,
-                                position: position,
-                                title: name
-                            });
-
-                            google.maps.event.addListener(marker, 'click', function() {
-                                allBindingsAccessor().itemSelected();
-                            });
-
-                            markers.push(marker);
-                            viewModel._mapMarker = marker;
-
-                            allBindingsAccessor().map.setCenter(position);
-                        } catch (err) {
+                ko.bindingHandlers.mapbox = {
+                    init: function (element) {
+                        var mapBox = L.mapbox.map(element, 'mapbox.streets');
+                        element._mapBox = mapBox;
+                    },
+                    update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+                        if (element._mapBoxLayer) {
+                            element._mapBox.removeLayer(element._mapBoxLayer);
                         }
+
+                        var bindings = allBindingsAccessor();
+                        var points = bindings.mapbox();
+
+                        if (points && points.length > 0) {
+                            var geojson = {
+                                type: 'FeatureCollection',
+                                features: points.map(function(point) {
+                                    var lat = point.lat();
+                                    var lng = point.lng();
+
+                                    return {
+                                        type: 'Feature',
+                                        properties: {
+                                            'marker-color': '#f86767',
+                                            'marker-size': 'large',
+                                            'marker-symbol': 'star'
+                                        },
+                                        geometry: {
+                                            type: 'Point',
+                                            coordinates: [lng, lat]
+                                        }
+                                    };
+                                })
+                            };
+
+                            element._mapBoxLayer = L.mapbox.featureLayer(geojson);
+                            element._mapBoxLayer.addTo(element._mapBox);
+                            element._mapBox.fitBounds(element._mapBoxLayer.getBounds());
+                        }
+                    }
+                };
+
+                ko.bindingHandlers.gmap = {
+                    init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+                         var gmap = new google.maps.Map(element, {
+                            center: {lat: -34.397, lng: 150.644},
+                            zoom: 8
+                          });
+
+                        element._gmap = gmap;
                     },
                     update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
-                        try {
-                            var latlng = new google.maps.LatLng(allBindingsAccessor().latitude(), allBindingsAccessor().longitude());
-                            viewModel._mapMarker.setPosition(latlng);
-                        } catch (err) {
+                        var bindings = allBindingsAccessor();
+                        var points = bindings.gmap();
+                        var latlngbounds = new google.maps.LatLngBounds();
+
+                        for(var i=0;i<points.length;i++){
+                            point = points[i];
+                            var position = new google.maps.LatLng(point.lat(),point.lng());
+                            latlngbounds.extend(position);
+                            var marker = point._gmarker;
+                            if(!marker){
+                                marker = new google.maps.Marker({
+                                    map:element._gmap,
+                                    position: position,
+                                    title: name
+                                });
+
+
+                                var listenerFactory = function(point){
+                                    return function(){
+                                        bindings.markerSelected(point);
+                                    };
+                                };
+
+                                google.maps.event.addListener(marker, 'click', listenerFactory(point));
+                                point._mapMarker = marker;
+                            }
+                            marker.setPosition(position);
                         }
+                        element._gmap.fitBounds(latlngbounds);
                     }
                 };
 

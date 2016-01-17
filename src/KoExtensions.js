@@ -2377,13 +2377,27 @@ define('KoExtensions/koextensions',['./charting', './kotools', './Charts/barchar
             var markers = [];
 
             self.registerExtensions = function () {
-              if(ko === null){
-                  throw "If you want to use KoExtensions with Knockout, please reference Knockout before calling registerExtensions";
-              }
-                ko.bindingHandlers.map = {
+                if(ko === null){
+                    throw "If you want to use KoExtensions with Knockout, please reference Knockout before calling registerExtensions";
+                }
+                ko.bindingHandlers.gmap = {
                     init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+                         var gmap = new google.maps.Map(element, {
+                            center: {lat: -34.397, lng: 150.644},
+                            zoom: 8
+                          });
 
-                        try {
+                        element._gmap = gmap;
+                    },
+                    update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+                        if (element._mapBoxLayer) {
+                            element._mapBox.removeLayer(element._mapBoxLayer);
+                        }
+
+                        var bindings = allBindingsAccessor();
+                        var points = bindings.gmap();
+
+                        for(var i=0;i<points.length;i++){
                             var position = new google.maps.LatLng(allBindingsAccessor().latitude(), allBindingsAccessor().longitude());
 
                             var marker = new google.maps.Marker({
@@ -2398,16 +2412,76 @@ define('KoExtensions/koextensions',['./charting', './kotools', './Charts/barchar
 
                             markers.push(marker);
                             viewModel._mapMarker = marker;
-
-                            allBindingsAccessor().map.setCenter(position);
-                        } catch (err) {
                         }
+
+
+                        if (points && points.length > 0) {
+                            var geojson = {
+                                type: 'FeatureCollection',
+                                features: points.map(function(point) {
+                                    var lat = point.lat();
+                                    var lng = point.lng();
+
+                                    return {
+                                        type: 'Feature',
+                                        properties: {
+                                            'marker-color': '#f86767',
+                                            'marker-size': 'large',
+                                            'marker-symbol': 'star'
+                                        },
+                                        geometry: {
+                                            type: 'Point',
+                                            coordinates: [lng, lat]
+                                        }
+                                    };
+                                })
+                            };
+
+                            element._mapBoxLayer = L.mapbox.featureLayer(geojson);
+                            element._mapBoxLayer.addTo(element._mapBox);
+                            element._mapBox.fitBounds(element._mapBoxLayer.getBounds());
+                        }
+                    }
+                };
+
+                ko.bindingHandlers.mapbox = {
+                    init: function (element) {
+                        var mapBox = L.mapbox.map(element, 'mapbox.streets');
+                        element._mapBox = mapBox;
                     },
-                    update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
-                        try {
-                            var latlng = new google.maps.LatLng(allBindingsAccessor().latitude(), allBindingsAccessor().longitude());
-                            viewModel._mapMarker.setPosition(latlng);
-                        } catch (err) {
+                    update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+                        if (element._mapBoxLayer) {
+                            element._mapBox.removeLayer(element._mapBoxLayer);
+                        }
+
+                        var bindings = allBindingsAccessor();
+                        var points = bindings.mapbox();
+
+                        if (points && points.length > 0) {
+                            var geojson = {
+                                type: 'FeatureCollection',
+                                features: points.map(function(point) {
+                                    var lat = point.lat();
+                                    var lng = point.lng();
+
+                                    return {
+                                        type: 'Feature',
+                                        properties: {
+                                            'marker-color': '#f86767',
+                                            'marker-size': 'large',
+                                            'marker-symbol': 'star'
+                                        },
+                                        geometry: {
+                                            type: 'Point',
+                                            coordinates: [lng, lat]
+                                        }
+                                    };
+                                })
+                            };
+
+                            element._mapBoxLayer = L.mapbox.featureLayer(geojson);
+                            element._mapBoxLayer.addTo(element._mapBox);
+                            element._mapBox.fitBounds(element._mapBoxLayer.getBounds());
                         }
                     }
                 };

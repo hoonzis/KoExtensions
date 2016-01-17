@@ -3,99 +3,54 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>Map Test Page</title>
-        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+        <script src='https://api.mapbox.com/mapbox.js/v2.2.3/mapbox.js'></script>
+        <link href='https://api.mapbox.com/mapbox.js/v2.2.3/mapbox.css' rel='stylesheet' />
+        <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v2.0.2/turf.min.js'></script>
+
         <script src="../Scripts/require.js"></script>
-        <style type="text/css">
-            html { height: 100% }
-
-            body {
-                height: 100%;
-                margin: 0;
-                padding: 0
-            }
-
-            #map {
-                float: left;
-                height: 300px;
-                width: 200px;
-            }
-        </style>
     </head>
     <body>
-        <div id="map">
-        </div>
-        <div data-bind="foreach: stations">
-            <div data-bind="latitude: lat, longitude:lng, map:map, selected:selected">
-            </div>
-        </div>
+        <table>
+            <tr>
+                <td>
+                    <div id="map" style="width:300px;height:300px" data-bind="gmap:points, markerSelected:pointSelected">
+                    </div>
+                </td>
+                <td>
+                    <div id="mapbox" style="width:300px;height:300px" data-bind="mapbox:points">
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <td>Name</td>
+                    <td>Latitude</td>
+                    <td>Longitude</td>
+                    <td>Selected</td>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach:points">
+                <tr>
+                    <td><span data-bind="text:name"></span></td>
+                    <td><input data-bind="value:lat"/></td>
+                    <td><input data-bind="value:lng"/></td>
+                    <td><span data-bind="text:selected"></span></td>
+                </tr>
+            </tbody>
+        </table>
 
-        <div data-bind="foreach: points">
-            <div data-bind="latitude: lat, longitude:lng, map:map, selected:selected">
-            </div>
-        </div>
-
-        <div style="margin: 5px; float:left">
-            <h3>Stations</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <td>Name</td>
-                        <td>Latitude</td>
-                        <td>Longitude</td>
-                    </tr>
-                </thead>
-                <tbody data-bind="foreach:stations">
-                    <tr>
-                        <td><span data-bind="text:name"></span></td>
-                        <td><input data-bind="value:lat"/></td>
-                        <td><input data-bind="value:lng"/></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div>
-            <h3>Points</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <td>Name</td>
-                        <td>Latitude</td>
-                        <td>Longitude</td>
-                    </tr>
-                </thead>
-                <tbody data-bind="foreach:points">
-                    <tr>
-                        <td><span data-bind="text:name"></span></td>
-                        <td><input data-bind="value:lat"/></td>
-                        <td><input data-bind="value:lng"/></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
         <script>
-            var map = null;
-
             require.config({
                 baseUrl: "../Scripts"
             });
-
-            function initialize() {
-                try {
-                    var myOptions = {
-                        zoom: 8,
-                        mapTypeId: google.maps.MapTypeId.ROADMAP
-                    };
-                    map = new google.maps.Map(document.getElementById("map"), myOptions);
-                } catch (err) {
-                    console.log(err);
-                }
-            }
 
             var ko;
             require(['KoExtensions/koextensions','knockout-3.2.0.debug'], function(koext,kol) {
                 ko = kol;
                 koext.registerExtensions();
-                initialize();
                 var stationsData = {
                     "stations": [
                         {
@@ -114,38 +69,7 @@
                             "name": "Station 3"
                         }
                     ],
-                    "points": [
-                        {
-                            "lat": 55.172,
-                            "lng": 55.142,
-                            "name": "Point 1"
-                        },
-                        {
-                            "lat": 55.274,
-                            "lng": 55.154,
-                            "name": "Point 2"
-                        },
-                        {
-                            "lat": 55.278,
-                            "lng": 55.148,
-                            "name": "Point 3"
-                        }
-                    ]
                 };
-
-                function StationViewModel(data) {
-                    var self = this;
-                    self.lat = ko.observable();
-                    self.lng = ko.observable();
-                    self.name = ko.observable();
-                    self.selected = ko.observable();
-
-                    if (data != null) {
-                        self.lat(data.lat);
-                        self.lng(data.lng);
-                        self.name(data.name);
-                    }
-                }
 
                 function PointViewModel(data) {
                     var self = this;
@@ -163,19 +87,25 @@
 
                 function StationListViewModel(json) {
                     var self = this;
-                    self.stations = ko.observableArray([]);
                     self.points = ko.observableArray([]);
+                    self.selectedPoint = ko.observable();
 
-                    if (json != null) {
-                        self.stations(json.stations.map(function(x) { return new StationViewModel(x); }));
-                        self.points(json.points.map(function(x) { return new PointViewModel(x); }));
-                    }
+                    self.pointSelected = function(point){
+                        if(self.selectedPoint())
+                            self.selectedPoint().selected(false);
+                        point.selected(true);
+                        self.selectedPoint(point);
+                    };
+
+                    self.points(json.stations.map(function(x) { return new PointViewModel(x); }));
                 }
 
                 var vm = new StationListViewModel(stationsData);
+                L.mapbox.accessToken = 'pk.eyJ1IjoiaG9vbnppcyIsImEiOiJjaWpqNHZmbHgwMDRpdmVtNG9ieWs4Mjg1In0.mKQEXA9KZhJe5w7o-9znEQ';
                 ko.applyBindings(vm);
             });
+
+
         </script>
     </body>
-
 </html>

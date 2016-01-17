@@ -29,10 +29,10 @@ define(['d3','./kotools'],function (d3,koTools) {
 
         //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
         var legendWidth = 25 + maxWidth;
-		
+
 		var size = legendWidth > 70 ? 15 : 18;
 		var fontSize = legendWidth > 70 ? "13px" : "16px";
-				
+
         if (showLegend) {
             var legend = parent
                 .append("svg")
@@ -145,7 +145,7 @@ define(['d3','./kotools'],function (d3,koTools) {
             options.height = el.height;
         }
         var dims = {};
-        dims.margin = { top: 5, right: 5, bottom: 5 , left: 5 };
+        dims.margin = { top: 10, right: 5, bottom: 10 , left: 5 };
         dims.width = options.width ? options.width : 200;
         dims.height = options.height ? options.height : 100;
         dims.containerHeight = dims.height;
