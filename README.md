@@ -2,7 +2,7 @@ KoExtensions
 ============
 [![Build Status](https://travis-ci.org/hoonzis/KoExtensions.svg?branch=master)](https://travis-ci.org/hoonzis/KoExtensions)
 
-KoExtensions can be used as standalone JavaScript charting library basedo on D3JS or plug-in for KnockoutJS. Besides charting, when used with Knockout it provides other usefull bindings. Available charts:
+KoExtensions can be used as standalone JavaScript charting library based on D3JS or plug-in for KnockoutJS. Besides charting, when used with Knockout it provides other useful bindings. Available charts:
 
 [piechart]: http://hoonzis.github.com/KoExtensions/img/small/piechart.PNG
 [cashflow]: http://hoonzis.github.com/KoExtensions/img/small/cashflow.PNG
@@ -10,6 +10,7 @@ KoExtensions can be used as standalone JavaScript charting library basedo on D3J
 [chordchart]: http://hoonzis.github.com/KoExtensions/img/small/chordchart.PNG
 [bubblechart]: http://hoonzis.github.com/KoExtensions/img/small/bubblechart.PNG
 [histochart]: http://hoonzis.github.com/KoExtensions/img/small/histogram.PNG
+[mapbinding]: http://hoonzis.github.com/KoExtensions/img/mapbinding.PNG
 
 [piechartex]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/piecharts.html
 [cashFlowEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/CashFlowExample.html
@@ -38,7 +39,7 @@ KoExtensions can be used as standalone JavaScript charting library basedo on D3J
 
 **Other bindings useful for Knockout:**
 
-* Google maps binding [Example] [googleMapsEx]
+* Google maps and Mapbox binding [Example] [googleMapsEx]
 * Bootstrap DateTime picker binding [[Example] [datepickerEx]
 * FormattedValue binding - showing data values in the UI with applied formatting (currencies, rounding). [Example][formattingEx]
 
@@ -54,9 +55,10 @@ Both approaches can be used whether KoExtensions is used as standalone charting 
 ```javascript
 <script src="d3.js"></script>
 <script src="KoExtensions.js"></script>
-//if you want to use knockout binding, just call:
-koExtensions.registerExtensions
-//otherwise, use charting with all the charts
+//if you want to use knockout binding, just call
+koExtensions.registerExtensions()
+
+//otherwise, if you want to use the charts as standalone library
 koext.charting.lineChart(testData, el, chartOptions);
 ```
 
@@ -125,25 +127,15 @@ function TestViewModels (expenses){
         showOutliers: true}"></div>
 ```
 
-- Google maps binding is useful anytime you want a list of objects to be vizualized as points on google maps.
+#### Maps binding for Knockout
+Google maps and Mapbox bindings are available to visualize set of points in geographic map.
+Google maps binding currently accepts function which is invoked when the marker is clicked on the map.
 
-- [maps]: http://hoonzis.github.com/KoExtensions/img/maps.PNG  
-![alt text][maps]
+![maps binding][mapbinding]
 
 ```html
-<div id="map">
+<div id="map" style="width:300px;height:300px" data-bind="gmap:points, markerSelected:pointSelected">
 </div>
-<div data-bind="foreach: stations">
-	<div data-bind="latitude: lat, longitude:lng, map:map, selected:selected"></div>
+<div id="mapbox" style="width:300px;height:300px" data-bind="mapbox:points">
 </div>
-```
-
-```javascript
-function StationViewModel(data){
-	var self = this;
-	self.lat = ko.observable();
-	self.lng = ko.observable();
-	self.name = ko.observable();
-	self.selected = ko.observable();
-}
 ```
