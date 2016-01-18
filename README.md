@@ -40,7 +40,7 @@ KoExtensions can be used as standalone JavaScript charting library based on D3JS
 **Other bindings useful for Knockout:**
 
 * Google maps and Mapbox binding [Example] [googleMapsEx]
-* Bootstrap DateTime picker binding [[Example] [datepickerEx]
+* Bootstrap DateTime picker binding [Example] [datepickerEx]
 * FormattedValue binding - showing data values in the UI with applied formatting (currencies, rounding). [Example][formattingEx]
 
 All charts are created with [D3JS](http://d3js.org/) and based on multiple examples provided in the documentation.
@@ -63,7 +63,7 @@ koext.charting.lineChart(testData, el, chartOptions);
 ```
 
 ####Contributing and building
-RequireJS is used to handle dependencies as well as to bundle single referencable JS file, which can be built with NodeJS and RequireJS optimizer:
+RequireJS is used to handle dependencies as well as to bundle single JS file, which can be built with NodeJS and RequireJS optimizer:
 
 ```
 cd src
@@ -113,7 +113,7 @@ function TestViewModels (expenses){
 	self.expensesPerMonth(totalPerMonth);
 }
 ```
-- Hisotgram chart has some additional properties which can be used to vizualize the statisticial distribution, using either Mean or Median and standard variance or MAD (Median absolute deviation)
+- Histogram chart has some additional properties which can be used to visualize the statistical distribution, using either Mean or Median and standard variance or MAD (Median absolute deviation)
 
 [histogram]: http://hoonzis.github.com/KoExtensions/img/histogram.PNG
 ![alt text][histogram]

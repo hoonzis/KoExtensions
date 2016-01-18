@@ -965,6 +965,9 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
         //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
         var legendWidth = 25 + maxWidth;
 
+		var size = legendWidth > 70 ? 15 : 18;
+		var fontSize = legendWidth > 70 ? "13px" : "16px";
+
         if (showLegend) {
             var legend = parent
                 .append("svg")
@@ -976,12 +979,13 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
                 .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
             legend.append("rect")
-                .attr("width", 18)
-                .attr("height", 18)
+                .attr("width", size)
+                .attr("height", size)
                 .style("fill", function(i) { return color(i); });
             legend.append("text")
                 .attr("x", 24)
                 .attr("y", 9)
+				.attr("font-size",fontSize)
                 .attr("dy", ".35em")
                 .text(function (t) { return t; });
         }
@@ -1076,9 +1080,9 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
             options.height = el.height;
         }
         var dims = {};
-        dims.margin = { top: 20, right: 80, bottom: 50 , left: 50 };
-        dims.width = options.width ? options.width : (960 - dims.margin.left - dims.margin.right);
-        dims.height = options.height ? options.height : (500 - dims.margin.top - dims.margin.bottom);
+        dims.margin = { top: 10, right: 5, bottom: 10 , left: 5 };
+        dims.width = options.width ? options.width : 200;
+        dims.height = options.height ? options.height : 100;
         dims.containerHeight = dims.height;
         dims.containerWidth = dims.width;
         if (options.legend) {
@@ -1318,7 +1322,7 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
     //the rest of the properties is stacked to the chart
     charting.barChart = function (data, element, options, lineData) {
         var el = charting.getElementAndCheckData(element, data);
-        if (el === null || el === undefined)
+        if (!el)
             return;
 
         var defaultOptions = {
@@ -1596,7 +1600,7 @@ define('KoExtensions/Charts/piechart',['d3','./../charting','./../kotools'], fun
         var defaultOptions = {
             legend: true,
             width: 200,
-            height: 200
+            height: 150
         };
 
         options = koTools.setDefaultOptions(defaultOptions, options);
@@ -2155,7 +2159,7 @@ define('KoExtensions/Charts/chordchart',['d3','./../charting', './../kotools'], 
     charting.chordChart = function(data, element, options) {
 
         var el = charting.getElementAndCheckData(element, data);
-        if (el == null)
+        if (!el)
             return;
 
         var defaultOptions = {
@@ -2184,7 +2188,7 @@ define('KoExtensions/Charts/chordchart',['d3','./../charting', './../kotools'], 
             .outerRadius(outerRadius);
 
         var layout = d3.layout.chord()
-            .padding(.04);
+            .padding(0.04);
 
         var path = d3.svg.chord()
             .radius(innerRadius);
@@ -2212,7 +2216,7 @@ define('KoExtensions/Charts/chordchart',['d3','./../charting', './../kotools'], 
                 .style("opacity", 0.1);
 
             charting.showTooltip(info);
-        }
+        };
 
         var chord_mouse_out = function (g, i) {
             svg.selectAll(".chord")
@@ -2220,7 +2224,7 @@ define('KoExtensions/Charts/chordchart',['d3','./../charting', './../kotools'], 
                 .style("opacity", 1);
 
             charting.hideTooltip();
-        }
+        };
 
         var fade = function(opacity) {
             return function (g, i) {
@@ -2235,7 +2239,7 @@ define('KoExtensions/Charts/chordchart',['d3','./../charting', './../kotools'], 
                 info[descGetter(g)] = g.value;
                 charting.showTooltip(info);
             };
-        }
+        };
 
         layout.matrix(data.matrix);
         var group = svg.selectAll(".group")
@@ -2248,16 +2252,16 @@ define('KoExtensions/Charts/chordchart',['d3','./../charting', './../kotools'], 
             .attr("id", function(d, i) { return "group" + i; })
             .attr("d", arc)
             .style("fill", function(d, i) { return color(i); })
-            .on("mouseover", fade(.1))
+            .on("mouseover", fade(0.1))
             .on("mouseout", fade(1));
 
         group.append("text")
             .each(function(d) { d.angle = (d.startAngle + d.endAngle) / 2; })
             .attr("dy", ".35em")
             .attr("transform", function(d) {
-                return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
-                    + "translate(" + (innerRadius + 26) + ")"
-                    + (d.angle > Math.PI ? "rotate(180)" : "");
+                return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")" +
+                "translate(" + (innerRadius + 26) + ")" +
+                (d.angle > Math.PI ? "rotate(180)" : "");
             })
             .style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
             .attr("font-family", "Open Sans, sans-serif")
@@ -2273,7 +2277,7 @@ define('KoExtensions/Charts/chordchart',['d3','./../charting', './../kotools'], 
             .attr("d", path)
             .on("mouseover", chord_mouse_over)
             .on("mouseout", chord_mouse_out);
-    }
+    };
 });
 
 
@@ -2380,69 +2384,6 @@ define('KoExtensions/koextensions',['./charting', './kotools', './Charts/barchar
                 if(ko === null){
                     throw "If you want to use KoExtensions with Knockout, please reference Knockout before calling registerExtensions";
                 }
-                ko.bindingHandlers.gmap = {
-                    init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
-                         var gmap = new google.maps.Map(element, {
-                            center: {lat: -34.397, lng: 150.644},
-                            zoom: 8
-                          });
-
-                        element._gmap = gmap;
-                    },
-                    update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
-                        if (element._mapBoxLayer) {
-                            element._mapBox.removeLayer(element._mapBoxLayer);
-                        }
-
-                        var bindings = allBindingsAccessor();
-                        var points = bindings.gmap();
-
-                        for(var i=0;i<points.length;i++){
-                            var position = new google.maps.LatLng(allBindingsAccessor().latitude(), allBindingsAccessor().longitude());
-
-                            var marker = new google.maps.Marker({
-                                map: allBindingsAccessor().map,
-                                position: position,
-                                title: name
-                            });
-
-                            google.maps.event.addListener(marker, 'click', function() {
-                                allBindingsAccessor().itemSelected();
-                            });
-
-                            markers.push(marker);
-                            viewModel._mapMarker = marker;
-                        }
-
-
-                        if (points && points.length > 0) {
-                            var geojson = {
-                                type: 'FeatureCollection',
-                                features: points.map(function(point) {
-                                    var lat = point.lat();
-                                    var lng = point.lng();
-
-                                    return {
-                                        type: 'Feature',
-                                        properties: {
-                                            'marker-color': '#f86767',
-                                            'marker-size': 'large',
-                                            'marker-symbol': 'star'
-                                        },
-                                        geometry: {
-                                            type: 'Point',
-                                            coordinates: [lng, lat]
-                                        }
-                                    };
-                                })
-                            };
-
-                            element._mapBoxLayer = L.mapbox.featureLayer(geojson);
-                            element._mapBoxLayer.addTo(element._mapBox);
-                            element._mapBox.fitBounds(element._mapBoxLayer.getBounds());
-                        }
-                    }
-                };
 
                 ko.bindingHandlers.mapbox = {
                     init: function (element) {
@@ -2483,6 +2424,48 @@ define('KoExtensions/koextensions',['./charting', './kotools', './Charts/barchar
                             element._mapBoxLayer.addTo(element._mapBox);
                             element._mapBox.fitBounds(element._mapBoxLayer.getBounds());
                         }
+                    }
+                };
+
+                ko.bindingHandlers.gmap = {
+                    init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+                         var gmap = new google.maps.Map(element, {
+                            center: {lat: -34.397, lng: 150.644},
+                            zoom: 8
+                          });
+
+                        element._gmap = gmap;
+                    },
+                    update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+                        var bindings = allBindingsAccessor();
+                        var points = bindings.gmap();
+                        var latlngbounds = new google.maps.LatLngBounds();
+
+                        for(var i=0;i<points.length;i++){
+                            point = points[i];
+                            var position = new google.maps.LatLng(point.lat(),point.lng());
+                            latlngbounds.extend(position);
+                            var marker = point._gmarker;
+                            if(!marker){
+                                marker = new google.maps.Marker({
+                                    map:element._gmap,
+                                    position: position,
+                                    title: name
+                                });
+
+
+                                var listenerFactory = function(point){
+                                    return function(){
+                                        bindings.markerSelected(point);
+                                    };
+                                };
+
+                                google.maps.event.addListener(marker, 'click', listenerFactory(point));
+                                point._mapMarker = marker;
+                            }
+                            marker.setPosition(position);
+                        }
+                        element._gmap.fitBounds(latlngbounds);
                     }
                 };
 
