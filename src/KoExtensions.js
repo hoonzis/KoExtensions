@@ -1080,11 +1080,11 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
             options.height = el.height;
         }
         var dims = {};
-        dims.margin = { top: 10, right: 5, bottom: 10 , left: 5 };
+        dims.margin = { top: 5, right: 10, bottom: 20 , left: 10 };
         dims.width = options.width ? options.width : 200;
         dims.height = options.height ? options.height : 100;
-        dims.containerHeight = dims.height;
-        dims.containerWidth = dims.width;
+        dims.containerHeight = dims.height + dims.margin.top + dims.margin.bottom;
+        dims.containerWidth = dims.width + dims.margin.left + dims.margin.right;
         if (options.legend) {
             dims.width = dims.containerWidth - charting.getLegendWidth(legenKeys);
         }
@@ -1100,11 +1100,10 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
 
     charting.appendContainer = function(el, dims) {
         var svg = el.append("svg")
-        .attr("width", dims.containerWidth + dims.margin.left + dims.margin.right)
-        .attr("height", dims.containerHeight + dims.margin.top + dims.margin.bottom)
+        .attr("width", dims.containerWidth)
+        .attr("height", dims.containerHeight)
       .append("g")
         .attr("transform", "translate(" + dims.margin.left + "," + dims.margin.top + ")");
-
         return svg;
     };
 
