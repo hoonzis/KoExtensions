@@ -154,14 +154,8 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         var onPointOver = function (d) {
             d3.select(this).style("fill", "blue");
             var info = {};
-            var unitName = d.xUnitName;
-            if (!unitName)
-                unitName = 'x';
-            info[unitName] = d.xLabel;
-            if (options.lineFormatter)
-                info[d.name] = options.lineFormatter(d.y);
-            else
-                info[d.name] = d.y;
+            var xName = koTools.isDate(d.x) ? d.x.toFormattedString() : d.x;
+            info[xName] = d.y;
             charting.showTooltip(info);
         };
 

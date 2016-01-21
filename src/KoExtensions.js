@@ -959,16 +959,15 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
     };
 
     charting.showStandardLegend = function(parent, data, color, showLegend, height) {
-
-        var maxWidth = charting.getLegendWidth(data);
-
-        //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
-        var legendWidth = 25 + maxWidth;
-
-		var size = legendWidth > 70 ? 15 : 18;
-		var fontSize = legendWidth > 70 ? "13px" : "16px";
-
         if (showLegend) {
+            var maxWidth = charting.getLegendWidth(data);
+
+            //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
+            var legendWidth = 25 + maxWidth;
+
+    		var size = legendWidth > 70 ? 15 : 18;
+    		var fontSize = legendWidth > 70 ? "13px" : "16px";
+
             var legend = parent
                 .append("svg")
                 .attr("width", legendWidth)
@@ -2283,7 +2282,7 @@ define('KoExtensions/Charts/chordchart',['d3','./../charting', './../kotools'], 
 define('KoExtensions/Charts/bubblechart',['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
     charting.bubbleChart = function (data, element, options) {
         var el = charting.getElementAndCheckData(element, data);
-        if (el == null)
+        if (!el)
             return;
 
         var defaultOptions = {
@@ -2306,7 +2305,10 @@ define('KoExtensions/Charts/bubblechart',['d3','./../charting','./../kotools'], 
 
         options = koTools.setDefaultOptions(defaultOptions, options);
 
-        var dims = charting.getDimensions(options, el);
+        // get all the names for the legend (that will be represented by the color of each bull)
+        var keys = data.map(options.bubbleColor);
+
+        var dims = charting.getDimensions(options, el, keys);
 
         var maxY = d3.max(data, options.bubbleVertical);
         var horizontalValues = data.map(options.bubbleHorizontal);
@@ -2346,7 +2348,7 @@ define('KoExtensions/Charts/bubblechart',['d3','./../charting','./../kotools'], 
             info[options.horizontalLabel] = options.bubbleHorizontal(d);
 
             charting.showTooltip(info);
-        }
+        };
 
         var xGetter = charting.xGetter(xScaleDef, xScale);
 
@@ -2364,7 +2366,7 @@ define('KoExtensions/Charts/bubblechart',['d3','./../charting','./../kotools'], 
             .on("mouseover", bubblenodeMouseover)
             .on("click", bubblenodeMouseover)
             .on("mouseout", bubblenodeMouseout);
-    }
+    };
 });
 
 define('KoExtensions/koextensions',['./charting', './kotools', './Charts/barchart', './Charts/piechart', './Charts/linechart', './Charts/histogramchart', './Charts/scatterplot', './Charts/chordchart', './Charts/bubblechart'],

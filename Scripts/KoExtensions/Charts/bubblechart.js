@@ -2,7 +2,7 @@
 define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
     charting.bubbleChart = function (data, element, options) {
         var el = charting.getElementAndCheckData(element, data);
-        if (el == null)
+        if (!el)
             return;
 
         var defaultOptions = {
@@ -25,7 +25,10 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
         options = koTools.setDefaultOptions(defaultOptions, options);
 
-        var dims = charting.getDimensions(options, el);
+        // get all the names for the legend (that will be represented by the color of each bull)
+        var keys = data.map(options.bubbleColor);
+
+        var dims = charting.getDimensions(options, el, keys);
 
         var maxY = d3.max(data, options.bubbleVertical);
         var horizontalValues = data.map(options.bubbleHorizontal);
@@ -65,7 +68,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             info[options.horizontalLabel] = options.bubbleHorizontal(d);
 
             charting.showTooltip(info);
-        }
+        };
 
         var xGetter = charting.xGetter(xScaleDef, xScale);
 
@@ -83,5 +86,5 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             .on("mouseover", bubblenodeMouseover)
             .on("click", bubblenodeMouseover)
             .on("mouseout", bubblenodeMouseout);
-    }
+    };
 });
