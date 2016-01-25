@@ -11,6 +11,10 @@
   <div id="monthlySales" data-bind="barchart: carSales, chartOptions:{legend:true, width:800,height:300,style:'stack',xcoord:'month'}">
   </div>
 
+  <h2>Stacked bar chart - with datetime x axis</h2>
+  <div id="monthlySales" data-bind="barchart: carSales, chartOptions:{legend:true, width:800,height:300,style:'stack',xcoord:'date'}">
+  </div>
+
 	<h2>Grouped barchart</h2>
 	<div id="monthlySales2" data-bind="barchart: carSales,chartOptions:{legend:true, width:800,height:300,style:'bar',xcoord:'month',unitTransform:valueToLabel}">
 	</div>
@@ -32,30 +36,35 @@
             koext.registerExtensions();
             var data = [
                 {
+                    date: new Date(2012,1,1),
                     month: 'january',
                     peugot: 100,
                     audit: 200,
                     bmw: 300
                 },
                 {
+                    date: new Date(2012,2,2),
                     month: 'february',
                     peugot: 50,
                     audit: 110,
                     bmw: 80
                 },
                 {
+                    date: new Date(2012,3,3),
                     month: 'marz',
                     peugot: 120,
                     audit: 230,
                     bmw: 115
                 },
                 {
+                    date: new Date(2012,4,4),
                     month: 'april',
                     peugot: 80,
                     audit: 120,
                     bmw: 75
                 },
                 {
+                    date: new Date(2012,5,5),
                     month: 'may',
                     peugot: 100,
                     audit: 140,
@@ -63,6 +72,7 @@
                 },
                 //negative values
                 {
+                    date: new Date(2012,5,5),
                     month: 'may',
                     peugot: -100,
                     audit: -140,

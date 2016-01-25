@@ -33,12 +33,14 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
         var dims = charting.getDimensions(options, el,keys);
 
+        var xKeys = data.map(function(d){return d[xcoord];});
+        var scaleDef = charting.determineXScale(xKeys,null,options);
+
         var x = d3.scale.ordinal()
             .rangeRoundBands([0, dims.width], 0.3);
 
         var y = d3.scale.linear()
             .rangeRound([dims.height, 0]);
-
 
         //runs overs all the data. copies the result to a new array.
         //for each item we need y0 and y1 - are the y coordinates of the rectangle
@@ -53,8 +55,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
             var values = [];
             color.domain().forEach(function (m) {
-
-                if (d[m] === 0 || d[m] === null)
+                if (!koTools.isNumber(d[m]) || d[m] === 0 || d[m] === null)
                     return;
                 var xLabel = newD.x;
                 if (options.xUnitFormat)

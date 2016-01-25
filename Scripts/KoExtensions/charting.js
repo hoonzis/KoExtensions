@@ -235,7 +235,7 @@ define(['d3','./kotools'],function (d3,koTools) {
         return yAxis;
     };
 
-    charting.determineXScale = function (data, def,linename) {
+    charting.determineXScale = function (data, def,options) {
         if (!def) {
             def = {
                 allNumbers: true,
@@ -260,7 +260,11 @@ define(['d3','./kotools'],function (d3,koTools) {
 
         def.xKeys = def.xKeys.concat(newKeys);
         def.scaleType = def.allNumbers ? 'linear' : def.allDates ? 'date' : 'ordinal';
-        def.xUnitFormat = def.allNumbers ? null : koTools.getIdealDateFormat([def.min,def.max]);
+        def.xUnitFormat = def.allDates ? koTools.getIdealDateFormat([def.min,def.max]) : null;
+        if(!options.xUnitFormat){
+            options.xUnitFormat = def.xUnitFormat;
+        }
+
         return def;
     };
 
@@ -269,12 +273,8 @@ define(['d3','./kotools'],function (d3,koTools) {
         data.forEach(function(i) {
             def = charting.determineXScale(i.values.map(function(v) {
                 return v.x;
-            }), def,i.linename);
+            }), def,options);
         });
-
-        if(!options.xUnitFormat){
-            options.xUnitFormat = def.xUnitFormat;
-        }
         return def;
     };
 

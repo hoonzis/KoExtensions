@@ -481,7 +481,7 @@ define(['d3'],function (d3) {
                     return val;
                 };
             }else {
-                var diffHours = Math.abs(date1 - date2) / 36e5;
+                var diffHours = Math.abs(max - min) / 36e5;
                 if(diffHours > 2){
                     return function(d){
                         return d.getHours() + ":" + d.getMinutes();

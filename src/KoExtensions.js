@@ -925,7 +925,7 @@ define('KoExtensions/kotools',['d3'],function (d3) {
                     return val;
                 };
             }else {
-                var diffHours = Math.abs(date1 - date2) / 36e5;
+                var diffHours = Math.abs(max - min) / 36e5;
                 if(diffHours > 2){
                     return function(d){
                         return d.getHours() + ":" + d.getMinutes();
@@ -1193,7 +1193,7 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
         return yAxis;
     };
 
-    charting.determineXScale = function (data, def,linename) {
+    charting.determineXScale = function (data, def,options) {
         if (!def) {
             def = {
                 allNumbers: true,
@@ -1218,7 +1218,11 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
 
         def.xKeys = def.xKeys.concat(newKeys);
         def.scaleType = def.allNumbers ? 'linear' : def.allDates ? 'date' : 'ordinal';
-        def.xUnitFormat = def.allNumbers ? null : koTools.getIdealDateFormat([def.min,def.max]);
+        def.xUnitFormat = def.allDates ? koTools.getIdealDateFormat([def.min,def.max]) : null;
+        if(!options.xUnitFormat){
+            options.xUnitFormat = def.xUnitFormat;
+        }
+
         return def;
     };
 
@@ -1227,12 +1231,8 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
         data.forEach(function(i) {
             def = charting.determineXScale(i.values.map(function(v) {
                 return v.x;
-            }), def,i.linename);
+            }), def,options);
         });
-
-        if(!options.xUnitFormat){
-            options.xUnitFormat = def.xUnitFormat;
-        }
         return def;
     };
 
@@ -1374,12 +1374,14 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
 
         var dims = charting.getDimensions(options, el,keys);
 
+        var xKeys = data.map(function(d){return d[xcoord];});
+        var scaleDef = charting.determineXScale(xKeys,null,options);
+
         var x = d3.scale.ordinal()
             .rangeRoundBands([0, dims.width], 0.3);
 
         var y = d3.scale.linear()
             .rangeRound([dims.height, 0]);
-
 
         //runs overs all the data. copies the result to a new array.
         //for each item we need y0 and y1 - are the y coordinates of the rectangle
@@ -1394,8 +1396,7 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
 
             var values = [];
             color.domain().forEach(function (m) {
-
-                if (d[m] === 0 || d[m] === null)
+                if (!koTools.isNumber(d[m]) || d[m] === 0 || d[m] === null)
                     return;
                 var xLabel = newD.x;
                 if (options.xUnitFormat)
