@@ -469,6 +469,29 @@ define(['d3'],function (d3) {
             return config;
         };
 
+        self.getIdealDateFormat = function(range) {
+            var min = range[0];
+            var max = range[1];
+            var oneDay = 24*60*60*1000;
+            var diffDays = Math.round(Math.abs((max.getTime() - min.getTime())/(oneDay)));
+
+            if(diffDays > 5){
+                return function(d){
+                    var val = d.toFormattedString();
+                    return val;
+                };
+            }else {
+                var diffHours = Math.abs(date1 - date2) / 36e5;
+                if(diffHours > 2){
+                    return function(d){
+                        return d.getHours() + ":" + d.getMinutes();
+                    };
+                }else{
+                    return function(d) { return d.getMinutes() + ":" + d.getSeconds();};
+                }
+            }
+        }
+
         self.throttle = function(delay, callback) {
             var previousCall = new Date().getTime();
             return function () {

@@ -61,7 +61,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         var y = d3.scale.linear()
           .range([dims.height, 0]);
 
-        var scaleDef = charting.getXScaleForMultiLines(data);
+        var scaleDef = charting.getXScaleForMultiLines(data,options);
         var x = charting.getXScaleFromConfig(scaleDef, dims);
         var getX = function(d) {
             return charting.xGetter(scaleDef, x)(d.x);

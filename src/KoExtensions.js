@@ -913,6 +913,29 @@ define('KoExtensions/kotools',['d3'],function (d3) {
             return config;
         };
 
+        self.getIdealDateFormat = function(range) {
+            var min = range[0];
+            var max = range[1];
+            var oneDay = 24*60*60*1000;
+            var diffDays = Math.round(Math.abs((max.getTime() - min.getTime())/(oneDay)));
+
+            if(diffDays > 5){
+                return function(d){
+                    var val = d.toFormattedString();
+                    return val;
+                };
+            }else {
+                var diffHours = Math.abs(date1 - date2) / 36e5;
+                if(diffHours > 2){
+                    return function(d){
+                        return d.getHours() + ":" + d.getMinutes();
+                    };
+                }else{
+                    return function(d) { return d.getMinutes() + ":" + d.getSeconds();};
+                }
+            }
+        }
+
         self.throttle = function(delay, callback) {
             var previousCall = new Date().getTime();
             return function () {
@@ -1175,8 +1198,8 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
             def = {
                 allNumbers: true,
                 allDates: true,
-                min: 100000000000000000000,
-                max: -1000000000000000000000,
+                min: Number.MAX_VALUE,
+                max: Number.MIN_VALUE,
                 xKeys:[]
             };
         }
@@ -1195,10 +1218,11 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
 
         def.xKeys = def.xKeys.concat(newKeys);
         def.scaleType = def.allNumbers ? 'linear' : def.allDates ? 'date' : 'ordinal';
+        def.xUnitFormat = def.allNumbers ? null : koTools.getIdealDateFormat([def.min,def.max]);
         return def;
     };
 
-    charting.getXScaleForMultiLines = function (data) {
+    charting.getXScaleForMultiLines = function (data,options) {
         var def = null;
         data.forEach(function(i) {
             def = charting.determineXScale(i.values.map(function(v) {
@@ -1206,13 +1230,16 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
             }), def,i.linename);
         });
 
+        if(!options.xUnitFormat){
+            options.xUnitFormat = def.xUnitFormat;
+        }
         return def;
     };
 
     charting.getYScaleDefForMultiline = function(data,options,filteredDomain){
       var def = {
-          min: 100000000000000000000,
-          max: -1000000000000000000000
+          min: Number.MAX_VALUE,
+          max: Number.MIN_VALUE
       };
 
       data.forEach(function(line){
@@ -1232,7 +1259,6 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
       var reversedCoef = 2.0 - options.marginCoef;
       def.max = def.max > 0 ? def.max * options.marginCoef : def.max * reversedCoef;
       def.min = def.min < 0 ? def.min * options.marginCoef : def.min * reversedCoef;
-
       return def;
     };
 
@@ -1469,14 +1495,8 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
         var onPointOver = function (d) {
             d3.select(this).style("fill", "blue");
             var info = {};
-            var unitName = d.xUnitName;
-            if (!unitName)
-                unitName = 'x';
-            info[unitName] = d.xLabel;
-            if (options.lineFormatter)
-                info[d.name] = options.lineFormatter(d.y);
-            else
-                info[d.name] = d.y;
+            var xName = koTools.isDate(d.x) ? d.x.toFormattedString() : d.x;
+            info[xName] = d.y;
             charting.showTooltip(info);
         };
 
@@ -1740,7 +1760,7 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
         var y = d3.scale.linear()
           .range([dims.height, 0]);
 
-        var scaleDef = charting.getXScaleForMultiLines(data);
+        var scaleDef = charting.getXScaleForMultiLines(data,options);
         var x = charting.getXScaleFromConfig(scaleDef, dims);
         var getX = function(d) {
             return charting.xGetter(scaleDef, x)(d.x);

@@ -240,8 +240,8 @@ define(['d3','./kotools'],function (d3,koTools) {
             def = {
                 allNumbers: true,
                 allDates: true,
-                min: 100000000000000000000,
-                max: -1000000000000000000000,
+                min: Number.MAX_VALUE,
+                max: Number.MIN_VALUE,
                 xKeys:[]
             };
         }
@@ -260,10 +260,11 @@ define(['d3','./kotools'],function (d3,koTools) {
 
         def.xKeys = def.xKeys.concat(newKeys);
         def.scaleType = def.allNumbers ? 'linear' : def.allDates ? 'date' : 'ordinal';
+        def.xUnitFormat = def.allNumbers ? null : koTools.getIdealDateFormat([def.min,def.max]);
         return def;
     };
 
-    charting.getXScaleForMultiLines = function (data) {
+    charting.getXScaleForMultiLines = function (data,options) {
         var def = null;
         data.forEach(function(i) {
             def = charting.determineXScale(i.values.map(function(v) {
@@ -271,13 +272,16 @@ define(['d3','./kotools'],function (d3,koTools) {
             }), def,i.linename);
         });
 
+        if(!options.xUnitFormat){
+            options.xUnitFormat = def.xUnitFormat;
+        }
         return def;
     };
 
     charting.getYScaleDefForMultiline = function(data,options,filteredDomain){
       var def = {
-          min: 100000000000000000000,
-          max: -1000000000000000000000
+          min: Number.MAX_VALUE,
+          max: Number.MIN_VALUE
       };
 
       data.forEach(function(line){
@@ -297,7 +301,6 @@ define(['d3','./kotools'],function (d3,koTools) {
       var reversedCoef = 2.0 - options.marginCoef;
       def.max = def.max > 0 ? def.max * options.marginCoef : def.max * reversedCoef;
       def.min = def.min < 0 ? def.min * options.marginCoef : def.min * reversedCoef;
-
       return def;
     };
 
