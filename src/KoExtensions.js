@@ -1237,29 +1237,42 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
     };
 
     charting.getYScaleDefForMultiline = function(data,options,filteredDomain){
-      var def = {
-          min: Number.MAX_VALUE,
-          max: Number.MIN_VALUE
-      };
-
-      data.forEach(function(line){
-        line.values.forEach(function(v){
-          //if filtered domain is specififed consider only certain Y values in the given X range
-          if(!filteredDomain || (v.x>=filteredDomain[0] && v.x <= filteredDomain[1])){
-            if(v.y>def.max)
-              def.max = v.y;
-            if(v.y<def.min)
-              def.min = v.y;
-          }
+        var def = null;
+        data.forEach(function(i) {
+            def = charting.determineYScale(i.values.map(function(v) {
+                return v.y;
+            }), def,options);
         });
-      });
+        return def;
+    };
 
-      //setting up margings. how much more on the bottom and on the top of the chart should be shown
-      //bellow or above the max and minimum value - carefull to handle negative max values
-      var reversedCoef = 2.0 - options.marginCoef;
-      def.max = def.max > 0 ? def.max * options.marginCoef : def.max * reversedCoef;
-      def.min = def.min < 0 ? def.min * options.marginCoef : def.min * reversedCoef;
-      return def;
+    charting.determineYScale = function (data, def,options) {
+        if (!def) {
+            def = {
+                min: Number.MAX_VALUE,
+                max: Number.MIN_VALUE
+            };
+        }
+
+        data.forEach(function(v) {
+            if (v < def.min)
+                def.min = v;
+            if (v > def.max)
+                def.max = v;
+        });
+
+        //setting up margings. how much more on the bottom and on the top of the chart should be shown
+        //bellow or above the max and minimum value - carefull to handle negative max values
+        if(options.marginCoef){
+            var reversedCoef = - options.marginCoef;
+            def.max = def.max > 0 ? def.max * options.marginCoef : def.max * reversedCoef;
+            def.min = def.min < 0 ? def.min * options.marginCoef : def.min * reversedCoef;
+        }
+
+        //the min and max can also be specified in the options directly
+        def.min = options.yMin || def.min;
+        def.max = options.yMax || def.max;
+        return def;
     };
 
     //takes the result of determineXScale and creates D3 scale
@@ -1716,7 +1729,6 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
             horizontalLabel: 'x',
             verticalLabel: 'y',
             showDataPoints: true,
-            marginCoef: 1.1,
             verticalCursorLine: false,
             xAxisLabel: false,
             yAxisLabel: false,
@@ -2330,9 +2342,8 @@ define('KoExtensions/Charts/bubblechart',['d3','./../charting','./../kotools'], 
         var keys = data.map(options.bubbleColor);
 
         var dims = charting.getDimensions(options, el, keys);
-
-        var maxY = d3.max(data, options.bubbleVertical);
         var horizontalValues = data.map(options.bubbleHorizontal);
+        var verticalValues = data.map(options.bubbleVertical);
 
         var bubbleSizes = data.map(options.bubbleSize);
         bubbleSizes.sort(d3.ascending);
@@ -2340,11 +2351,11 @@ define('KoExtensions/Charts/bubblechart',['d3','./../charting','./../kotools'], 
         var maxBubbleSize = d3.max(bubbleSizes);
         var minBubbleSize = d3.min(bubbleSizes);
 
-
-        var xScaleDef = charting.determineXScale(horizontalValues, null);
+        var xScaleDef = charting.determineXScale(horizontalValues, null, options);
         var xScale = charting.getXScaleFromConfig(xScaleDef,dims);
-        var yScale = d3.scale.linear().domain([0, maxY]).range([dims.height, 0]);
-        var radiusScale = d3.scale.pow().exponent(0.4).domain([minBubbleSize, maxBubbleSize]).range([2, options.maxBubbleSize]).clamp(true);
+        var yScaleDef = charting.determineYScale(verticalValues, null, options);
+        var yScale = d3.scale.linear().domain([yScaleDef.min, yScaleDef.max]).range([dims.height, 0]);
+        var radiusScale = d3.scale.pow().exponent(0.4).domain([minBubbleSize, maxBubbleSize]).range([1, options.maxBubbleSize]).clamp(true);
 
         var colors = koTools.distinct(data, options.bubbleColor);
         var colorScale = d3.scale.category20().domain(colors);
