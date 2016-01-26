@@ -4,7 +4,8 @@ define(['d3','./../charting', './../kotools'], function (d3,charting, koTools) {
         var defaultOptions = {
             bins: 80,
             width: 500,
-            fillParentController:false
+            fillParentController:false,
+            histogramType: 'frequency'
         };
 
         var el = charting.getElementAndCheckData(element,data);
@@ -15,7 +16,7 @@ define(['d3','./../charting', './../kotools'], function (d3,charting, koTools) {
         var dims = charting.getDimensions(options,el);
 
         var histogramData = d3.layout.histogram()
-            .frequency(false)
+            .frequency(options.histogramType === 'frequency')
             .bins(options.bins)(data);
 
         var minX = koTools.isValidNumber(options.min) ? options.min : d3.min(histogramData, function (d) { return d.x; });
@@ -47,12 +48,22 @@ define(['d3','./../charting', './../kotools'], function (d3,charting, koTools) {
                 return "translate(" + x(d.x) + "," + y(d.y) + ")";
             });
 
+
+        var onBarOver = function (d) {
+            var header = options.histogramType == "frequency" ? "count": "probability";
+            var info = {};
+            info[header] = d.y;
+            info["range"] = d.x + " - " + (d.x+d.dx);
+            charting.showTooltip(info);
+        };
+
         bar.append("rect")
             .attr("x", 1)
             .attr("width",columnWidth)
             .attr("height", function(d) {
                 return dims.height - y(d.y);
-            });
+            })
+            .on("mouseover",onBarOver);
 
         charting.createXAxis(svg,options,x,dims);
 
