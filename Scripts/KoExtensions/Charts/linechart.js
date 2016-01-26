@@ -16,7 +16,6 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             horizontalLabel: 'x',
             verticalLabel: 'y',
             showDataPoints: true,
-            marginCoef: 1.1,
             verticalCursorLine: false,
             xAxisLabel: false,
             yAxisLabel: false,

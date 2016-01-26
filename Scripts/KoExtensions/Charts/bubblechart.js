@@ -29,9 +29,8 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         var keys = data.map(options.bubbleColor);
 
         var dims = charting.getDimensions(options, el, keys);
-
-        var maxY = d3.max(data, options.bubbleVertical);
         var horizontalValues = data.map(options.bubbleHorizontal);
+        var verticalValues = data.map(options.bubbleVertical);
 
         var bubbleSizes = data.map(options.bubbleSize);
         bubbleSizes.sort(d3.ascending);
@@ -39,11 +38,11 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         var maxBubbleSize = d3.max(bubbleSizes);
         var minBubbleSize = d3.min(bubbleSizes);
 
-
-        var xScaleDef = charting.determineXScale(horizontalValues, null);
+        var xScaleDef = charting.determineXScale(horizontalValues, null, options);
         var xScale = charting.getXScaleFromConfig(xScaleDef,dims);
-        var yScale = d3.scale.linear().domain([0, maxY]).range([dims.height, 0]);
-        var radiusScale = d3.scale.pow().exponent(0.4).domain([minBubbleSize, maxBubbleSize]).range([2, options.maxBubbleSize]).clamp(true);
+        var yScaleDef = charting.determineYScale(verticalValues, null, options);
+        var yScale = d3.scale.linear().domain([yScaleDef.min, yScaleDef.max]).range([dims.height, 0]);
+        var radiusScale = d3.scale.pow().exponent(0.4).domain([minBubbleSize, maxBubbleSize]).range([1, options.maxBubbleSize]).clamp(true);
 
         var colors = koTools.distinct(data, options.bubbleColor);
         var colorScale = d3.scale.category20().domain(colors);

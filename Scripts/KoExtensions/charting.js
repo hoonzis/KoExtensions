@@ -279,29 +279,42 @@ define(['d3','./kotools'],function (d3,koTools) {
     };
 
     charting.getYScaleDefForMultiline = function(data,options,filteredDomain){
-      var def = {
-          min: Number.MAX_VALUE,
-          max: Number.MIN_VALUE
-      };
-
-      data.forEach(function(line){
-        line.values.forEach(function(v){
-          //if filtered domain is specififed consider only certain Y values in the given X range
-          if(!filteredDomain || (v.x>=filteredDomain[0] && v.x <= filteredDomain[1])){
-            if(v.y>def.max)
-              def.max = v.y;
-            if(v.y<def.min)
-              def.min = v.y;
-          }
+        var def = null;
+        data.forEach(function(i) {
+            def = charting.determineYScale(i.values.map(function(v) {
+                return v.y;
+            }), def,options);
         });
-      });
+        return def;
+    };
 
-      //setting up margings. how much more on the bottom and on the top of the chart should be shown
-      //bellow or above the max and minimum value - carefull to handle negative max values
-      var reversedCoef = 2.0 - options.marginCoef;
-      def.max = def.max > 0 ? def.max * options.marginCoef : def.max * reversedCoef;
-      def.min = def.min < 0 ? def.min * options.marginCoef : def.min * reversedCoef;
-      return def;
+    charting.determineYScale = function (data, def,options) {
+        if (!def) {
+            def = {
+                min: Number.MAX_VALUE,
+                max: Number.MIN_VALUE
+            };
+        }
+
+        data.forEach(function(v) {
+            if (v < def.min)
+                def.min = v;
+            if (v > def.max)
+                def.max = v;
+        });
+
+        //setting up margings. how much more on the bottom and on the top of the chart should be shown
+        //bellow or above the max and minimum value - carefull to handle negative max values
+        if(options.marginCoef){
+            var reversedCoef = - options.marginCoef;
+            def.max = def.max > 0 ? def.max * options.marginCoef : def.max * reversedCoef;
+            def.min = def.min < 0 ? def.min * options.marginCoef : def.min * reversedCoef;
+        }
+
+        //the min and max can also be specified in the options directly
+        def.min = options.yMin || def.min;
+        def.max = options.yMax || def.max;
+        return def;
     };
 
     //takes the result of determineXScale and creates D3 scale
