@@ -1062,9 +1062,8 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
             .style("width", "150px")
             .style("position", "absolute")
             .style("opacity", 0)
-            .style("background-color", "lightgray")
-            .style("border-radius", "5px")
-            .style("border", "1px solid black")
+            .style("background-color", "#2ca02c")
+            .style("border-radius", "6px")
             .append("div")
             .style("margin", "5px")
             .style("z-index", 100000);
@@ -1102,19 +1101,22 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
             options.height = el.height;
         }
         var dims = {};
-        dims.margin = { top: 5, right: 10, bottom: 20 , left: 10 };
+        dims.margin = { top: 5, right: 60, bottom: 30 , left: 10 };
         dims.width = options.width ? options.width : 200;
         dims.height = options.height ? options.height : 100;
+        if(options.xAxisTextAngle){
+            dims.margin.bottom = options.xAxisTextAngle*40/90 + dims.margin.bottom;
+        }
         dims.containerHeight = dims.height + dims.margin.top + dims.margin.bottom;
         dims.containerWidth = dims.width + dims.margin.left + dims.margin.right;
         if (options.legend) {
-            dims.width = dims.containerWidth - charting.getLegendWidth(legenKeys);
+            dims.containerWidth += charting.getLegendWidth(legenKeys);
         }
 
         if(options.horizontalSlider){
            var sliderSpace = 25;
             dims.sliderHeight = 20;
-            dims.height = dims.containerHeight - dims.sliderHeight - sliderSpace - 25;
+            dims.containerHeight = dims.height + dims.sliderHeight + sliderSpace + 25;
             dims.sliderOffset = dims.height + sliderSpace;
         }
         return dims;
@@ -1168,17 +1170,14 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
 
     charting.createYAxis = function (svg, options, yScale, dims) {
         var yAxis = d3.svg.axis().scale(yScale).tickSize(dims.width).orient("right");
+
         var gy = svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis);
+           .attr("class", "y axis")
+           .call(yAxis);
 
-        gy.selectAll("g").
-            filter(function (d) { return d; })
-            .classed("minor", true);
-
-        gy.selectAll("text")
-            .attr("x", 4)
-            .attr("dy", -4);
+        gy.selectAll("g")
+           .filter(function (d) { return d; })
+           .classed("minor", true);
 
         if (options.yAxisLabel) {
             svg.append("text")
@@ -1966,7 +1965,9 @@ define('KoExtensions/Charts/histogramchart',['d3','./../charting', './../kotools
         var defaultOptions = {
             bins: 80,
             width: 500,
-            fillParentController:false
+            fillParentController:false,
+            histogramType: 'frequency',
+            rangeRounding: 2
         };
 
         var el = charting.getElementAndCheckData(element,data);
@@ -1977,7 +1978,7 @@ define('KoExtensions/Charts/histogramchart',['d3','./../charting', './../kotools
         var dims = charting.getDimensions(options,el);
 
         var histogramData = d3.layout.histogram()
-            .frequency(false)
+            .frequency(options.histogramType === 'frequency')
             .bins(options.bins)(data);
 
         var minX = koTools.isValidNumber(options.min) ? options.min : d3.min(histogramData, function (d) { return d.x; });
@@ -1987,17 +1988,12 @@ define('KoExtensions/Charts/histogramchart',['d3','./../charting', './../kotools
                 minX,
                 d3.max(histogramData, function(d) { return d.x; })
             ])
-            .range([0, dims.width]);
+            .range([0, dims.width-10]);
         var columnWidth = x(minX + histogramData[0].dx) - 1;
 
         var y = d3.scale.linear()
             .domain([0, d3.max(histogramData, function(d) { return d.y; })])
             .range([dims.height, 0]);
-
-        var yAxis = d3.svg.axis()
-            .scale(y)
-            .tickSize(dims.width)
-            .orient("right");
 
         var svg = charting.appendContainer(el, dims);
 
@@ -2009,22 +2005,35 @@ define('KoExtensions/Charts/histogramchart',['d3','./../charting', './../kotools
                 return "translate(" + x(d.x) + "," + y(d.y) + ")";
             });
 
+
+        var onBarOver = function (d) {
+            d3.select(this).style("opacity", 1);
+            var header = options.histogramType == "frequency" ? "count": "probability";
+            var info = {};
+            info[header] = d.y;
+            info["range"] = d.x.toFixed(options.rangeRounding) + " - " + (d.x+d.dx).toFixed(options.rangeRounding);
+            charting.showTooltip(info);
+        };
+
+        var onBarOut = function () {
+            charting.hideTooltip();
+            d3.select(this).style("opacity", 0.8);
+        };
+
         bar.append("rect")
             .attr("x", 1)
             .attr("width",columnWidth)
             .attr("height", function(d) {
                 return dims.height - y(d.y);
-            });
+            })
+            .attr("fill","#1f77b4")
+            .attr("opacity",0.8)
+            .style("cursor", "pointer")
+            .on("mouseover",onBarOver)
+            .on("mouseout",onBarOut);
 
         charting.createXAxis(svg,options,x,dims);
-
-        var gy = svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis);
-
-        gy.selectAll("g").
-           filter(function (d) { return d; })
-           .classed("minor", true);
+        charting.createYAxis(svg, options, y, dims);
 
         var line = d3.svg.line()
             .interpolate("linear")
@@ -2368,12 +2377,13 @@ define('KoExtensions/Charts/bubblechart',['d3','./../charting','./../kotools'], 
         charting.createYAxis(svg, options, yScale, dims);
 
         var bubblenodeMouseout = function () {
+            d3.select(this).style("opacity", 0.8);
             charting.hideTooltip();
         };
 
         var bubblenodeMouseover = function (d) {
+            d3.select(this).style("opacity", 1);
             var info = {};
-
             info[options.typeLabel] = options.bubbleColor(d);
             info[options.sizeLabel] = options.bubbleSize(d);
             info[options.verticalLabel] = options.bubbleVertical(d);
@@ -2395,6 +2405,7 @@ define('KoExtensions/Charts/bubblechart',['d3','./../charting','./../kotools'], 
             .attr("cx", function (d) { return xGetter(options.bubbleHorizontal(d)); })
             .attr("cy", function (d) { return yScale(options.bubbleVertical(d)); })
             .attr("r", function (d) { return radiusScale(options.bubbleSize(d)); })
+            .style("cursor", "pointer")
             .on("mouseover", bubblenodeMouseover)
             .on("click", bubblenodeMouseover)
             .on("mouseout", bubblenodeMouseout);

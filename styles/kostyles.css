@@ -4,19 +4,19 @@ div.header1{
     font-family: sans-serif;
     margin-bottom: 4px;
     margin-right: 4px;
-    margin-left: 4px;
-    color:#333;
+    margin-left: 10px;
+    color:#FFFFFF;
     font-weight:bold;
     clear:both;
     float:left;
 }
 
 div.header2{
-    color:#000;
+    color:#FFFFFF;
     font-size: 12px;
     font-family:  sans-serif;
-    margin-bottom: 4px;
-    margin-left: 4px;
+    margin-bottom: 6px;
+    margin-left: 10px;
 }
 
 .axis path {

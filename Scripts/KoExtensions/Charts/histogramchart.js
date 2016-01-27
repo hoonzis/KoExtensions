@@ -5,7 +5,8 @@ define(['d3','./../charting', './../kotools'], function (d3,charting, koTools) {
             bins: 80,
             width: 500,
             fillParentController:false,
-            histogramType: 'frequency'
+            histogramType: 'frequency',
+            rangeRounding: 2
         };
 
         var el = charting.getElementAndCheckData(element,data);
@@ -26,17 +27,12 @@ define(['d3','./../charting', './../kotools'], function (d3,charting, koTools) {
                 minX,
                 d3.max(histogramData, function(d) { return d.x; })
             ])
-            .range([0, dims.width]);
+            .range([0, dims.width-10]);
         var columnWidth = x(minX + histogramData[0].dx) - 1;
 
         var y = d3.scale.linear()
             .domain([0, d3.max(histogramData, function(d) { return d.y; })])
             .range([dims.height, 0]);
-
-        var yAxis = d3.svg.axis()
-            .scale(y)
-            .tickSize(dims.width)
-            .orient("right");
 
         var svg = charting.appendContainer(el, dims);
 
@@ -50,11 +46,17 @@ define(['d3','./../charting', './../kotools'], function (d3,charting, koTools) {
 
 
         var onBarOver = function (d) {
+            d3.select(this).style("opacity", 1);
             var header = options.histogramType == "frequency" ? "count": "probability";
             var info = {};
             info[header] = d.y;
-            info["range"] = d.x + " - " + (d.x+d.dx);
+            info["range"] = d.x.toFixed(options.rangeRounding) + " - " + (d.x+d.dx).toFixed(options.rangeRounding);
             charting.showTooltip(info);
+        };
+
+        var onBarOut = function () {
+            charting.hideTooltip();
+            d3.select(this).style("opacity", 0.8);
         };
 
         bar.append("rect")
@@ -63,17 +65,14 @@ define(['d3','./../charting', './../kotools'], function (d3,charting, koTools) {
             .attr("height", function(d) {
                 return dims.height - y(d.y);
             })
-            .on("mouseover",onBarOver);
+            .attr("fill","#1f77b4")
+            .attr("opacity",0.8)
+            .style("cursor", "pointer")
+            .on("mouseover",onBarOver)
+            .on("mouseout",onBarOut);
 
         charting.createXAxis(svg,options,x,dims);
-
-        var gy = svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis);
-
-        gy.selectAll("g").
-           filter(function (d) { return d; })
-           .classed("minor", true);
+        charting.createYAxis(svg, options, y, dims);
 
         var line = d3.svg.line()
             .interpolate("linear")

@@ -55,12 +55,13 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         charting.createYAxis(svg, options, yScale, dims);
 
         var bubblenodeMouseout = function () {
+            d3.select(this).style("opacity", 0.8);
             charting.hideTooltip();
         };
 
         var bubblenodeMouseover = function (d) {
+            d3.select(this).style("opacity", 1);
             var info = {};
-
             info[options.typeLabel] = options.bubbleColor(d);
             info[options.sizeLabel] = options.bubbleSize(d);
             info[options.verticalLabel] = options.bubbleVertical(d);
@@ -82,6 +83,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             .attr("cx", function (d) { return xGetter(options.bubbleHorizontal(d)); })
             .attr("cy", function (d) { return yScale(options.bubbleVertical(d)); })
             .attr("r", function (d) { return radiusScale(options.bubbleSize(d)); })
+            .style("cursor", "pointer")
             .on("mouseover", bubblenodeMouseover)
             .on("click", bubblenodeMouseover)
             .on("mouseout", bubblenodeMouseout);
