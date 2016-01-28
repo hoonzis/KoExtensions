@@ -1101,7 +1101,7 @@ define('KoExtensions/charting',['d3','./kotools'],function (d3,koTools) {
             options.height = el.height;
         }
         var dims = {};
-        dims.margin = { top: 5, right: 60, bottom: 30 , left: 10 };
+        dims.margin = { top: 20, right: 60, bottom: 30 , left: 50 };
         dims.width = options.width ? options.width : 200;
         dims.height = options.height ? options.height : 100;
         if(options.xAxisTextAngle){
@@ -1454,7 +1454,6 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
 
         var svg = charting.appendContainer(el, dims);
 
-        var xKeys = arranged.map(function (d) { return d.x; });
         x.domain(xKeys);
         if (options.style == "stack") {
             y.domain([
@@ -1586,15 +1585,13 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
             lineY.domain(y.domain());
         }
 
-
-        var yAxisRight = d3.svg.axis()
-            .scale(lineY)
-            .orient("right");
+        var yAxisLeft = d3.svg.axis()
+           .scale(lineY)
+           .orient("left");
 
         svg.append("g")
-            .call(yAxisRight)
-            .attr("transform", "translate(" + dims.width + " ,0)");
-
+           .attr("class", "y axis")
+           .call(yAxisLeft);
 
         svg.append("path")
             .attr("d", line(lineData))

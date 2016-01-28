@@ -101,7 +101,6 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
         var svg = charting.appendContainer(el, dims);
 
-        var xKeys = arranged.map(function (d) { return d.x; });
         x.domain(xKeys);
         if (options.style == "stack") {
             y.domain([
@@ -233,15 +232,13 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             lineY.domain(y.domain());
         }
 
-
-        var yAxisRight = d3.svg.axis()
-            .scale(lineY)
-            .orient("right");
+        var yAxisLeft = d3.svg.axis()
+           .scale(lineY)
+           .orient("left");
 
         svg.append("g")
-            .call(yAxisRight)
-            .attr("transform", "translate(" + dims.width + " ,0)");
-
+           .attr("class", "y axis")
+           .call(yAxisLeft);
 
         svg.append("path")
             .attr("d", line(lineData))

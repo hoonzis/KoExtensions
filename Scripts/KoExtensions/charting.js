@@ -143,7 +143,7 @@ define(['d3','./kotools'],function (d3,koTools) {
             options.height = el.height;
         }
         var dims = {};
-        dims.margin = { top: 5, right: 60, bottom: 30 , left: 10 };
+        dims.margin = { top: 20, right: 60, bottom: 30 , left: 50 };
         dims.width = options.width ? options.width : 200;
         dims.height = options.height ? options.height : 100;
         if(options.xAxisTextAngle){
