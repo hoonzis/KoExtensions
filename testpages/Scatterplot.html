@@ -2,7 +2,6 @@
     <head>
         <title>Scatterplot example</title>
         <script src="../Scripts/require.js"></script>
-        <link type="text/css" rel="stylesheet" href="../styles/kostyles.css" />
     </head>
     <body>
     <h2>Scatterplot</h2>
@@ -18,8 +17,8 @@
             require(['KoExtensions/koextensions','knockout-3.2.0.debug'], function(koext,kol) {
                 ko = kol;
                 koext.registerExtensions();
-                var hours = [30, 35, 40, 45, 50, 55, 60, 65, 70];
-                var result = [5, 6, 9, 12, 14, 18, 23, 27, 34, 40];
+                var hours = [30, 35, 40, 45, 50, 55, 60, 65, 70, 10, 12, 30];
+                var result = [5, 6, 9, 12, 14, 18, 23, 27, 34, 40, 10,40,14];
 
                 function TestViewModel() {
                     var self = this;

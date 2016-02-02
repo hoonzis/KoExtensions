@@ -6,8 +6,7 @@ define(['./charting', './kotools', './Charts/barchart', './Charts/piechart', './
             //let tools and charting be accesible globaly
             self.tools = kotools;
             self.charting = charting;
-
-            charting.initializeCharts();
+            
             var markers = [];
 
             self.registerExtensions = function () {

@@ -5,8 +5,9 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
     //the rest of the properties is stacked to the chart
     charting.barChart = function (data, element, options, lineData) {
         var el = charting.getElementAndCheckData(element, data);
-        if (!el)
+        if (!el){
             return;
+        }
 
         var defaultOptions = {
             legend: true,
@@ -23,7 +24,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         // not all the items do have the same set of properties, therefor scan them all and concatenate the result
         var keys = [];
         data.map(function (i) {
-            var itemKeys = d3.keys(i).filter(function (key) { return key != xcoord && keys.indexOf(key) < 0; });
+            var itemKeys = d3.keys(i).filter(function (key) { return key !== xcoord && keys.indexOf(key) < 0; });
             keys = keys.concat(itemKeys);
         });
 
@@ -55,14 +56,17 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
             var values = [];
             color.domain().forEach(function (m) {
-                if (!koTools.isNumber(d[m]) || d[m] === 0 || d[m] === null)
+                if (!koTools.isNumber(d[m]) || d[m] === 0 || d[m] === null){
                     return;
+                }
                 var xLabel = newD.x;
-                if (options.xUnitFormat)
+                if (options.xUnitFormat){
                     xLabel = options.xUnitFormat(newD.x);
+                }
                 var formattedValue = d[m];
-                if (options.unitTransform)
+                if (options.unitTransform){
                     formattedValue = options.unitTransform(d[m]);
+                }
 
                 var value = {
                     name:m,
@@ -73,10 +77,10 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                     formattedValue: formattedValue
                 };
 
-                if (d[m] > 0 && options.style == "stack") {
+                if (d[m] > 0 && options.style === "stack") {
                     value.y0 = y0Pos;
                     value.y1 = y0Pos += +d[m];
-                } else if (d[m] < 0 && options.style == "stack"){
+                } else if (d[m] < 0 && options.style === "stack"){
                     var y1 = y0Neg;
                     value.y0 = y0Neg += d[m];
                     value.y1 =  y1;
@@ -140,8 +144,6 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
         var onBarOver = function (d) {
             var column = arrangedByX[d.x];
-
-            d3.select(this).style("stroke", 'black');
             d3.select(this).style("opacity", 1);
             var info = {};
             info[options.xUnitName] = d.xLabel;
@@ -236,9 +238,10 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
            .scale(lineY)
            .orient("left");
 
-        svg.append("g")
-           .attr("class", "y axis")
+        var leftAxis = svg.append("g")
            .call(yAxisLeft);
+
+        charting.yAxisStyle(leftAxis);
 
         svg.append("path")
             .attr("d", line(lineData))

@@ -19,17 +19,21 @@ define(['d3'],function (d3) {
         };
 
         Array.prototype.setOrAdd = function (x, y, value) {
-            if (this[x] === null || this[x] === undefined)
+            if (this[x] === null || this[x] === undefined){
                 this[x] = [];
-            if (this[x][y] === null || isNaN(this[x][y]))
+            }
+            if (this[x][y] === null || isNaN(this[x][y])){
                 this[x][y] = value;
-            else
+            }
+            else{
                 this[x][y] += value;
+            }
         };
 
         Array.prototype.set = function (x, y, value) {
-            if (this[x] === null || this[x] === undefined)
+            if (!this[x]){
                 this[x] = [];
+            }
             this[x][y] = value;
         };
 
@@ -124,8 +128,22 @@ define(['d3'],function (d3) {
 
         self.getWidth = function(el)
         {
-            if (el.clientWidth !== null && el.clientWidth !== undefined)
+            if (el.clientWidth){
                 return el.clientWidth;
+            }
+
+            if (Array.isArray(el) && el.length > 0) {
+                return self.getWidth(el[0]);
+            }
+            return null;
+        };
+
+
+        self.getHeight = function(el)
+        {
+            if (el.clientHeight){
+                return el.clientWidth;
+            }
 
             if (Array.isArray(el) && el.length > 0) {
                 return self.getWidth(el[0]);

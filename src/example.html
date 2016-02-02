@@ -3,7 +3,6 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=UTF8">
         <title>Charting Test Page</title>
-        <link type="text/css" rel="stylesheet" href="../styles/kostyles.css" />
 		<script src="../Scripts/d3.js"></script>
 		<script src="../Scripts/knockout-3.2.0.js"></script>
 		<script src="../Scripts/jquery-2.1.1.js"></script>
@@ -167,7 +166,6 @@
 
 		$( document ).ready(function() {
 			var vm = new TestViewModels(carSales, lastWeek);
-			koExtensions.charting.initializeCharts();
 			ko.applyBindings(vm);
 		});
     </script>
