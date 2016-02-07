@@ -4,43 +4,40 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
     //x is the label and y the value which determines the size of the slice of the pie chart.
     charting.pieChart = function(data, element,options) {
         var el = charting.getElementAndCheckData(element, data);
-        if (el == null)
+        if (!el) {
             return;
+        }
 
         var defaultOptions = {
             legend: true,
             width: 200,
-            height: 150
+            height: 150,
+            left: 3,
+            right:3
         };
 
         options = koTools.setDefaultOptions(defaultOptions, options);
-
-        var color;
 
         //for a piechart only positive values make sense
         data = data.filter(function (i) {
             return i.y > 0;
         });
 
-        if (data.length == 0)
+        if (data.length === 0){
             return;
-
-        //TODO: why is the color scale passed as paramter
-        if (options.colors != null) {
-            color = options.colors;
-        } else {
-            color = d3.scale.category20();
-            var keys = data.map(function (item) {
-                return item.x;
-            });
-            color.domain(keys);
         }
 
+        var color = options.colors || d3.scale.category20();
         var xKeys = data.map(function (i) { return i.x; });
+
+        //the color scale can be passed from outside...
+        if(!options.colors){
+            color.domain(xKeys);
+        }
         var dims = charting.getDimensions(options, el, xKeys);
 
         var outerRadius = Math.min(dims.width, dims.height) / 2 - 3;
-        var innerRadius = outerRadius * .3;
+        var innerRadius = outerRadius * 0.3;
         var donut = d3.layout.pie();
         var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
         donut.value(function (d) { return d.y; });
@@ -65,13 +62,13 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             var value = d.formatted + " (" + koTools.toPercent(d.percentage) + ")";
             info[d.data.x] = value;
             charting.showTooltip(info);
-        }
+        };
 
         var arcMouseOut = function() {
             d3.select(this).style("stroke", 'none');
             d3.select(this).style("opacity", 0.7);
             charting.hideTooltip();
-        }
+        };
 
         arcs.append("path")
             .attr("d", arc)
@@ -86,5 +83,5 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                 d.percentage = d.data.y / sum;
                 d.formatted = options.unitTransform ? options.unitTransform(d.data.y) : d.data.y;
         });
-    }
+    };
 });
