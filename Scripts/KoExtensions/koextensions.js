@@ -6,18 +6,18 @@ define(['./charting', './kotools', './Charts/barchart', './Charts/piechart', './
             //let tools and charting be accesible globaly
             self.tools = kotools;
             self.charting = charting;
-            
-            var markers = [];
 
             self.registerExtensions = function () {
-                if(ko === null){
+                if (typeof(ko) === 'undefined') {
                     throw "If you want to use KoExtensions with Knockout, please reference Knockout before calling registerExtensions";
                 }
 
                 ko.bindingHandlers.mapbox = {
                     init: function (element) {
-                        var mapBox = L.mapbox.map(element, 'mapbox.streets');
-                        element._mapBox = mapBox;
+                        if (typeof(L) !== 'undefined') {
+                            var mapBox = L.mapbox.map(element, 'mapbox.streets');
+                            element._mapBox = mapBox;
+                        }
                     },
                     update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
                         if (element._mapBoxLayer) {
