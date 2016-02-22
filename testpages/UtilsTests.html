@@ -18,6 +18,8 @@
 	<input data-bind="value: distance"/>
 	<br/><b>Total consumption:</b>
     <span data-bind="formattedValue: totalConsumption, currency:'l'"></span>
+    <br/><b>Test date:</b>
+    <span data-bind="formattedValue: date"></span>
     <script type="text/javascript">
         var koextensions;
         require.config({
@@ -40,6 +42,8 @@
                 self.totalConsumption = ko.computed(function() {
                     return self.distance() * self.consumption100();
                 });
+
+                self.date = ko.observable(new Date());
             }
 
             var vm = new CarViewModel();

@@ -13,9 +13,10 @@ define(['./charting', './kotools', './Charts/barchart', './Charts/piechart', './
                 }
 
                 ko.bindingHandlers.mapbox = {
-                    init: function (element) {
+                    init: function (element,valueAccessor, allBindings) {
                         if (typeof(L) !== 'undefined') {
-                            var mapBox = L.mapbox.map(element, 'mapbox.streets');
+                            var options = allBindings().mapOptions;
+                            var mapBox = L.mapbox.map(element, 'mapbox.streets',options);
                             element._mapBox = mapBox;
                         }
                     },
@@ -68,9 +69,9 @@ define(['./charting', './kotools', './Charts/barchart', './Charts/piechart', './
                     update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
                         var bindings = allBindingsAccessor();
                         var points = bindings.gmap();
-                        var latlngbounds = new google.maps.LatLngBounds();
-
-                        for(var i=0;i<points.length;i++){
+                        var latlngbounds = new google.maps.LatLngBounds(),i = 0;
+                        var point;
+                        for(i = 0;i<points.length;i++) {
                             point = points[i];
                             var position = new google.maps.LatLng(point.lat(),point.lng());
                             latlngbounds.extend(position);
@@ -265,6 +266,8 @@ define(['./charting', './kotools', './Charts/barchart', './Charts/piechart', './
                         fValue.val = fValue.transf(fValue.val);
                     if (kotools.isNumber(fValue.val)) {
                         element.innerHTML = fValue.val.toCurrencyString(fValue.currency, fValue.rounding);
+                    } else if (kotools.isDate(fValue.val)) {
+                        element.innerHTML = fValue.val.toFormattedString();
                     } else {
                         element.innerHTML = fValue.val;
                     }
