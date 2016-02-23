@@ -1120,7 +1120,7 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
             options.height = d3.max([koTools.getHeight(el), options.height]);
         }
         var dims = {};
-        dims.margin = { top: 20, right: 60, bottom: 30 , left: 50 };
+        dims.margin = { top: 20, right: options.right || 60, bottom: 30 , left: options.left || 50 };
         dims.width = options.width || 200;
         dims.height = options.height || 100;
         if(options.xAxisTextAngle){
@@ -1674,43 +1674,40 @@ define('KoExtensions/Charts/piechart',['d3','./../charting','./../kotools'], fun
     //x is the label and y the value which determines the size of the slice of the pie chart.
     charting.pieChart = function(data, element,options) {
         var el = charting.getElementAndCheckData(element, data);
-        if (el == null)
+        if (!el) {
             return;
+        }
 
         var defaultOptions = {
             legend: true,
             width: 200,
-            height: 150
+            height: 150,
+            left: 3,
+            right:3
         };
 
         options = koTools.setDefaultOptions(defaultOptions, options);
-
-        var color;
 
         //for a piechart only positive values make sense
         data = data.filter(function (i) {
             return i.y > 0;
         });
 
-        if (data.length == 0)
+        if (data.length === 0){
             return;
-
-        //TODO: why is the color scale passed as paramter
-        if (options.colors != null) {
-            color = options.colors;
-        } else {
-            color = d3.scale.category20();
-            var keys = data.map(function (item) {
-                return item.x;
-            });
-            color.domain(keys);
         }
 
+        var color = options.colors || d3.scale.category20();
         var xKeys = data.map(function (i) { return i.x; });
+
+        //the color scale can be passed from outside...
+        if(!options.colors){
+            color.domain(xKeys);
+        }
         var dims = charting.getDimensions(options, el, xKeys);
 
         var outerRadius = Math.min(dims.width, dims.height) / 2 - 3;
-        var innerRadius = outerRadius * .3;
+        var innerRadius = outerRadius * 0.3;
         var donut = d3.layout.pie();
         var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
         donut.value(function (d) { return d.y; });
@@ -1735,13 +1732,13 @@ define('KoExtensions/Charts/piechart',['d3','./../charting','./../kotools'], fun
             var value = d.formatted + " (" + koTools.toPercent(d.percentage) + ")";
             info[d.data.x] = value;
             charting.showTooltip(info);
-        }
+        };
 
         var arcMouseOut = function() {
             d3.select(this).style("stroke", 'none');
             d3.select(this).style("opacity", 0.7);
             charting.hideTooltip();
-        }
+        };
 
         arcs.append("path")
             .attr("d", arc)
@@ -1756,7 +1753,7 @@ define('KoExtensions/Charts/piechart',['d3','./../charting','./../kotools'], fun
                 d.percentage = d.data.y / sum;
                 d.formatted = options.unitTransform ? options.unitTransform(d.data.y) : d.data.y;
         });
-    }
+    };
 });
 
 
@@ -2447,18 +2444,19 @@ define('KoExtensions/koextensions',['./charting', './kotools', './Charts/barchar
             //let tools and charting be accesible globaly
             self.tools = kotools;
             self.charting = charting;
-            
-            var markers = [];
 
             self.registerExtensions = function () {
-                if(ko === null){
+                if (typeof(ko) === 'undefined') {
                     throw "If you want to use KoExtensions with Knockout, please reference Knockout before calling registerExtensions";
                 }
 
                 ko.bindingHandlers.mapbox = {
-                    init: function (element) {
-                        var mapBox = L.mapbox.map(element, 'mapbox.streets');
-                        element._mapBox = mapBox;
+                    init: function (element,valueAccessor, allBindings) {
+                        if (typeof(L) !== 'undefined') {
+                            var options = allBindings().mapOptions;
+                            var mapBox = L.mapbox.map(element, 'mapbox.streets',options);
+                            element._mapBox = mapBox;
+                        }
                     },
                     update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
                         if (element._mapBoxLayer) {
@@ -2509,9 +2507,9 @@ define('KoExtensions/koextensions',['./charting', './kotools', './Charts/barchar
                     update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
                         var bindings = allBindingsAccessor();
                         var points = bindings.gmap();
-                        var latlngbounds = new google.maps.LatLngBounds();
-
-                        for(var i=0;i<points.length;i++){
+                        var latlngbounds = new google.maps.LatLngBounds(),i = 0;
+                        var point;
+                        for(i = 0;i<points.length;i++) {
                             point = points[i];
                             var position = new google.maps.LatLng(point.lat(),point.lng());
                             latlngbounds.extend(position);
@@ -2706,6 +2704,8 @@ define('KoExtensions/koextensions',['./charting', './kotools', './Charts/barchar
                         fValue.val = fValue.transf(fValue.val);
                     if (kotools.isNumber(fValue.val)) {
                         element.innerHTML = fValue.val.toCurrencyString(fValue.currency, fValue.rounding);
+                    } else if (kotools.isDate(fValue.val)) {
+                        element.innerHTML = fValue.val.toFormattedString();
                     } else {
                         element.innerHTML = fValue.val;
                     }
