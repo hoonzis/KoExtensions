@@ -27,7 +27,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             return;
         }
 
-        var color = options.colors || d3.scale.category20();
+        var color = options.colors || charting.colors;
         var xKeys = data.map(function (i) { return i.x; });
 
         //the color scale can be passed from outside...
@@ -37,9 +37,11 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         var dims = charting.getDimensions(options, el, xKeys);
 
         var outerRadius = Math.min(dims.width, dims.height) / 2 - 3;
-        var innerRadius = outerRadius * 0.3;
         var donut = d3.layout.pie();
-        var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
+        var arc = d3.svg.arc().outerRadius(outerRadius);
+        var labelRadius = outerRadius-30;
+        var labelArc = d3.svg.arc().outerRadius(labelRadius).innerRadius(labelRadius);
+
         donut.value(function (d) { return d.y; });
         var sum = d3.sum(data, function (item) { return item.y; });
 
@@ -56,7 +58,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
 
         var arcMouseOver = function(d) {
-            d3.select(this).style("stroke", 'black');
+            d3.select(this).style("stroke", 'white');
             d3.select(this).style("opacity", 1);
             var info = {};
             var value = d.formatted + " (" + koTools.toPercent(d.percentage) + ")";
@@ -65,8 +67,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         };
 
         var arcMouseOut = function() {
-            d3.select(this).style("stroke", 'none');
-            d3.select(this).style("opacity", 0.7);
+            d3.select(this).style("opacity", 0.9);
             charting.hideTooltip();
         };
 
@@ -74,14 +75,28 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             .attr("d", arc)
             .style("fill", function(d) { return color(d.data.x); })
             .style("stroke-width", 2)
-            .style("stroke", "none")
+            .style("stroke", "white")
             .on("mouseover", arcMouseOver)
             .on("mouseout", arcMouseOut)
             .style("cursor", "pointer")
-            .style("opacity",0.7)
+            .style("opacity",0.9)
             .each(function(d) {
                 d.percentage = d.data.y / sum;
                 d.formatted = options.unitTransform ? options.unitTransform(d.data.y) : d.data.y;
-        });
+            });
+
+        arcs.append("text")
+            .attr("transform", function(d) {
+                return "translate(" + labelArc.centroid(d) + ")";
+            })
+            .style("font-family", "sans-serif")
+            .style("font-size", 12)
+            .style("fill", "#FFFFFF")
+            .style("font-weight", "bold")
+            .style("text-anchor", "middle")
+            //.attr("dy", ".35em")
+            .text(function(d) {
+                return (d.percentage*100).toCurrencyString("%",1);
+            });
     };
 });

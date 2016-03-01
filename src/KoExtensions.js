@@ -978,6 +978,8 @@ define('KoExtensions/kotools',['d3'],function (d3) {
 define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
     var charting = {};
 
+    charting.colors = d3.scale.ordinal().range(["#1f77b4", "#2ca02c", "#d62728", "#393b79", "#3182bd", "#636363", "#ff8c00"]);
+
     charting.getElementAndCheckData = function (element, data) {
         var el = d3.select(element);
         if (data === null || data === undefined || data.length === 0) {
@@ -1431,8 +1433,7 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
         });
 
         //we need color for each possible variable
-        var color = d3.scale.category20();
-        color.domain(keys);
+        var color = charting.colors.domain(keys);
 
         var dims = charting.getDimensions(options, el,keys);
 
@@ -1486,10 +1487,10 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
                     var y1 = y0Neg;
                     value.y0 = y0Neg += d[m];
                     value.y1 =  y1;
-                } else if (d[m] > 0 && options.style != "stack"){
+                } else if (d[m] > 0 && options.style !== "stack"){
                     value.y0 = 0;
                     value.y1 = d[m];
-                } else if(d[m] < 0 && options.style != "stack"){
+                } else if(d[m] < 0 && options.style !== "stack"){
                     value.y0 = d[m];
                     value.y1 = 0;
                 }
@@ -1508,13 +1509,14 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
         var svg = charting.appendContainer(el, dims);
 
         x.domain(xKeys);
-        if (options.style == "stack") {
+        if (options.style === "stack") {
             y.domain([
                 d3.min(arranged, function (d) {
                   return d.totalNegative;
                 }), d3.max(arranged, function (d) {
-                    if (!d)
+                    if (!d){
                         return 0;
+                    }
                     return d.totalPositive;
                 })
             ]);
@@ -1524,8 +1526,9 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
                 d3.min(arranged, function (d) {
                     return d3.min(d.values,
                         function (i) {
-                            if (i.val < 0)
+                            if (i.val < 0){
                                 return i.val;
+                            }
                             return 0;
                         });
                 }),
@@ -1550,8 +1553,9 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
             var info = {};
             info[options.xUnitName] = d.xLabel;
             info[d.name] = d.formattedValue;
-            if (column.totalNegative === 0)
+            if (column.totalNegative === 0){
                 info[d.name] += " (" + koTools.toPercent(d.val / column.totalPositive) + ")";
+            }
             charting.showTooltip(info);
         };
 
@@ -1570,7 +1574,7 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
 
         var onBarOut = function () {
             d3.select(this).style("stroke", 'none');
-            d3.select(this).style("opacity", 0.8);
+            d3.select(this).style("opacity", 0.9);
             charting.hideTooltip();
         };
 
@@ -1584,7 +1588,7 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
             .data(function (d) { return d.values; })
             .enter().append("rect");
 
-        if (options.style == "stack") {
+        if (options.style === "stack") {
             rectangles.attr("width", x.rangeBand());
         } else {
             rectangles.attr("width", x1.rangeBand())
@@ -1602,15 +1606,16 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
         })
         .on("mouseover", onBarOver)
         .on("mouseout", onBarOut)
-        .style("opacity", 0.8)
+        .style("opacity", 0.9)
         .style("cursor", "pointer")
         .style("fill", function (d) {
             return color(d.name);
         });
 
         //Add the single line
-        if (!lineData || lineData.length === 0)
+        if (!lineData || lineData.length === 0){
             return;
+        }
 
         var lineY = d3.scale.linear()
             .range([dims.height, 0]);
@@ -1697,7 +1702,7 @@ define('KoExtensions/Charts/piechart',['d3','./../charting','./../kotools'], fun
             return;
         }
 
-        var color = options.colors || d3.scale.category20();
+        var color = options.colors || charting.colors;
         var xKeys = data.map(function (i) { return i.x; });
 
         //the color scale can be passed from outside...
@@ -1707,9 +1712,11 @@ define('KoExtensions/Charts/piechart',['d3','./../charting','./../kotools'], fun
         var dims = charting.getDimensions(options, el, xKeys);
 
         var outerRadius = Math.min(dims.width, dims.height) / 2 - 3;
-        var innerRadius = outerRadius * 0.3;
         var donut = d3.layout.pie();
-        var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
+        var arc = d3.svg.arc().outerRadius(outerRadius);
+        var labelRadius = outerRadius-30;
+        var labelArc = d3.svg.arc().outerRadius(labelRadius).innerRadius(labelRadius);
+
         donut.value(function (d) { return d.y; });
         var sum = d3.sum(data, function (item) { return item.y; });
 
@@ -1726,7 +1733,7 @@ define('KoExtensions/Charts/piechart',['d3','./../charting','./../kotools'], fun
             .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
 
         var arcMouseOver = function(d) {
-            d3.select(this).style("stroke", 'black');
+            d3.select(this).style("stroke", 'white');
             d3.select(this).style("opacity", 1);
             var info = {};
             var value = d.formatted + " (" + koTools.toPercent(d.percentage) + ")";
@@ -1735,8 +1742,7 @@ define('KoExtensions/Charts/piechart',['d3','./../charting','./../kotools'], fun
         };
 
         var arcMouseOut = function() {
-            d3.select(this).style("stroke", 'none');
-            d3.select(this).style("opacity", 0.7);
+            d3.select(this).style("opacity", 0.9);
             charting.hideTooltip();
         };
 
@@ -1744,15 +1750,29 @@ define('KoExtensions/Charts/piechart',['d3','./../charting','./../kotools'], fun
             .attr("d", arc)
             .style("fill", function(d) { return color(d.data.x); })
             .style("stroke-width", 2)
-            .style("stroke", "none")
+            .style("stroke", "white")
             .on("mouseover", arcMouseOver)
             .on("mouseout", arcMouseOut)
             .style("cursor", "pointer")
-            .style("opacity",0.7)
+            .style("opacity",0.9)
             .each(function(d) {
                 d.percentage = d.data.y / sum;
                 d.formatted = options.unitTransform ? options.unitTransform(d.data.y) : d.data.y;
-        });
+            });
+
+        arcs.append("text")
+            .attr("transform", function(d) {
+                return "translate(" + labelArc.centroid(d) + ")";
+            })
+            .style("font-family", "sans-serif")
+            .style("font-size", 12)
+            .style("fill", "#FFFFFF")
+            .style("font-weight", "bold")
+            .style("text-anchor", "middle")
+            //.attr("dy", ".35em")
+            .text(function(d) {
+                return (d.percentage*100).toCurrencyString("%",1);
+            });
     };
 });
 
@@ -2223,8 +2243,9 @@ define('KoExtensions/Charts/chordchart',['d3','./../charting', './../kotools'], 
     charting.chordChart = function(data, element, options) {
 
         var el = charting.getElementAndCheckData(element, data);
-        if (!el)
+        if (!el){
             return;
+        }
 
         var defaultOptions = {
             width: 800,
@@ -2239,13 +2260,13 @@ define('KoExtensions/Charts/chordchart',['d3','./../charting', './../kotools'], 
 
         //get the name of the item by id
         var descGetter = function (item) {
-            if(options.hideNames)
+            if(options.hideNames){
                 return item.index + 1;
-            else
-                return data.names[item.index];
+            }
+            return data.names[item.index];
         };
 
-        var color = d3.scale.category20();
+        var color = charting.colors;
 
         var arc = d3.svg.arc()
             .innerRadius(innerRadius)
@@ -2294,7 +2315,7 @@ define('KoExtensions/Charts/chordchart',['d3','./../charting', './../kotools'], 
             return function (g, i) {
                 svg.selectAll(".chord")
                     .filter(function (d) {
-                        return d.target.index != i && d.source.index != i;
+                        return d.target.index !== i && d.source.index !== i;
                     })
                     .transition()
                     .style("opacity", opacity);
@@ -2391,8 +2412,7 @@ define('KoExtensions/Charts/bubblechart',['d3','./../charting','./../kotools'], 
         var radiusScale = d3.scale.pow().exponent(0.4).domain([minBubbleSize, maxBubbleSize]).range([1, options.maxBubbleSize]).clamp(true);
 
         var colors = koTools.distinct(data, options.bubbleColor);
-        var colorScale = d3.scale.category20().domain(colors);
-
+        var colorScale = charting.colors.domain(colors);
 
         charting.showStandardLegend(el, colors, colorScale, options.legend, dims.height);
         var svg = charting.appendContainer(el, dims);

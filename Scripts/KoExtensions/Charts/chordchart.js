@@ -3,8 +3,9 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
     charting.chordChart = function(data, element, options) {
 
         var el = charting.getElementAndCheckData(element, data);
-        if (!el)
+        if (!el){
             return;
+        }
 
         var defaultOptions = {
             width: 800,
@@ -19,13 +20,13 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
 
         //get the name of the item by id
         var descGetter = function (item) {
-            if(options.hideNames)
+            if(options.hideNames){
                 return item.index + 1;
-            else
-                return data.names[item.index];
+            }
+            return data.names[item.index];
         };
 
-        var color = d3.scale.category20();
+        var color = charting.colors;
 
         var arc = d3.svg.arc()
             .innerRadius(innerRadius)
@@ -74,7 +75,7 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
             return function (g, i) {
                 svg.selectAll(".chord")
                     .filter(function (d) {
-                        return d.target.index != i && d.source.index != i;
+                        return d.target.index !== i && d.source.index !== i;
                     })
                     .transition()
                     .style("opacity", opacity);

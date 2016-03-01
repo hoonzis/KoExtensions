@@ -29,8 +29,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         });
 
         //we need color for each possible variable
-        var color = d3.scale.category20();
-        color.domain(keys);
+        var color = charting.colors.domain(keys);
 
         var dims = charting.getDimensions(options, el,keys);
 
@@ -84,10 +83,10 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                     var y1 = y0Neg;
                     value.y0 = y0Neg += d[m];
                     value.y1 =  y1;
-                } else if (d[m] > 0 && options.style != "stack"){
+                } else if (d[m] > 0 && options.style !== "stack"){
                     value.y0 = 0;
                     value.y1 = d[m];
-                } else if(d[m] < 0 && options.style != "stack"){
+                } else if(d[m] < 0 && options.style !== "stack"){
                     value.y0 = d[m];
                     value.y1 = 0;
                 }
@@ -106,13 +105,14 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         var svg = charting.appendContainer(el, dims);
 
         x.domain(xKeys);
-        if (options.style == "stack") {
+        if (options.style === "stack") {
             y.domain([
                 d3.min(arranged, function (d) {
                   return d.totalNegative;
                 }), d3.max(arranged, function (d) {
-                    if (!d)
+                    if (!d){
                         return 0;
+                    }
                     return d.totalPositive;
                 })
             ]);
@@ -122,8 +122,9 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                 d3.min(arranged, function (d) {
                     return d3.min(d.values,
                         function (i) {
-                            if (i.val < 0)
+                            if (i.val < 0){
                                 return i.val;
+                            }
                             return 0;
                         });
                 }),
@@ -148,8 +149,9 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             var info = {};
             info[options.xUnitName] = d.xLabel;
             info[d.name] = d.formattedValue;
-            if (column.totalNegative === 0)
+            if (column.totalNegative === 0){
                 info[d.name] += " (" + koTools.toPercent(d.val / column.totalPositive) + ")";
+            }
             charting.showTooltip(info);
         };
 
@@ -168,7 +170,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
         var onBarOut = function () {
             d3.select(this).style("stroke", 'none');
-            d3.select(this).style("opacity", 0.8);
+            d3.select(this).style("opacity", 0.9);
             charting.hideTooltip();
         };
 
@@ -182,7 +184,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             .data(function (d) { return d.values; })
             .enter().append("rect");
 
-        if (options.style == "stack") {
+        if (options.style === "stack") {
             rectangles.attr("width", x.rangeBand());
         } else {
             rectangles.attr("width", x1.rangeBand())
@@ -200,15 +202,16 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         })
         .on("mouseover", onBarOver)
         .on("mouseout", onBarOut)
-        .style("opacity", 0.8)
+        .style("opacity", 0.9)
         .style("cursor", "pointer")
         .style("fill", function (d) {
             return color(d.name);
         });
 
         //Add the single line
-        if (!lineData || lineData.length === 0)
+        if (!lineData || lineData.length === 0){
             return;
+        }
 
         var lineY = d3.scale.linear()
             .range([dims.height, 0]);

@@ -45,8 +45,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         var radiusScale = d3.scale.pow().exponent(0.4).domain([minBubbleSize, maxBubbleSize]).range([1, options.maxBubbleSize]).clamp(true);
 
         var colors = koTools.distinct(data, options.bubbleColor);
-        var colorScale = d3.scale.category20().domain(colors);
-
+        var colorScale = charting.colors.domain(colors);
 
         charting.showStandardLegend(el, colors, colorScale, options.legend, dims.height);
         var svg = charting.appendContainer(el, dims);
