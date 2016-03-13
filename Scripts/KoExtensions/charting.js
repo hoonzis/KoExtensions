@@ -2,7 +2,7 @@
 define(['d3','./kotools'], function (d3,koTools) {
     var charting = {};
 
-    charting.colors = d3.scale.ordinal().range(["#1f77b4", "#2ca02c", "#d62728", "#393b79", "#3182bd", "#636363", "#ff8c00"]);
+    charting.colors = d3.scale.ordinal().range(["#1f77b4", "#2ca02c", "#d62728", "#393b79", "#ff7f0e","#8c564b","#843c39"]);
 
     charting.getElementAndCheckData = function (element, data) {
         var el = d3.select(element);
