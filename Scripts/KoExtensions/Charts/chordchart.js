@@ -14,7 +14,7 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
         };
 
         options = koTools.setDefaultOptions(defaultOptions, options);
-        var dims = charting.getDimensions(options, el, null);
+        var dims = charting.getDimensions(options, el);
         var outerRadius = Math.min(dims.width, dims.height) / 2 - 100;
         var innerRadius = outerRadius - 24;
 

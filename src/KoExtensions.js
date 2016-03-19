@@ -992,14 +992,14 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
 
     charting.getLegendWidth = function (data) {
         //when there is no legend, just return 0 pixels
-        if (data === null || data.length === 0) {
+        if (!data || data.length === 0) {
             return 0;
         }
         var maxWidth = d3.max(data, function (el) {
             return el.length;
         });
         //asuming 7px per character
-        return maxWidth * 7;
+        return maxWidth * 10;
     };
 
     charting.showStandardLegend = function (parent, data, color, showLegend, height) {
@@ -1116,13 +1116,13 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
             .style("z-index", 100000);
     };
 
-    charting.getDimensions = function (options, el, legenKeys) {
+    charting.getDimensions = function (options, el) {
         if (options.fillParentController) {
             options.width = koTools.getWidth(el);
             options.height = d3.max([koTools.getHeight(el), options.height]);
         }
         var dims = {};
-        dims.margin = { top: 20, right: options.right || 60, bottom: 30 , left: options.left || 50 };
+        dims.margin = { top: 20, right: options.right || 50, bottom: 30 , left: options.left || 50 };
         dims.width = options.width || 200;
         dims.height = options.height || 100;
         if(options.xAxisTextAngle){
@@ -1130,9 +1130,6 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
         }
         dims.containerHeight = dims.height + dims.margin.top + dims.margin.bottom;
         dims.containerWidth = dims.width + dims.margin.left + dims.margin.right;
-        if (options.legend) {
-            dims.containerWidth += charting.getLegendWidth(legenKeys);
-        }
 
         if(options.horizontalSlider){
            var sliderSpace = 25;
@@ -1149,6 +1146,7 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
         .attr("height", dims.containerHeight)
       .append("g")
         .attr("transform", "translate(" + dims.margin.left + "," + dims.margin.top + ")");
+
         return svg;
     };
 
@@ -1194,8 +1192,8 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
 
     charting.yAxisStyle = function(el){
         el.select("path").style("display","none");
-        el.selectAll(".major").style("shape-rendering","crispEdges").style("stroke","#000");
-        el.selectAll(".minor").style("stroke","#777").style("stroke-dasharray","2.2");
+        el.selectAll("line").style("shape-rendering","crispEdges").style("stroke","#000");
+        el.selectAll("line").style("stroke","#777").style("stroke-dasharray","2.2");
     };
 
     charting.xAxisStyle = function(el){
@@ -1435,10 +1433,9 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
         //we need color for each possible variable
         var color = charting.colors.domain(keys);
 
-        var dims = charting.getDimensions(options, el,keys);
+        var dims = charting.getDimensions(options, el);
 
         var xKeys = data.map(function(d){return d[xcoord];});
-        var scaleDef = charting.determineXScale(xKeys,null,options);
 
         var x = d3.scale.ordinal()
             .rangeRoundBands([0, dims.width], 0.3);
@@ -1482,10 +1479,12 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
 
                 if (d[m] > 0 && options.style === "stack") {
                     value.y0 = y0Pos;
-                    value.y1 = y0Pos += +d[m];
+                    y0Pos += d[m];
+                    value.y1 = y0Pos;
                 } else if (d[m] < 0 && options.style === "stack"){
                     var y1 = y0Neg;
-                    value.y0 = y0Neg += d[m];
+                    y0Neg += d[m];
+                    value.y0 = y0Neg;
                     value.y1 =  y1;
                 } else if (d[m] > 0 && options.style !== "stack"){
                     value.y0 = 0;
@@ -1709,7 +1708,7 @@ define('KoExtensions/Charts/piechart',['d3','./../charting','./../kotools'], fun
         if(!options.colors){
             color.domain(xKeys);
         }
-        var dims = charting.getDimensions(options, el, xKeys);
+        var dims = charting.getDimensions(options, el);
 
         var outerRadius = Math.min(dims.width, dims.height) / 2 - 3;
         var donut = d3.layout.pie();
@@ -1784,8 +1783,9 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
     //[{linename:receivedEtf, values:[x:q1, y:200]}]
     charting.lineChart = function (data, element, options) {
         var el = charting.getElementAndCheckData(element, data);
-        if (!el)
+        if (!el) {
             return;
+        }
 
         var defaultOptions = {
             legend: true,
@@ -1807,13 +1807,13 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
         }
 
         data.forEach(function (singleLine) {
-            if (!singleLine.values)
+            if (!singleLine.values){
                 throw "Each line needs to have values property containing tuples of x and y values";
+            }
+
             //sort each line using the x coordinate
             singleLine.values.sort(function (a, b) {
-                if (a.x > b.x) return 1;
-                if (a.x < b.x) return -1;
-                return 0;
+                return d3.ascending(a.x,b.x);
             });
 
             singleLine.values.forEach(function(d){
@@ -1830,7 +1830,7 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
 
         //and helper function to get the color
         var getColor = function (l) {
-            return l.color ? l.color : color(l.linename);
+            return l.color || color(l.linename);
         };
 
         var dims = charting.getDimensions(options, el, linenames);
@@ -1882,7 +1882,7 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
                 return line(d.values);
             })
             .style("stroke-width", function(d) {
-                return d.width ? d.width : 2;
+                return d.width || 2;
             })
             .style("stroke", function(d) {
                 return getColor(d);
@@ -1898,7 +1898,7 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
             };
 
             var spMouseOver = function (d) {
-                var xLabel = d.xLabel ? d.xLabel : d.x;
+                var xLabel = d.xLabel || d.x;
                 var info = {};
                 info[options.horizontalLabel] = xLabel;
                 info[d.linename] = d.y;
@@ -1906,7 +1906,7 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
                 d3.select(this).style("fill", "black");
             };
 
-            var allPoints = data.length == 1 ? data[0].values : data.reduce(function(a,b){return a.values.concat(b.values);});
+            var allPoints = data.length === 1 ? data[0].values : data.reduce(function(a,b){return a.values.concat(b.values);});
 
             var points = svg.selectAll(".point")
                 .data(allPoints)
@@ -1930,8 +1930,9 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
 
                 var cursorLineMove = function () {
                     var now = new Date();
-                    if (now - lastMove < 100)
+                    if (now - lastMove < 100){
                         return;
+                    }
                     lastMove = now;
                     var coord = charting.mouseCoordinates(this,x,y);
                     vLine = charting.createOrMoveVerticalLine(vLine,svg,dims,coord.x);
@@ -2254,7 +2255,7 @@ define('KoExtensions/Charts/chordchart',['d3','./../charting', './../kotools'], 
         };
 
         options = koTools.setDefaultOptions(defaultOptions, options);
-        var dims = charting.getDimensions(options, el, null);
+        var dims = charting.getDimensions(options, el);
         var outerRadius = Math.min(dims.width, dims.height) / 2 - 100;
         var innerRadius = outerRadius - 24;
 
@@ -2369,8 +2370,9 @@ define('KoExtensions/Charts/chordchart',['d3','./../charting', './../kotools'], 
 define('KoExtensions/Charts/bubblechart',['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
     charting.bubbleChart = function (data, element, options) {
         var el = charting.getElementAndCheckData(element, data);
-        if (!el)
+        if (!el) {
             return;
+        }
 
         var defaultOptions = {
             legend: true,
@@ -2392,10 +2394,7 @@ define('KoExtensions/Charts/bubblechart',['d3','./../charting','./../kotools'], 
 
         options = koTools.setDefaultOptions(defaultOptions, options);
 
-        // get all the names for the legend (that will be represented by the color of each bull)
-        var keys = data.map(options.bubbleColor);
-
-        var dims = charting.getDimensions(options, el, keys);
+        var dims = charting.getDimensions(options, el);
         var horizontalValues = data.map(options.bubbleHorizontal);
         var verticalValues = data.map(options.bubbleVertical);
 

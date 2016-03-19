@@ -2,8 +2,9 @@
 define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
     charting.bubbleChart = function (data, element, options) {
         var el = charting.getElementAndCheckData(element, data);
-        if (!el)
+        if (!el) {
             return;
+        }
 
         var defaultOptions = {
             legend: true,
@@ -25,10 +26,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
         options = koTools.setDefaultOptions(defaultOptions, options);
 
-        // get all the names for the legend (that will be represented by the color of each bull)
-        var keys = data.map(options.bubbleColor);
-
-        var dims = charting.getDimensions(options, el, keys);
+        var dims = charting.getDimensions(options, el);
         var horizontalValues = data.map(options.bubbleHorizontal);
         var verticalValues = data.map(options.bubbleVertical);
 

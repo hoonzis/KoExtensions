@@ -6,8 +6,9 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
     //[{linename:receivedEtf, values:[x:q1, y:200]}]
     charting.lineChart = function (data, element, options) {
         var el = charting.getElementAndCheckData(element, data);
-        if (!el)
+        if (!el) {
             return;
+        }
 
         var defaultOptions = {
             legend: true,
@@ -29,13 +30,13 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         }
 
         data.forEach(function (singleLine) {
-            if (!singleLine.values)
+            if (!singleLine.values){
                 throw "Each line needs to have values property containing tuples of x and y values";
+            }
+
             //sort each line using the x coordinate
             singleLine.values.sort(function (a, b) {
-                if (a.x > b.x) return 1;
-                if (a.x < b.x) return -1;
-                return 0;
+                return d3.ascending(a.x,b.x);
             });
 
             singleLine.values.forEach(function(d){
@@ -52,7 +53,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
         //and helper function to get the color
         var getColor = function (l) {
-            return l.color ? l.color : color(l.linename);
+            return l.color || color(l.linename);
         };
 
         var dims = charting.getDimensions(options, el, linenames);
@@ -104,7 +105,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                 return line(d.values);
             })
             .style("stroke-width", function(d) {
-                return d.width ? d.width : 2;
+                return d.width || 2;
             })
             .style("stroke", function(d) {
                 return getColor(d);
@@ -120,7 +121,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             };
 
             var spMouseOver = function (d) {
-                var xLabel = d.xLabel ? d.xLabel : d.x;
+                var xLabel = d.xLabel || d.x;
                 var info = {};
                 info[options.horizontalLabel] = xLabel;
                 info[d.linename] = d.y;
@@ -128,7 +129,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                 d3.select(this).style("fill", "black");
             };
 
-            var allPoints = data.length == 1 ? data[0].values : data.reduce(function(a,b){return a.values.concat(b.values);});
+            var allPoints = data.length === 1 ? data[0].values : data.reduce(function(a,b){return a.values.concat(b.values);});
 
             var points = svg.selectAll(".point")
                 .data(allPoints)
@@ -152,8 +153,9 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
                 var cursorLineMove = function () {
                     var now = new Date();
-                    if (now - lastMove < 100)
+                    if (now - lastMove < 100){
                         return;
+                    }
                     lastMove = now;
                     var coord = charting.mouseCoordinates(this,x,y);
                     vLine = charting.createOrMoveVerticalLine(vLine,svg,dims,coord.x);

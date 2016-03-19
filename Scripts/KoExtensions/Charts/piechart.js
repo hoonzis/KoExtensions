@@ -34,7 +34,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         if(!options.colors){
             color.domain(xKeys);
         }
-        var dims = charting.getDimensions(options, el, xKeys);
+        var dims = charting.getDimensions(options, el);
 
         var outerRadius = Math.min(dims.width, dims.height) / 2 - 3;
         var donut = d3.layout.pie();

@@ -16,14 +16,14 @@ define(['d3','./kotools'], function (d3,koTools) {
 
     charting.getLegendWidth = function (data) {
         //when there is no legend, just return 0 pixels
-        if (data === null || data.length === 0) {
+        if (!data || data.length === 0) {
             return 0;
         }
         var maxWidth = d3.max(data, function (el) {
             return el.length;
         });
         //asuming 7px per character
-        return maxWidth * 7;
+        return maxWidth * 10;
     };
 
     charting.showStandardLegend = function (parent, data, color, showLegend, height) {
@@ -140,13 +140,13 @@ define(['d3','./kotools'], function (d3,koTools) {
             .style("z-index", 100000);
     };
 
-    charting.getDimensions = function (options, el, legenKeys) {
+    charting.getDimensions = function (options, el) {
         if (options.fillParentController) {
             options.width = koTools.getWidth(el);
             options.height = d3.max([koTools.getHeight(el), options.height]);
         }
         var dims = {};
-        dims.margin = { top: 20, right: options.right || 60, bottom: 30 , left: options.left || 50 };
+        dims.margin = { top: 20, right: options.right || 50, bottom: 30 , left: options.left || 50 };
         dims.width = options.width || 200;
         dims.height = options.height || 100;
         if(options.xAxisTextAngle){
@@ -154,9 +154,6 @@ define(['d3','./kotools'], function (d3,koTools) {
         }
         dims.containerHeight = dims.height + dims.margin.top + dims.margin.bottom;
         dims.containerWidth = dims.width + dims.margin.left + dims.margin.right;
-        if (options.legend) {
-            dims.containerWidth += charting.getLegendWidth(legenKeys);
-        }
 
         if(options.horizontalSlider){
            var sliderSpace = 25;
@@ -173,6 +170,7 @@ define(['d3','./kotools'], function (d3,koTools) {
         .attr("height", dims.containerHeight)
       .append("g")
         .attr("transform", "translate(" + dims.margin.left + "," + dims.margin.top + ")");
+
         return svg;
     };
 
@@ -218,8 +216,8 @@ define(['d3','./kotools'], function (d3,koTools) {
 
     charting.yAxisStyle = function(el){
         el.select("path").style("display","none");
-        el.selectAll(".major").style("shape-rendering","crispEdges").style("stroke","#000");
-        el.selectAll(".minor").style("stroke","#777").style("stroke-dasharray","2.2");
+        el.selectAll("line").style("shape-rendering","crispEdges").style("stroke","#000");
+        el.selectAll("line").style("stroke","#777").style("stroke-dasharray","2.2");
     };
 
     charting.xAxisStyle = function(el){

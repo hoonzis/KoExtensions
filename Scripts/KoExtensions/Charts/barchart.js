@@ -31,10 +31,9 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         //we need color for each possible variable
         var color = charting.colors.domain(keys);
 
-        var dims = charting.getDimensions(options, el,keys);
+        var dims = charting.getDimensions(options, el);
 
         var xKeys = data.map(function(d){return d[xcoord];});
-        var scaleDef = charting.determineXScale(xKeys,null,options);
 
         var x = d3.scale.ordinal()
             .rangeRoundBands([0, dims.width], 0.3);
@@ -78,10 +77,12 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
                 if (d[m] > 0 && options.style === "stack") {
                     value.y0 = y0Pos;
-                    value.y1 = y0Pos += +d[m];
+                    y0Pos += d[m];
+                    value.y1 = y0Pos;
                 } else if (d[m] < 0 && options.style === "stack"){
                     var y1 = y0Neg;
-                    value.y0 = y0Neg += d[m];
+                    y0Neg += d[m];
+                    value.y0 = y0Neg;
                     value.y1 =  y1;
                 } else if (d[m] > 0 && options.style !== "stack"){
                     value.y0 = 0;
