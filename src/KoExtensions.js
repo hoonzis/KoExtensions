@@ -978,7 +978,7 @@ define('KoExtensions/kotools',['d3'],function (d3) {
 define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
     var charting = {};
 
-    charting.colors = d3.scale.ordinal().range(["#1f77b4", "#2ca02c", "#d62728", "#393b79", "#ff7f0e","#8c564b","#843c39"]);
+    charting.colors = d3.scale.ordinal().range(["#1f77b4", "#2ca02c", "#d62728", "#393b79", "#ff7f0e", "#8c564b", "#843c39"]);
 
     charting.getElementAndCheckData = function (element, data) {
         var el = d3.select(element);
@@ -1007,19 +1007,17 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
             var maxWidth = charting.getLegendWidth(data);
 
             //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
-            var legendWidth = 25 + maxWidth;
-
-    		var size = legendWidth > 70 ? 15 : 18,
-                fontSize = legendWidth > 70 ? "13px" : "16px";
-
-            var legend = parent
-                .append("svg")
-                .attr("width", legendWidth)
-                .attr("height", height)
-                .selectAll("g")
-                .data(data)
-                .enter().append("g")
-                .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+            var legendWidth = 25 + maxWidth,
+                size = legendWidth > 70 ? 15 : 18,
+                fontSize = legendWidth > 70 ? "13px" : "16px",
+                legend = parent
+                    .append("svg")
+                    .attr("width", legendWidth)
+                    .attr("height", height)
+                    .selectAll("g")
+                    .data(data)
+                    .enter().append("g")
+                    .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
 
             legend.append("rect")
                   .attr("width", size)
@@ -1028,7 +1026,7 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
             legend.append("text")
                   .attr("x", 24)
                   .attr("y", 9)
-  		            .attr("font-size", fontSize)
+                  .attr("font-size", fontSize)
                   .attr("dy", ".35em")
                   .text(function (t) { return t; });
         }
@@ -1040,8 +1038,6 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
              .style("font-size", "12px")
              .style("font-family", "sans-serif")
              .style("margin-bottom", "4px")
-             .style("margin-right", "4px")
-             .style("margin-left", "10px")
              .style("color", "#FFFFFF")
              .style("font-weight", "bold")
              .style("clear", "both")
@@ -1053,9 +1049,12 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
             .style("text-align", "left")
             .style("font-size", "12px")
             .style("font-family", "sans-serif")
-            .style("margin-bottom", "6px")
-            .style("margin-left", "15px")
-            .style("color", "#FFFFFF");
+            // botom marging is 4 so that the padding of the tooltip on bottom is 6, gives 10 as the padding
+            // on top of the tooltip
+            .style("margin-bottom", "4px")
+            .style("margin-left", "6px")
+            .style("color", "#FFFFFF")
+            .style("float", "left");
     };
 
     charting.showTooltip = function (info) {
@@ -1086,7 +1085,7 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
 
           tooltip.transition()
               .duration(200)
-              .style("opacity", ".9");
+              .style("opacity", ".83");
 
           tooltip.style("left", (d3.event.pageX + 15) + "px")
               .style("top", (d3.event.pageY - 75) + "px");
@@ -1105,14 +1104,14 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
 
         tooltip
             .attr("id", "toolTipBorder")
-            .style("width", "150px")
             .style("position", "absolute")
             .style("opacity", 0)
             .style("background-color", "#111111")
             .style("border-radius", "6px")
+            .style("padding", "10px")
+            .style("padding-bottom", "6px")
             .append("div")
             .attr("id", "toolTip")
-            .style("margin", "10px")
             .style("z-index", 100000);
     };
 
@@ -1125,16 +1124,23 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
         dims.margin = { top: 20, right: options.right || 50, bottom: 30 , left: options.left || 50 };
         dims.width = options.width || 200;
         dims.height = options.height || 100;
-        if(options.xAxisTextAngle){
+        if (options.xAxisTextAngle) {
             dims.margin.bottom = options.xAxisTextAngle*40/90 + dims.margin.bottom;
         }
         dims.containerHeight = dims.height + dims.margin.top + dims.margin.bottom;
         dims.containerWidth = dims.width + dims.margin.left + dims.margin.right;
 
-        if(options.horizontalSlider){
-           var sliderSpace = 25;
+        if (options.horizontalSlider) {
+            var sliderSpace = 30;
+            var afterSlider = 60;
+
+            if (options.xAxisTextAngle) {
+                sliderSpace = 60;
+                afterSlider = 80;
+            }
+
             dims.sliderHeight = 20;
-            dims.containerHeight = dims.height + dims.sliderHeight + sliderSpace + 25;
+            dims.containerHeight = dims.height + dims.sliderHeight + sliderSpace + afterSlider;
             dims.sliderOffset = dims.height + sliderSpace;
         }
         return dims;
@@ -1164,21 +1170,14 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
         }
 
         var axis = svg.append("g")
+            .attr("class", "x axis")
             .attr("transform", "translate(0," + dims.height + ")")
             .call(xAxis);
 
         charting.xAxisStyle(axis);
+        charting.rotateAxisText(axis, options);
 
-        if (options.xAxisTextAngle) {
-            axis.selectAll("text")
-                .attr("y", 0)
-                .attr("x", 9)
-                .attr("dy", ".35em")
-                .attr("transform", "rotate(" + options.xAxisTextAngle + ")")
-                .style("text-anchor", "start");
-        }
-
-        if (options.xAxisLabel) {
+        if (options.xAxisLabel){
             svg.append("text")
                 .style("font-size", "15px")
                 .attr("class", "x label")
@@ -1190,7 +1189,19 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
         return xAxis;
     };
 
-    charting.yAxisStyle = function(el){
+    charting.rotateAxisText = function (axis, options) {
+        if (options.xAxisTextAngle) {
+            axis.selectAll("text")
+                .attr("y", 0)
+                .attr("x", 9)
+                .attr("dy", ".35em")
+                .attr("transform", "rotate(" + options.xAxisTextAngle + ")")
+                .style("text-anchor", "start");
+        }
+    };
+
+    charting.yAxisStyle = function(el)
+    {
         el.select("path").style("display","none");
         el.selectAll("line").style("shape-rendering","crispEdges").style("stroke","#000");
         el.selectAll("line").style("stroke","#777").style("stroke-dasharray","2.2");
@@ -1203,11 +1214,7 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
         return el;
     };
 
-    charting.createYAxis = function (svg, options, yScale, dims) {
-        var yAxis = d3.svg.axis().scale(yScale).tickSize(dims.width).orient("right");
-
-        var axis = svg.append("g").call(yAxis);
-
+    charting.apllyYClasses = function (axis) {
         axis.selectAll("g").filter(function(d) {
             return d;
         }).classed("minor", true);
@@ -1215,6 +1222,14 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
         axis.selectAll("g").filter(function(d) {
             return d === 0 || d === yScale.domain()[0];
         }).classed("major", true);
+    };
+
+    charting.createYAxis = function (svg, options, yScale, dims) {
+        var yAxis = d3.svg.axis().scale(yScale).tickSize(dims.width).orient("right");
+
+        var axis = svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
 
         charting.yAxisStyle(axis);
 
@@ -1281,7 +1296,13 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
     charting.getYScaleDefForMultiline = function (data,options,filteredDomain){
         var def = null;
         data.forEach(function(i) {
-            def = charting.determineYScale(i.values.map(function(v) {
+            var filteredData = i.values;
+            if(filteredDomain){
+                var filteredData = i.values.filter(function(d){
+                    return d.x >= filteredDomain[0] && d.x <= filteredDomain[1];
+                });
+            }
+            def = charting.determineYScale(filteredData.map(function(v) {
                 return v.y;
             }), def,options);
         });
@@ -1776,7 +1797,7 @@ define('KoExtensions/Charts/piechart',['d3','./../charting','./../kotools'], fun
 });
 
 
-define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
+define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], function (d3, charting, koTools) {
 
     //Takes as input collection of items [data]. Each item has two values [x] and [y].
     //[{x:1, receivedEtf:123, tradedEtf:100},{x:2, receivedEtf:200, tradedEtf:100}]
@@ -1807,22 +1828,25 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
         }
 
         data.forEach(function (singleLine) {
-            if (!singleLine.values){
+            if (!singleLine.values) {
                 throw "Each line needs to have values property containing tuples of x and y values";
             }
 
             //sort each line using the x coordinate
             singleLine.values.sort(function (a, b) {
-                return d3.ascending(a.x,b.x);
+                return d3.ascending(a.x, b.x);
             });
 
-            singleLine.values.forEach(function(d){
-              d.linename = singleLine.linename;
+            singleLine.values.forEach(function (d) {
+                d.linename = singleLine.linename;
             });
         });
 
-        //define all the linenames to compute thed legen width approximation
+        // define all the linenames to compute thed legen width approximation
         var linenames = data.map(function (item) { return item.linename; });
+
+        // points collection will be initilized only if the users wants to see the line points
+        var points = null;
 
         //we need also one color per linename
         var color = d3.scale.category20();
@@ -1836,22 +1860,22 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
         var dims = charting.getDimensions(options, el, linenames);
 
         var y = d3.scale.linear()
-          .range([dims.height, 0]);
+            .range([dims.height, 0]);
 
-        var scaleDef = charting.getXScaleForMultiLines(data,options);
+        var scaleDef = charting.getXScaleForMultiLines(data, options);
         var x = charting.getXScaleFromConfig(scaleDef, dims);
-        var getX = function(d) {
+        var getX = function (d) {
             return charting.xGetter(scaleDef, x)(d.x);
         };
 
-        var yScaleDef = charting.getYScaleDefForMultiline(data,options);
+        var yScaleDef = charting.getYScaleDefForMultiline(data, options);
 
         y.domain([yScaleDef.min, yScaleDef.max]);
 
         var line = d3.svg.line()
-          .interpolate("linear")
-          .x(getX)
-          .y(function (d) { return y(d.y); });
+            .interpolate("linear")
+            .x(getX)
+            .y(function (d) { return y(d.y); });
 
         var svg = charting.appendContainer(el, dims);
 
@@ -1867,9 +1891,10 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
         var yAxis = charting.createYAxis(svg, options, y, dims);
 
         //howering over a line will just show a tooltip with line name
-        var lineMouseOver = function(d) {
+        var lineMouseOver = function (d) {
             var info = {};
-            info.line = d.linename;
+            // TODO: would be good to have the y value here
+            info[d.linename] = "";
             charting.showTooltip(info);
         };
 
@@ -1878,18 +1903,19 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
             .enter()
             .append("path")
             .attr("class", "line")
-            .attr("d", function(d) {
+            .attr("d", function (d) {
                 return line(d.values);
             })
-            .style("stroke-width", function(d) {
+            .style("stroke-width", function (d) {
                 return d.width || 2;
             })
-            .style("stroke", function(d) {
+            .style("stroke", function (d) {
                 return getColor(d);
             })
             .style("fill", "none")
             .on("mouseover", lineMouseOver)
-            .on("mouseout", charting.hideTooltip);
+            .on("mouseout", charting.hideTooltip)
+            .attr("clip-path", "url(#clip)");
 
         if (options.showDataPoints) {
             var spMouseOut = function () {
@@ -1906,123 +1932,110 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
                 d3.select(this).style("fill", "black");
             };
 
-            var allPoints = data.length === 1 ? data[0].values : data.reduce(function(a,b){return a.values.concat(b.values);});
+            var allPoints = data.length === 1 ? data[0].values : data.reduce(function (a, b) {return a.values.concat(b.values); });
 
-            var points = svg.selectAll(".point")
+            points = svg.selectAll(".point")
                 .data(allPoints)
                 .enter()
                 .append("circle")
                 .attr("cx", getX)
                 .attr("cy", function (d) { return y(d.y); })
-                .attr("r", function () { return 4; })
+                .attr("r", function () { return 3; })
                 .style("fill", "white")
-                .style("stroke-width", "2")
-                .style("stroke", function (d) { return "black"; })
+                .style("stroke-width", "1")
+                .style("stroke", function () { return "black"; })
                 .style("cursor", "pointer")
                 .on("mouseover", spMouseOver)
                 .on("click", spMouseOver)
-                .on("mouseout", spMouseOut);
-            }
+                .on("mouseout", spMouseOut)
+                .attr("clip-path", "url(#clip)");
+        }
 
-            if (options.verticalCursorLine) {
-                var vLine = null;
-                var lastMove = new Date();
+        if (options.horizontalSlider) {
+            var context = svg.append("g")
+                .attr("transform", "translate(" + "0" + "," + dims.sliderOffset + ")")
+                .attr("class", "context");
 
-                var cursorLineMove = function () {
-                    var now = new Date();
-                    if (now - lastMove < 100){
-                        return;
-                    }
-                    lastMove = now;
-                    var coord = charting.mouseCoordinates(this,x,y);
-                    vLine = charting.createOrMoveVerticalLine(vLine,svg,dims,coord.x);
-                    var info = {
-                      x:coord.rX,
-                      y:coord.rY
-                    };
-                    charting.showTooltip(info);
-                };
-                charting.createMouseMoveListener(svg,dims,cursorLineMove);
-            }
+            var slidderScale = charting.getXScaleFromConfig(scaleDef, dims);
 
-            if(options.horizontalSlider){
-                var context = svg.append("g")
-                  .attr("transform", "translate(" + 0 + "," + dims.sliderOffset + ")")
-                  .attr("class", "context");
+            var allTicks = x.ticks();
+            var startMin = allTicks[2];
+            var startMax = allTicks[7];
 
-                var slidderScale = charting.getXScaleFromConfig(scaleDef,dims);
+            var brush = d3.svg.brush()
+                .x(slidderScale)
+                .extent([startMin, startMax]);
 
-                var allTicks = x.ticks();
-                var startMin = allTicks[2];
-                var startMax = allTicks[7];
+            var brushed = function () {
+                var filteredDomain = brush.empty() ? slidderScale.domain() : brush.extent();
+                x.domain(filteredDomain);
 
-                var brush = d3.svg.brush()//for slider bar at the bottom
-                   .x(slidderScale)
-                   .extent([startMin,startMax])
-                   .on("brush", brushed);
+                var axis = svg.select(".x.axis");
+                axis.transition().call(xAxis);
+                charting.rotateAxisText(axis, options);
+                charting.xAxisStyle(axis);
 
-                var sliderAxis = d3.svg.axis() // xAxis for brush slider
-                   .scale(slidderScale)
-                   .orient("bottom");
+                var yScaleDef = charting.getYScaleDefForMultiline(data, options, filteredDomain);
+                y.domain([yScaleDef.min, yScaleDef.max]);
+
+                axis = svg.select(".y.axis");
+                axis.transition().call(yAxis);
+                charting.yAxisStyle(axis);
+
+                lines.transition()
+                    .attr("d", function (d) {
+                        return line(d.values);
+                    });
+
+                if (points) {
+                    points.transition()
+                        .attr("cx", getX)
+                        .attr("cy", function (d) { return y(d.y); });
+                }
+            };
+
+            brush.on("brush", brushed);
+
+            var sliderAxis = d3.svg.axis()
+                .scale(slidderScale)
+                .tickFormat(options.xUnitFormat)
+                .orient("bottom");
+
+            var sliderAxisElement = context.append("g")
+                .attr("class", "x sliderAxis")
+                .attr("transform", "translate(0," + dims.sliderHeight + ")")
+                .call(sliderAxis);
+            charting.xAxisStyle(sliderAxisElement);
+            charting.rotateAxisText(sliderAxisElement, options);
+
+            svg.append("defs")
+                .append("clipPath")
+                .attr("id", "clip")
+                .append("rect")
+                .attr("width", dims.width)
+                .attr("height", dims.height);
+
+            var contextArea = d3.svg.area()
+                .interpolate("monotone")
+                .x(function (d) { return slidderScale(d.x); })
+                .y0(dims.sliderHeight)
+                .y1(0);
+
+            context.append("path")
+                .attr("class", "area")
+                .attr("d", contextArea(data[0].values))
+                .attr("fill", "#F1F1F2");
+
+            context.append("g")
+                .attr("class", "x brush")
+                .call(brush)
+                .selectAll("rect")
+                .attr("height", dims.sliderHeight)
+                .attr("fill", "#1f77b4")
+                .attr("rx", "5");
 
 
-                context.append("g") // Create brushing xAxis
-                   .attr("class", "x axis")
-                   .attr("transform", "translate(0," + dims.sliderHeight + ")")
-                   .call(sliderAxis);
-
-                var contextArea = d3.svg.area() // Set attributes for area chart in brushing context graph
-                 .interpolate("monotone")
-                 .x(function(d) { return slidderScale(d.x); }) // x is scaled to xScale2
-                 .y0(dims.sliderHeight) // Bottom line begins at height2 (area chart not inverted)
-                 .y1(0); // Top line of area, 0 (area chart not inverted)
-
-               //plot the rect as the bar at the bottom
-               context.append("path") // Path is created using svg.area details
-                 .attr("class", "area")
-                 .attr("d", contextArea(data[0].values)) // pass first categories data .values to area path generator
-                 .attr("fill", "#F1F1F2");
-
-               //append the brush for the selection of subsection
-               context.append("g")
-                 .attr("class", "x brush")
-                 .call(brush)
-                 .selectAll("rect")
-                 .attr("height", dims.sliderHeight) // Make brush rects same height
-                 .attr("fill", "#1f77b4")
-                 .attr("rx", "5");
-
-
-                   //for brusher of the slider bar at the bottom
-                  function brushed() {
-
-                    var filteredDomain = brush.empty() ? x.domain() : brush.extent();
-                    x.domain(filteredDomain); // If brush is empty then reset the Xscale domain to default, if not then make it the brush extent
-
-                    svg.select(".x.axis") // replot xAxis with transition when brush used
-                          .transition()
-                          .call(xAxis);
-
-                    var yScaleDef = charting.getYScaleDefForMultiline(data,options,filteredDomain);
-                    y.domain([yScaleDef.min,yScaleDef.max]); // Redefine yAxis domain based on highest y value of categories data with "visible"; true
-
-                    svg.select(".y.axis") // Redraw yAxis
-                      .transition()
-                      .call(yAxis);
-
-                    lines.transition()
-                      .attr("d", function(d){
-                          return line(d.values);
-                      });
-
-                      if(points){
-                        points.transition()
-                          .attr("cx", getX)
-                          .attr("cy", function (d) { return y(d.y); });
-                      }
-                  }
-            }
-
+        }
     };
 });
 

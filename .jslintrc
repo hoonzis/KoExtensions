@@ -30,6 +30,6 @@
     "sub": false,
     "todo": false,
     "unparam": true,
-    "vars": true,
+    "vars": false,
     "white": true
 }

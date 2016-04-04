@@ -62,8 +62,6 @@ define(['d3','./kotools'], function (d3,koTools) {
              .style("font-size", "12px")
              .style("font-family", "sans-serif")
              .style("margin-bottom", "4px")
-             .style("margin-right", "4px")
-             .style("margin-left", "10px")
              .style("color", "#FFFFFF")
              .style("font-weight", "bold")
              .style("clear", "both")
@@ -75,9 +73,12 @@ define(['d3','./kotools'], function (d3,koTools) {
             .style("text-align", "left")
             .style("font-size", "12px")
             .style("font-family", "sans-serif")
-            .style("margin-bottom", "6px")
-            .style("margin-left", "15px")
-            .style("color", "#FFFFFF");
+            // botom marging is 4 so that the padding of the tooltip on bottom is 6, gives 10 as the padding
+            // on top of the tooltip
+            .style("margin-bottom", "4px")
+            .style("margin-left", "6px")
+            .style("color", "#FFFFFF")
+            .style("float", "left");
     };
 
     charting.showTooltip = function (info) {
@@ -108,7 +109,7 @@ define(['d3','./kotools'], function (d3,koTools) {
 
           tooltip.transition()
               .duration(200)
-              .style("opacity", ".9");
+              .style("opacity", ".83");
 
           tooltip.style("left", (d3.event.pageX + 15) + "px")
               .style("top", (d3.event.pageY - 75) + "px");
@@ -127,14 +128,14 @@ define(['d3','./kotools'], function (d3,koTools) {
 
         tooltip
             .attr("id", "toolTipBorder")
-            .style("width", "150px")
             .style("position", "absolute")
             .style("opacity", 0)
             .style("background-color", "#111111")
             .style("border-radius", "6px")
+            .style("padding", "10px")
+            .style("padding-bottom", "6px")
             .append("div")
             .attr("id", "toolTip")
-            .style("margin", "10px")
             .style("z-index", 100000);
     };
 
@@ -153,10 +154,17 @@ define(['d3','./kotools'], function (d3,koTools) {
         dims.containerHeight = dims.height + dims.margin.top + dims.margin.bottom;
         dims.containerWidth = dims.width + dims.margin.left + dims.margin.right;
 
-        if(options.horizontalSlider){
-           var sliderSpace = 50;
+        if (options.horizontalSlider) {
+            var sliderSpace = 30;
+            var afterSlider = 60;
+
+            if (options.xAxisTextAngle) {
+                sliderSpace = 60;
+                afterSlider = 80;
+            }
+
             dims.sliderHeight = 20;
-            dims.containerHeight = dims.height + dims.sliderHeight + sliderSpace + 60;
+            dims.containerHeight = dims.height + dims.sliderHeight + sliderSpace + afterSlider;
             dims.sliderOffset = dims.height + sliderSpace;
         }
         return dims;
@@ -230,13 +238,7 @@ define(['d3','./kotools'], function (d3,koTools) {
         return el;
     };
 
-    charting.createYAxis = function (svg, options, yScale, dims) {
-        var yAxis = d3.svg.axis().scale(yScale).tickSize(dims.width).orient("right");
-
-        var axis = svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis);
-
+    charting.apllyYClasses = function (axis) {
         axis.selectAll("g").filter(function(d) {
             return d;
         }).classed("minor", true);
@@ -244,6 +246,14 @@ define(['d3','./kotools'], function (d3,koTools) {
         axis.selectAll("g").filter(function(d) {
             return d === 0 || d === yScale.domain()[0];
         }).classed("major", true);
+    };
+
+    charting.createYAxis = function (svg, options, yScale, dims) {
+        var yAxis = d3.svg.axis().scale(yScale).tickSize(dims.width).orient("right");
+
+        var axis = svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
 
         charting.yAxisStyle(axis);
 

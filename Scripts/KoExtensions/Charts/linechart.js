@@ -1,5 +1,5 @@
 "use strict";
-define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
+define(['d3','./../charting','./../kotools'], function (d3, charting, koTools) {
 
     //Takes as input collection of items [data]. Each item has two values [x] and [y].
     //[{x:1, receivedEtf:123, tradedEtf:100},{x:2, receivedEtf:200, tradedEtf:100}]
@@ -95,7 +95,8 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         //howering over a line will just show a tooltip with line name
         var lineMouseOver = function (d) {
             var info = {};
-            info.line = d.linename;
+            // TODO: would be good to have the y value here
+            info[d.linename] = "";
             charting.showTooltip(info);
         };
 
@@ -115,7 +116,8 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             })
             .style("fill", "none")
             .on("mouseover", lineMouseOver)
-            .on("mouseout", charting.hideTooltip);
+            .on("mouseout", charting.hideTooltip)
+            .attr("clip-path", "url(#clip)");
 
         if (options.showDataPoints) {
             var spMouseOut = function () {
@@ -147,7 +149,8 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                 .style("cursor", "pointer")
                 .on("mouseover", spMouseOver)
                 .on("click", spMouseOver)
-                .on("mouseout", spMouseOut);
+                .on("mouseout", spMouseOut)
+                .attr("clip-path", "url(#clip)");
         }
 
         if (options.horizontalSlider) {
@@ -172,13 +175,14 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                 var axis = svg.select(".x.axis");
                 axis.transition().call(xAxis);
                 charting.rotateAxisText(axis, options);
+                charting.xAxisStyle(axis);
 
                 var yScaleDef = charting.getYScaleDefForMultiline(data, options, filteredDomain);
                 y.domain([yScaleDef.min, yScaleDef.max]);
 
-                svg.select(".y.axis")
-                    .transition()
-                    .call(yAxis);
+                axis = svg.select(".y.axis");
+                axis.transition().call(yAxis);
+                charting.yAxisStyle(axis);
 
                 lines.transition()
                     .attr("d", function (d) {
@@ -196,12 +200,22 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
             var sliderAxis = d3.svg.axis()
                 .scale(slidderScale)
+                .tickFormat(options.xUnitFormat)
                 .orient("bottom");
 
-            context.append("g")
+            var sliderAxisElement = context.append("g")
                 .attr("class", "x sliderAxis")
                 .attr("transform", "translate(0," + dims.sliderHeight + ")")
                 .call(sliderAxis);
+            charting.xAxisStyle(sliderAxisElement);
+            charting.rotateAxisText(sliderAxisElement, options);
+
+            svg.append("defs")
+                .append("clipPath")
+                .attr("id", "clip")
+                .append("rect")
+                .attr("width", dims.width)
+                .attr("height", dims.height);
 
             var contextArea = d3.svg.area()
                 .interpolate("monotone")
