@@ -134,7 +134,12 @@ define(['d3','./../charting','./../kotools'], function (d3, charting, koTools) {
                 d3.select(this).style("fill", "black");
             };
 
-            var allPoints = data.length === 1 ? data[0].values : data.reduce(function (a, b) {return a.values.concat(b.values); });
+            var allPoints = data.length === 1 ? data[0].values : data.reduce(function(a, b) {
+                if (a.values) {
+                    return a.values.concat(b.values);
+                }
+                return a.concat(b.values);
+            });
 
             points = svg.selectAll(".point")
                 .data(allPoints)
