@@ -30,22 +30,25 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         }
 
         data.forEach(function (singleLine) {
-            if (!singleLine.values){
+            if (!singleLine.values) {
                 throw "Each line needs to have values property containing tuples of x and y values";
             }
 
             //sort each line using the x coordinate
             singleLine.values.sort(function (a, b) {
-                return d3.ascending(a.x,b.x);
+                return d3.ascending(a.x, b.x);
             });
 
-            singleLine.values.forEach(function(d){
-              d.linename = singleLine.linename;
+            singleLine.values.forEach(function (d) {
+                d.linename = singleLine.linename;
             });
         });
 
-        //define all the linenames to compute thed legen width approximation
+        // define all the linenames to compute thed legen width approximation
         var linenames = data.map(function (item) { return item.linename; });
+
+        // points collection will be initilized only if the users wants to see the line points
+        var points = null;
 
         //we need also one color per linename
         var color = d3.scale.category20();
@@ -59,22 +62,22 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         var dims = charting.getDimensions(options, el, linenames);
 
         var y = d3.scale.linear()
-          .range([dims.height, 0]);
+            .range([dims.height, 0]);
 
-        var scaleDef = charting.getXScaleForMultiLines(data,options);
+        var scaleDef = charting.getXScaleForMultiLines(data, options);
         var x = charting.getXScaleFromConfig(scaleDef, dims);
-        var getX = function(d) {
+        var getX = function (d) {
             return charting.xGetter(scaleDef, x)(d.x);
         };
 
-        var yScaleDef = charting.getYScaleDefForMultiline(data,options);
+        var yScaleDef = charting.getYScaleDefForMultiline(data, options);
 
         y.domain([yScaleDef.min, yScaleDef.max]);
 
         var line = d3.svg.line()
-          .interpolate("linear")
-          .x(getX)
-          .y(function (d) { return y(d.y); });
+            .interpolate("linear")
+            .x(getX)
+            .y(function (d) { return y(d.y); });
 
         var svg = charting.appendContainer(el, dims);
 
@@ -90,7 +93,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         var yAxis = charting.createYAxis(svg, options, y, dims);
 
         //howering over a line will just show a tooltip with line name
-        var lineMouseOver = function(d) {
+        var lineMouseOver = function (d) {
             var info = {};
             info.line = d.linename;
             charting.showTooltip(info);
@@ -101,13 +104,13 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             .enter()
             .append("path")
             .attr("class", "line")
-            .attr("d", function(d) {
+            .attr("d", function (d) {
                 return line(d.values);
             })
-            .style("stroke-width", function(d) {
+            .style("stroke-width", function (d) {
                 return d.width || 2;
             })
-            .style("stroke", function(d) {
+            .style("stroke", function (d) {
                 return getColor(d);
             })
             .style("fill", "none")
@@ -129,122 +132,97 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                 d3.select(this).style("fill", "black");
             };
 
-            var allPoints = data.length === 1 ? data[0].values : data.reduce(function(a,b){return a.values.concat(b.values);});
+            var allPoints = data.length === 1 ? data[0].values : data.reduce(function (a, b) {return a.values.concat(b.values); });
 
-            var points = svg.selectAll(".point")
+            points = svg.selectAll(".point")
                 .data(allPoints)
                 .enter()
                 .append("circle")
                 .attr("cx", getX)
                 .attr("cy", function (d) { return y(d.y); })
-                .attr("r", function () { return 4; })
+                .attr("r", function () { return 3; })
                 .style("fill", "white")
-                .style("stroke-width", "2")
-                .style("stroke", function (d) { return "black"; })
+                .style("stroke-width", "1")
+                .style("stroke", function () { return "black"; })
                 .style("cursor", "pointer")
                 .on("mouseover", spMouseOver)
                 .on("click", spMouseOver)
                 .on("mouseout", spMouseOut);
-            }
+        }
 
-            if (options.verticalCursorLine) {
-                var vLine = null;
-                var lastMove = new Date();
+        if (options.horizontalSlider) {
+            var context = svg.append("g")
+                .attr("transform", "translate(" + "0" + "," + dims.sliderOffset + ")")
+                .attr("class", "context");
 
-                var cursorLineMove = function () {
-                    var now = new Date();
-                    if (now - lastMove < 100){
-                        return;
-                    }
-                    lastMove = now;
-                    var coord = charting.mouseCoordinates(this,x,y);
-                    vLine = charting.createOrMoveVerticalLine(vLine,svg,dims,coord.x);
-                    var info = {
-                      x:coord.rX,
-                      y:coord.rY
-                    };
-                    charting.showTooltip(info);
-                };
-                charting.createMouseMoveListener(svg,dims,cursorLineMove);
-            }
+            var slidderScale = charting.getXScaleFromConfig(scaleDef, dims);
 
-            if(options.horizontalSlider){
-                var context = svg.append("g")
-                  .attr("transform", "translate(" + 0 + "," + dims.sliderOffset + ")")
-                  .attr("class", "context");
+            var allTicks = x.ticks();
+            var startMin = allTicks[2];
+            var startMax = allTicks[7];
 
-                var slidderScale = charting.getXScaleFromConfig(scaleDef,dims);
+            var brush = d3.svg.brush()
+                .x(slidderScale)
+                .extent([startMin, startMax]);
 
-                var allTicks = x.ticks();
-                var startMin = allTicks[2];
-                var startMax = allTicks[7];
+            var brushed = function () {
+                var filteredDomain = brush.empty() ? slidderScale.domain() : brush.extent();
+                x.domain(filteredDomain);
 
-                var brush = d3.svg.brush()//for slider bar at the bottom
-                   .x(slidderScale)
-                   .extent([startMin,startMax])
-                   .on("brush", brushed);
+                var axis = svg.select(".x.axis");
+                axis.transition().call(xAxis);
+                charting.rotateAxisText(axis, options);
 
-                var sliderAxis = d3.svg.axis() // xAxis for brush slider
-                   .scale(slidderScale)
-                   .orient("bottom");
+                var yScaleDef = charting.getYScaleDefForMultiline(data, options, filteredDomain);
+                y.domain([yScaleDef.min, yScaleDef.max]);
+
+                svg.select(".y.axis")
+                    .transition()
+                    .call(yAxis);
+
+                lines.transition()
+                    .attr("d", function (d) {
+                        return line(d.values);
+                    });
+
+                if (points) {
+                    points.transition()
+                        .attr("cx", getX)
+                        .attr("cy", function (d) { return y(d.y); });
+                }
+            };
+
+            brush.on("brush", brushed);
+
+            var sliderAxis = d3.svg.axis()
+                .scale(slidderScale)
+                .orient("bottom");
+
+            context.append("g")
+                .attr("class", "x sliderAxis")
+                .attr("transform", "translate(0," + dims.sliderHeight + ")")
+                .call(sliderAxis);
+
+            var contextArea = d3.svg.area()
+                .interpolate("monotone")
+                .x(function (d) { return slidderScale(d.x); })
+                .y0(dims.sliderHeight)
+                .y1(0);
+
+            context.append("path")
+                .attr("class", "area")
+                .attr("d", contextArea(data[0].values))
+                .attr("fill", "#F1F1F2");
+
+            context.append("g")
+                .attr("class", "x brush")
+                .call(brush)
+                .selectAll("rect")
+                .attr("height", dims.sliderHeight)
+                .attr("fill", "#1f77b4")
+                .attr("rx", "5");
 
 
-                context.append("g") // Create brushing xAxis
-                   .attr("class", "x axis")
-                   .attr("transform", "translate(0," + dims.sliderHeight + ")")
-                   .call(sliderAxis);
-
-                var contextArea = d3.svg.area() // Set attributes for area chart in brushing context graph
-                 .interpolate("monotone")
-                 .x(function(d) { return slidderScale(d.x); }) // x is scaled to xScale2
-                 .y0(dims.sliderHeight) // Bottom line begins at height2 (area chart not inverted)
-                 .y1(0); // Top line of area, 0 (area chart not inverted)
-
-               //plot the rect as the bar at the bottom
-               context.append("path") // Path is created using svg.area details
-                 .attr("class", "area")
-                 .attr("d", contextArea(data[0].values)) // pass first categories data .values to area path generator
-                 .attr("fill", "#F1F1F2");
-
-               //append the brush for the selection of subsection
-               context.append("g")
-                 .attr("class", "x brush")
-                 .call(brush)
-                 .selectAll("rect")
-                 .attr("height", dims.sliderHeight) // Make brush rects same height
-                 .attr("fill", "#1f77b4")
-                 .attr("rx", "5");
-
-
-                   //for brusher of the slider bar at the bottom
-                  function brushed() {
-
-                    var filteredDomain = brush.empty() ? x.domain() : brush.extent();
-                    x.domain(filteredDomain); // If brush is empty then reset the Xscale domain to default, if not then make it the brush extent
-
-                    svg.select(".x.axis") // replot xAxis with transition when brush used
-                          .transition()
-                          .call(xAxis);
-
-                    var yScaleDef = charting.getYScaleDefForMultiline(data,options,filteredDomain);
-                    y.domain([yScaleDef.min,yScaleDef.max]); // Redefine yAxis domain based on highest y value of categories data with "visible"; true
-
-                    svg.select(".y.axis") // Redraw yAxis
-                      .transition()
-                      .call(yAxis);
-
-                    lines.transition()
-                      .attr("d", function(d){
-                          return line(d.values);
-                      });
-
-                      if(points){
-                        points.transition()
-                          .attr("cx", getX)
-                          .attr("cy", function (d) { return y(d.y); });
-                      }
-                  }
-            }
-
+        }
     };
 });

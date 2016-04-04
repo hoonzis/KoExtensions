@@ -2,7 +2,7 @@
 define(['d3','./kotools'], function (d3,koTools) {
     var charting = {};
 
-    charting.colors = d3.scale.ordinal().range(["#1f77b4", "#2ca02c", "#d62728", "#393b79", "#ff7f0e","#8c564b","#843c39"]);
+    charting.colors = d3.scale.ordinal().range(["#1f77b4", "#2ca02c", "#d62728", "#393b79", "#ff7f0e", "#8c564b", "#843c39"]);
 
     charting.getElementAndCheckData = function (element, data) {
         var el = d3.select(element);
@@ -31,19 +31,17 @@ define(['d3','./kotools'], function (d3,koTools) {
             var maxWidth = charting.getLegendWidth(data);
 
             //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
-            var legendWidth = 25 + maxWidth;
-
-    		var size = legendWidth > 70 ? 15 : 18,
-                fontSize = legendWidth > 70 ? "13px" : "16px";
-
-            var legend = parent
-                .append("svg")
-                .attr("width", legendWidth)
-                .attr("height", height)
-                .selectAll("g")
-                .data(data)
-                .enter().append("g")
-                .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+            var legendWidth = 25 + maxWidth,
+                size = legendWidth > 70 ? 15 : 18,
+                fontSize = legendWidth > 70 ? "13px" : "16px",
+                legend = parent
+                    .append("svg")
+                    .attr("width", legendWidth)
+                    .attr("height", height)
+                    .selectAll("g")
+                    .data(data)
+                    .enter().append("g")
+                    .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
 
             legend.append("rect")
                   .attr("width", size)
@@ -52,7 +50,7 @@ define(['d3','./kotools'], function (d3,koTools) {
             legend.append("text")
                   .attr("x", 24)
                   .attr("y", 9)
-  		            .attr("font-size", fontSize)
+                  .attr("font-size", fontSize)
                   .attr("dy", ".35em")
                   .text(function (t) { return t; });
         }
@@ -149,16 +147,16 @@ define(['d3','./kotools'], function (d3,koTools) {
         dims.margin = { top: 20, right: options.right || 50, bottom: 30 , left: options.left || 50 };
         dims.width = options.width || 200;
         dims.height = options.height || 100;
-        if(options.xAxisTextAngle){
+        if (options.xAxisTextAngle) {
             dims.margin.bottom = options.xAxisTextAngle*40/90 + dims.margin.bottom;
         }
         dims.containerHeight = dims.height + dims.margin.top + dims.margin.bottom;
         dims.containerWidth = dims.width + dims.margin.left + dims.margin.right;
 
         if(options.horizontalSlider){
-           var sliderSpace = 25;
+           var sliderSpace = 50;
             dims.sliderHeight = 20;
-            dims.containerHeight = dims.height + dims.sliderHeight + sliderSpace + 25;
+            dims.containerHeight = dims.height + dims.sliderHeight + sliderSpace + 60;
             dims.sliderOffset = dims.height + sliderSpace;
         }
         return dims;
@@ -188,21 +186,14 @@ define(['d3','./kotools'], function (d3,koTools) {
         }
 
         var axis = svg.append("g")
+            .attr("class", "x axis")
             .attr("transform", "translate(0," + dims.height + ")")
             .call(xAxis);
 
         charting.xAxisStyle(axis);
+        charting.rotateAxisText(axis, options);
 
-        if (options.xAxisTextAngle) {
-            axis.selectAll("text")
-                .attr("y", 0)
-                .attr("x", 9)
-                .attr("dy", ".35em")
-                .attr("transform", "rotate(" + options.xAxisTextAngle + ")")
-                .style("text-anchor", "start");
-        }
-
-        if (options.xAxisLabel) {
+        if (options.xAxisLabel){
             svg.append("text")
                 .style("font-size", "15px")
                 .attr("class", "x label")
@@ -214,7 +205,19 @@ define(['d3','./kotools'], function (d3,koTools) {
         return xAxis;
     };
 
-    charting.yAxisStyle = function(el){
+    charting.rotateAxisText = function (axis, options) {
+        if (options.xAxisTextAngle) {
+            axis.selectAll("text")
+                .attr("y", 0)
+                .attr("x", 9)
+                .attr("dy", ".35em")
+                .attr("transform", "rotate(" + options.xAxisTextAngle + ")")
+                .style("text-anchor", "start");
+        }
+    };
+
+    charting.yAxisStyle = function(el)
+    {
         el.select("path").style("display","none");
         el.selectAll("line").style("shape-rendering","crispEdges").style("stroke","#000");
         el.selectAll("line").style("stroke","#777").style("stroke-dasharray","2.2");
@@ -230,7 +233,9 @@ define(['d3','./kotools'], function (d3,koTools) {
     charting.createYAxis = function (svg, options, yScale, dims) {
         var yAxis = d3.svg.axis().scale(yScale).tickSize(dims.width).orient("right");
 
-        var axis = svg.append("g").call(yAxis);
+        var axis = svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
 
         axis.selectAll("g").filter(function(d) {
             return d;
@@ -305,7 +310,13 @@ define(['d3','./kotools'], function (d3,koTools) {
     charting.getYScaleDefForMultiline = function (data,options,filteredDomain){
         var def = null;
         data.forEach(function(i) {
-            def = charting.determineYScale(i.values.map(function(v) {
+            var filteredData = i.values;
+            if(filteredDomain){
+                var filteredData = i.values.filter(function(d){
+                    return d.x >= filteredDomain[0] && d.x <= filteredDomain[1];
+                });
+            }
+            def = charting.determineYScale(filteredData.map(function(v) {
                 return v.y;
             }), def,options);
         });
