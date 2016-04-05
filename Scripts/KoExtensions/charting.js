@@ -436,5 +436,26 @@ define(['d3','./kotools'], function (d3,koTools) {
       return line;
     };
 
+    charting.passOptions = function (func, options){
+        return function(d) {
+            func(options, d);
+        };
+    };
+
+    charting.singlePointOver = function (options, d) {
+        var info = {};
+        var xValue = options.xUnitFormat ? options.xUnitFormat(d.x) : d.x;
+        info[xValue] = "";
+        var valueName = d.linename || "value";
+        info[valueName] = d.y;
+        charting.showTooltip(info);
+        d3.select(this).style("fill", "black");
+    };
+
+    charting.singlePointOut = function () {
+        d3.select(this).style("fill", "white");
+        charting.hideTooltip();
+    };
+
     return charting;
 });

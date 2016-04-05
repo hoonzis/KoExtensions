@@ -120,19 +120,6 @@ define(['d3', './../charting', './../kotools'], function (d3, charting, koTools)
             .attr("clip-path", "url(#clip)");
 
         if (options.showDataPoints) {
-            var spMouseOut = function () {
-                d3.select(this).style("fill", "white");
-                charting.hideTooltip();
-            };
-
-            var spMouseOver = function (d) {
-                var xLabel = d.xLabel || d.x;
-                var info = {};
-                info[options.horizontalLabel] = xLabel;
-                info[d.linename] = d.y;
-                charting.showTooltip(info);
-                d3.select(this).style("fill", "black");
-            };
 
             var allPoints = data.length === 1 ? data[0].values : data.reduce(function(a, b) {
                 if (a.values) {
@@ -150,11 +137,11 @@ define(['d3', './../charting', './../kotools'], function (d3, charting, koTools)
                 .attr("r", function () { return 3; })
                 .style("fill", "white")
                 .style("stroke-width", "1")
-                .style("stroke", function () { return "black"; })
+                .style("stroke", "black")
                 .style("cursor", "pointer")
-                .on("mouseover", spMouseOver)
-                .on("click", spMouseOver)
-                .on("mouseout", spMouseOut)
+                .on("mouseover", charting.passOptions(charting.singlePointOver, options))
+                .on("click", charting.passOptions(charting.singlePointOver, options))
+                .on("mouseout", charting.singlePointOut)
                 .attr("clip-path", "url(#clip)");
         }
 

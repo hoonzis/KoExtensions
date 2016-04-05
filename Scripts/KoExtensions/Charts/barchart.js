@@ -161,19 +161,6 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             charting.showTooltip(info);
         };
 
-        var onPointOver = function (d) {
-            d3.select(this).style("fill", "blue");
-            var info = {};
-            var xName = koTools.isDate(d.x) ? d.x.toFormattedString() : d.x;
-            info[xName] = d.y;
-            charting.showTooltip(info);
-        };
-
-        var onPointOut = function () {
-            d3.select(this).style("fill", "white");
-            charting.hideTooltip();
-        };
-
         var onBarOut = function () {
             d3.select(this).style("stroke", 'none');
             d3.select(this).style("opacity", 0.9);
@@ -214,7 +201,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             return color(d.name);
         });
 
-        //Add the single line
+        //Add the single line for the cashflow like charts
         if (!lineData || lineData.length === 0){
             return;
         }
@@ -267,10 +254,12 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             .attr("cy", function (d) { return lineY(d.y); })
             .attr("r", function () { return 4; })
             .style("fill", "white")
-            .style("stroke-width", 2)
-            .style("stroke", "blue")
+            .attr("r", function () { return 3; })
+            .style("fill", "white")
+            .style("stroke-width", "1")
+            .style("stroke", "black")
             .style("cursor", "pointer")
-            .on("mouseover", onPointOver)
-            .on("mouseout", onPointOut);
+            .on("mouseover", charting.passOptions(charting.singlePointOver, options))
+            .on("mouseout", charting.singlePointOut);
     };
 });

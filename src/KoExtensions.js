@@ -1418,6 +1418,27 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
       return line;
     };
 
+    charting.passOptions = function (func, options){
+        return function(d) {
+            func(options, d);
+        };
+    };
+
+    charting.singlePointOver = function (options, d) {
+        var info = {};
+        var xValue = options.xUnitFormat ? options.xUnitFormat(d.x) : d.x;
+        info[xValue] = "";
+        var valueName = d.linename || "value";
+        info[valueName] = d.y;
+        charting.showTooltip(info);
+        d3.select(this).style("fill", "black");
+    };
+
+    charting.singlePointOut = function () {
+        d3.select(this).style("fill", "white");
+        charting.hideTooltip();
+    };
+
     return charting;
 });
 
@@ -1584,19 +1605,6 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
             charting.showTooltip(info);
         };
 
-        var onPointOver = function (d) {
-            d3.select(this).style("fill", "blue");
-            var info = {};
-            var xName = koTools.isDate(d.x) ? d.x.toFormattedString() : d.x;
-            info[xName] = d.y;
-            charting.showTooltip(info);
-        };
-
-        var onPointOut = function () {
-            d3.select(this).style("fill", "white");
-            charting.hideTooltip();
-        };
-
         var onBarOut = function () {
             d3.select(this).style("stroke", 'none');
             d3.select(this).style("opacity", 0.9);
@@ -1637,7 +1645,7 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
             return color(d.name);
         });
 
-        //Add the single line
+        //Add the single line for the cashflow like charts
         if (!lineData || lineData.length === 0){
             return;
         }
@@ -1690,11 +1698,13 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
             .attr("cy", function (d) { return lineY(d.y); })
             .attr("r", function () { return 4; })
             .style("fill", "white")
-            .style("stroke-width", 2)
-            .style("stroke", "blue")
+            .attr("r", function () { return 3; })
+            .style("fill", "white")
+            .style("stroke-width", "1")
+            .style("stroke", "black")
             .style("cursor", "pointer")
-            .on("mouseover", onPointOver)
-            .on("mouseout", onPointOut);
+            .on("mouseover", charting.passOptions(charting.singlePointOver, options))
+            .on("mouseout", charting.singlePointOut);
     };
 });
 
@@ -1923,19 +1933,6 @@ define('KoExtensions/Charts/linechart',['d3', './../charting', './../kotools'], 
             .attr("clip-path", "url(#clip)");
 
         if (options.showDataPoints) {
-            var spMouseOut = function () {
-                d3.select(this).style("fill", "white");
-                charting.hideTooltip();
-            };
-
-            var spMouseOver = function (d) {
-                var xLabel = d.xLabel || d.x;
-                var info = {};
-                info[options.horizontalLabel] = xLabel;
-                info[d.linename] = d.y;
-                charting.showTooltip(info);
-                d3.select(this).style("fill", "black");
-            };
 
             var allPoints = data.length === 1 ? data[0].values : data.reduce(function(a, b) {
                 if (a.values) {
@@ -1953,11 +1950,11 @@ define('KoExtensions/Charts/linechart',['d3', './../charting', './../kotools'], 
                 .attr("r", function () { return 3; })
                 .style("fill", "white")
                 .style("stroke-width", "1")
-                .style("stroke", function () { return "black"; })
+                .style("stroke", "black")
                 .style("cursor", "pointer")
-                .on("mouseover", spMouseOver)
-                .on("click", spMouseOver)
-                .on("mouseout", spMouseOut)
+                .on("mouseover", charting.passOptions(charting.singlePointOver, options))
+                .on("click", charting.passOptions(charting.singlePointOver, options))
+                .on("mouseout", charting.singlePointOut)
                 .attr("clip-path", "url(#clip)");
         }
 
