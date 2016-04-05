@@ -155,7 +155,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             var info = {};
             info[d.xLabel] = "";
             info[d.name] = d.formattedValue;
-            if (column.totalNegative === 0){
+            if (column.totalNegative === 0 && options.style === "stack"){
                 info[d.name] += " (" + koTools.toPercent(d.val / column.totalPositive) + ")";
             }
             charting.showTooltip(info);
@@ -259,7 +259,8 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             .style("stroke-width", "1")
             .style("stroke", "black")
             .style("cursor", "pointer")
-            .on("mouseover", charting.passOptions(charting.singlePointOver, options))
-            .on("mouseout", charting.singlePointOut);
+            .on("mouseover", function(d) { charting.singlePointOver(this, options, d);})
+            .on("click", function(d) { charting.singlePointOver(this, options, d);})
+            .on("mouseout", function(d) { charting.singlePointOut(this);})
     };
 });

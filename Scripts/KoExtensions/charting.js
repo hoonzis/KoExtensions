@@ -442,18 +442,18 @@ define(['d3','./kotools'], function (d3,koTools) {
         };
     };
 
-    charting.singlePointOver = function (options, d) {
+    charting.singlePointOver = function (element, options, d) {
         var info = {};
         var xValue = options.xUnitFormat ? options.xUnitFormat(d.x) : d.x;
         info[xValue] = "";
         var valueName = d.linename || "value";
         info[valueName] = d.y;
         charting.showTooltip(info);
-        d3.select(this).style("fill", "black");
+        d3.select(element).style("fill", "black");
     };
 
-    charting.singlePointOut = function () {
-        d3.select(this).style("fill", "white");
+    charting.singlePointOut = function (element) {
+        d3.select(element).style("fill", "white");
         charting.hideTooltip();
     };
 

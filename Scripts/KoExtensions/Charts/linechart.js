@@ -139,9 +139,9 @@ define(['d3', './../charting', './../kotools'], function (d3, charting, koTools)
                 .style("stroke-width", "1")
                 .style("stroke", "black")
                 .style("cursor", "pointer")
-                .on("mouseover", charting.passOptions(charting.singlePointOver, options))
-                .on("click", charting.passOptions(charting.singlePointOver, options))
-                .on("mouseout", charting.singlePointOut)
+                .on("mouseover", function(d) { charting.singlePointOver(this, options, d);})
+                .on("click", function(d) { charting.singlePointOver(this, options, d);})
+                .on("mouseout", function() { charting.singlePointOut(this);})
                 .attr("clip-path", "url(#clip)");
         }
 

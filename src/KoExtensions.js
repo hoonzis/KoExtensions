@@ -1424,18 +1424,18 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
         };
     };
 
-    charting.singlePointOver = function (options, d) {
+    charting.singlePointOver = function (element, options, d) {
         var info = {};
         var xValue = options.xUnitFormat ? options.xUnitFormat(d.x) : d.x;
         info[xValue] = "";
         var valueName = d.linename || "value";
         info[valueName] = d.y;
         charting.showTooltip(info);
-        d3.select(this).style("fill", "black");
+        d3.select(element).style("fill", "black");
     };
 
-    charting.singlePointOut = function () {
-        d3.select(this).style("fill", "white");
+    charting.singlePointOut = function (element) {
+        d3.select(element).style("fill", "white");
         charting.hideTooltip();
     };
 
@@ -1599,7 +1599,7 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
             var info = {};
             info[d.xLabel] = "";
             info[d.name] = d.formattedValue;
-            if (column.totalNegative === 0){
+            if (column.totalNegative === 0 && options.style === "stack"){
                 info[d.name] += " (" + koTools.toPercent(d.val / column.totalPositive) + ")";
             }
             charting.showTooltip(info);
@@ -1703,8 +1703,9 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
             .style("stroke-width", "1")
             .style("stroke", "black")
             .style("cursor", "pointer")
-            .on("mouseover", charting.passOptions(charting.singlePointOver, options))
-            .on("mouseout", charting.singlePointOut);
+            .on("mouseover", function(d) { charting.singlePointOver(this, options, d);})
+            .on("click", function(d) { charting.singlePointOver(this, options, d);})
+            .on("mouseout", function(d) { charting.singlePointOut(this);})
     };
 });
 
@@ -1952,9 +1953,9 @@ define('KoExtensions/Charts/linechart',['d3', './../charting', './../kotools'], 
                 .style("stroke-width", "1")
                 .style("stroke", "black")
                 .style("cursor", "pointer")
-                .on("mouseover", charting.passOptions(charting.singlePointOver, options))
-                .on("click", charting.passOptions(charting.singlePointOver, options))
-                .on("mouseout", charting.singlePointOut)
+                .on("mouseover", function(d) { charting.singlePointOver(this, options, d);})
+                .on("click", function(d) { charting.singlePointOver(this, options, d);})
+                .on("mouseout", function() { charting.singlePointOut(this);})
                 .attr("clip-path", "url(#clip)");
         }
 
