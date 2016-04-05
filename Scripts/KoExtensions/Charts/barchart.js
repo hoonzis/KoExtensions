@@ -35,6 +35,11 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
         var xKeys = data.map(function(d){return d[xcoord];});
 
+        // for bar chart the x-scale is always ordinary with range bounds
+        // but we run the determining X Scale method anyway
+        // because it can help determine the xUnitFormat
+        charting.determineXScale(xKeys, null, options);
+
         var x = d3.scale.ordinal()
             .rangeRoundBands([0, dims.width], 0.3);
 
@@ -148,7 +153,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             var column = arrangedByX[d.x];
             d3.select(this).style("opacity", 1);
             var info = {};
-            info[options.xUnitName] = d.xLabel;
+            info[d.xLabel] = "";
             info[d.name] = d.formattedValue;
             if (column.totalNegative === 0){
                 info[d.name] += " (" + koTools.toPercent(d.val / column.totalPositive) + ")";

@@ -2,8 +2,9 @@
 define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
     charting.treeChart = function (data, element, options) {
         var el = charting.getElementAndCheckData(element, data);
-        if (!el)
+        if (!el) {
             return;
+        }
 
         var defaultOptions = {
             legend: true,

@@ -125,8 +125,9 @@ define(['./charting', './kotools', './Charts/barchart', './Charts/piechart', './
                             }
 
                             //if the date is not valid - don't visualize it, or we would have a "NaN/NaN/NaN"
-                            if (!kotools.isValidDate(vmValue))
+                            if (!kotools.isValidDate(vmValue)) {
                                 return;
+                            }
 
                             widget.setDates(vmValue);
                         }
@@ -155,8 +156,9 @@ define(['./charting', './kotools', './Charts/barchart', './Charts/piechart', './
                         var options = ko.unwrap(allBindingsAccessor().chartOptions);
 
                         var line = null;
-                        if (allBindingsAccessor().line != null)
+                        if (allBindingsAccessor().line != null) {
                             line = allBindingsAccessor().line();
+                        }
                         charting.barChart(data, element, options, line);
                     }
                 };

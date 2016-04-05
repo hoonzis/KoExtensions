@@ -1,5 +1,5 @@
 "use strict";
-define(['d3','./../charting','./../kotools'], function (d3, charting, koTools) {
+define(['d3', './../charting', './../kotools'], function (d3, charting, koTools) {
 
     //Takes as input collection of items [data]. Each item has two values [x] and [y].
     //[{x:1, receivedEtf:123, tradedEtf:100},{x:2, receivedEtf:200, tradedEtf:100}]
@@ -182,7 +182,7 @@ define(['d3','./../charting','./../kotools'], function (d3, charting, koTools) {
                 charting.rotateAxisText(axis, options);
                 charting.xAxisStyle(axis);
 
-                var yScaleDef = charting.getYScaleDefForMultiline(data, options, filteredDomain);
+                yScaleDef = charting.getYScaleDefForMultiline(data, options, filteredDomain);
                 y.domain([yScaleDef.min, yScaleDef.max]);
 
                 axis = svg.select(".y.axis");
@@ -240,8 +240,6 @@ define(['d3','./../charting','./../kotools'], function (d3, charting, koTools) {
                 .attr("height", dims.sliderHeight)
                 .attr("fill", "#1f77b4")
                 .attr("rx", "5");
-
-
         }
     };
 });

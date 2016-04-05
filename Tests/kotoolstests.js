@@ -23,7 +23,7 @@ define(
                 equal(res[1].values[1].y.toFixed(2), 300);
             });
 
-            
+
 
             test("convertSeriesToXYPairs, will convert if series is just array of numbers", function () {
                 var data = [1000, 500, 100];
@@ -53,7 +53,7 @@ define(
                 var v = "0.05";
                 equal(koTools.isString(v), true, 'Is string');
             });
-            
+
             test("Int is not string", function () {
                 var v = 0.05;
                 equal(koTools.isString(v), false, 'Is not string');
@@ -106,7 +106,7 @@ define(
                 equal(res[0].values[1].y, 100);
                 equal(res[0].values[2].y, 200);
 
-                
+
                 equal(res[1].values[0].y, 100);
                 equal(res[1].values[1].y, 50);
 
@@ -130,7 +130,7 @@ define(
                 equal(res[1].values[0].y, 100);
                 equal(res[1].values[1].y, 50);
             });
-            
+
             test("default options setter sets all values specified in default options", function () {
                 var defaultOptions = {
                     start: 10,

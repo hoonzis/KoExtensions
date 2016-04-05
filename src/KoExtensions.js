@@ -495,40 +495,40 @@ define('KoExtensions/kotools',['d3'],function (d3) {
         };
 
         self.paddy = function (n, p, c) {
-            var pad_char = typeof c !== 'undefined' ? c : '0';
-            var pad = new Array(1 + p).join(pad_char);
+            var pad_char = c !== 'undefined' ? c : '0';
+            var pad = [1 + p].join(pad_char);
             return (pad + n).slice(-pad.length);
         };
 
         self.getMonth = function(item) {
             if (item.Year !== null && item.Month !== null) {
-                return item.Year + '' + self.paddy(item.Month, 2);
+                return String(item.Year) + self.paddy(item.Month, 2).toString();
             }
             return null;
         };
 
         self.monthsComparer = function(item1, item2) {
             if (self.isString(item1)) {
-                var year1 = parseInt(item1.substring(0, 4));
-                var month1 = parseInt(item1.substring(4, item1.length));
+                var year1 = parseInt(item1.substring(0, 4), 10);
+                var month1 = parseInt(item1.substring(4, item1.length), 10);
 
-                var year2 = parseInt(item2.substring(0, 4));
-                var month2 = parseInt(item2.substring(4, item2.length));
+                var year2 = parseInt(item2.substring(0, 4), 10);
+                var month2 = parseInt(item2.substring(4, item2.length), 10);
 
-                if (year1 == year2) {
+                if (year1 === year2) {
                     return d3.ascending(month1, month2);
-                } else
-                    return d3.ascending(year1, year2);
-            } else {
-                return d3.ascending(item1, item2);
+                }
+
+                return d3.ascending(year1, year2);
             }
+            return d3.ascending(item1, item2);
         };
 
         self.monthsIncrementer = function(item) {
-            var year = parseInt(item.substring(0, 4));
-            var month = parseInt(item.substring(4, item.length));
+            var year = parseInt(item.substring(0, 4), 10);
+            var month = parseInt(item.substring(4, item.length), 10);
 
-            if (month == 12) {
+            if (month === 12) {
                 month = 1;
                 year++;
             } else {
@@ -546,28 +546,28 @@ define('KoExtensions/kotools',['d3'],function (d3) {
             var q2 = item2.substring(1, 2);
             var year2 = item2.substring(2, 6);
 
-            if (year1 == year2) {
+            if (year1 === year2) {
                 return d3.ascending(q1, q2);
-            } else
-                return d3.ascending(year1, year2);
+            }
 
+            return d3.ascending(year1, year2);
         };
 
         var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
         self.getYearAndMonthLabel = function(i) {
-            if (!self.isString(i))
+            if (!self.isString(i)) {
                 return "";
-            var month = monthNames[parseInt(i.substring(4, i.length)) - 1];
+            }
+            var month = monthNames[parseInt(i.substring(4, i.length), 10) - 1];
             return month;
         };
 
         self.getProperty = function(key, d) {
-            if (typeof (key) == "function") {
+            if (typeof key === "function") {
                 return key(d);
-            } else {
-                return d[key];
             }
+            return d[key];
         };
 
         self.getWidth = function(el)
@@ -596,14 +596,17 @@ define('KoExtensions/kotools',['d3'],function (d3) {
         };
 
         self.find = function(data, predicate) {
-            for (var i = 0; i < data.length; i++)
-                if (predicate(data[i]))
+            var i = 0;
+            for (i = 0; i < data.length; i++) {
+                if (predicate(data[i])) {
                     return data[i];
+                }
+            }
             return null;
         };
 
         self.isString = function(x) {
-            return typeof (x) == 'string';
+            return typeof x === 'string';
         };
 
         self.isNumber = function(n) {
@@ -615,37 +618,39 @@ define('KoExtensions/kotools',['d3'],function (d3) {
         };
 
         self.isDate = function(d) {
-            return Object.prototype.toString.call(d) == "[object Date]";
+            return Object.prototype.toString.call(d) === "[object Date]";
 
         };
+
         Number.prototype.formatMoney = function(c, d, t) {
-            var n = this,
-                c = isNaN(c = Math.abs(c)) ? 2 : c,
-                d = d == undefined ? "." : d,
-                t = t == undefined ? "," : t,
-                s = n < 0 ? "-" : "",
-                i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+            var n = this;
+            c = isNaN(c = Math.abs(c)) ? 2 : c;
+            d = d === undefined ? "." : d;
+            t = t === undefined ? "," : t;
+            var s = n < 0 ? "-" : "",
+                i = parseInt(n = Math.abs(+n || 0).toFixed(c), 10) + "",
                 j = (j = i.length) > 3 ? j % 3 : 0;
             return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
         };
 
         self.parseDate = function(input) {
-            if (input instanceof Date)
+            if (input instanceof Date) {
                 return input;
+            }
 
             //first get rid of the hour & etc...
             var firstSpace = input.indexOf(" ");
 
-            if (firstSpace != -1) {
+            if (firstSpace !== -1) {
                 input = input.substring(0, firstSpace);
                 var separator = "/";
                 var parts = [];
-                if (input.indexOf("-") != -1) {
+                if (input.indexOf("-") !== -1) {
                     separator = "-";
                     parts = input.split(separator);
-                    if (parts.length == 3) {
+                    if (parts.length === 3) {
                         return new Date(parts[0], parts[1] - 1, parts[2]);
-                    } else if (input.indexOf("/") != -1) {
+                    } else if (input.indexOf("/") !== -1) {
                         return new Date(parts[2], parts[0] - 1, parts[1]);
                     }
                 }
@@ -655,8 +660,9 @@ define('KoExtensions/kotools',['d3'],function (d3) {
 
         //verify that the date is valid => object is date-time and there is a meaningful value
         self.isValidDate = function(d) {
-            if (!self.isDate(d))
+            if (!self.isDate(d)) {
                 return false;
+            }
             return !isNaN(d.getTime());
         };
 
@@ -1214,16 +1220,6 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
         return el;
     };
 
-    charting.apllyYClasses = function (axis) {
-        axis.selectAll("g").filter(function(d) {
-            return d;
-        }).classed("minor", true);
-
-        axis.selectAll("g").filter(function(d) {
-            return d === 0 || d === yScale.domain()[0];
-        }).classed("major", true);
-    };
-
     charting.createYAxis = function (svg, options, yScale, dims) {
         var yAxis = d3.svg.axis().scale(yScale).tickSize(dims.width).orient("right");
 
@@ -1273,7 +1269,11 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
             return v;
         });
 
-        def.xKeys = def.xKeys.concat(newKeys);
+        if(def.xKeys){
+            def.xKeys = def.xKeys.concat(newKeys);
+        }else{
+            def.xKeys = newKeys;
+        }
         def.scaleType = def.allNumbers ? 'linear' : def.allDates ? 'date' : 'ordinal';
         def.xUnitFormat = def.allDates ? koTools.getIdealDateFormat([def.min,def.max]) : null;
         if(!options.xUnitFormat){
@@ -1298,7 +1298,7 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
         data.forEach(function(i) {
             var filteredData = i.values;
             if(filteredDomain){
-                var filteredData = i.values.filter(function(d){
+                filteredData = i.values.filter(function(d){
                     return d.x >= filteredDomain[0] && d.x <= filteredDomain[1];
                 });
             }
@@ -1458,6 +1458,11 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
 
         var xKeys = data.map(function(d){return d[xcoord];});
 
+        // for bar chart the x-scale is always ordinary with range bounds
+        // but we run the determining X Scale method anyway
+        // because it can help determine the xUnitFormat
+        charting.determineXScale(xKeys, null, options);
+
         var x = d3.scale.ordinal()
             .rangeRoundBands([0, dims.width], 0.3);
 
@@ -1571,7 +1576,7 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
             var column = arrangedByX[d.x];
             d3.select(this).style("opacity", 1);
             var info = {};
-            info[options.xUnitName] = d.xLabel;
+            info[d.xLabel] = "";
             info[d.name] = d.formattedValue;
             if (column.totalNegative === 0){
                 info[d.name] += " (" + koTools.toPercent(d.val / column.totalPositive) + ")";
@@ -1797,7 +1802,7 @@ define('KoExtensions/Charts/piechart',['d3','./../charting','./../kotools'], fun
 });
 
 
-define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], function (d3, charting, koTools) {
+define('KoExtensions/Charts/linechart',['d3', './../charting', './../kotools'], function (d3, charting, koTools) {
 
     //Takes as input collection of items [data]. Each item has two values [x] and [y].
     //[{x:1, receivedEtf:123, tradedEtf:100},{x:2, receivedEtf:200, tradedEtf:100}]
@@ -1980,7 +1985,7 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
                 charting.rotateAxisText(axis, options);
                 charting.xAxisStyle(axis);
 
-                var yScaleDef = charting.getYScaleDefForMultiline(data, options, filteredDomain);
+                yScaleDef = charting.getYScaleDefForMultiline(data, options, filteredDomain);
                 y.domain([yScaleDef.min, yScaleDef.max]);
 
                 axis = svg.select(".y.axis");
@@ -2038,8 +2043,6 @@ define('KoExtensions/Charts/linechart',['d3','./../charting','./../kotools'], fu
                 .attr("height", dims.sliderHeight)
                 .attr("fill", "#1f77b4")
                 .attr("rx", "5");
-
-
         }
     };
 });
@@ -2600,8 +2603,9 @@ define('KoExtensions/koextensions',['./charting', './kotools', './Charts/barchar
                             }
 
                             //if the date is not valid - don't visualize it, or we would have a "NaN/NaN/NaN"
-                            if (!kotools.isValidDate(vmValue))
+                            if (!kotools.isValidDate(vmValue)) {
                                 return;
+                            }
 
                             widget.setDates(vmValue);
                         }
@@ -2630,8 +2634,9 @@ define('KoExtensions/koextensions',['./charting', './kotools', './Charts/barchar
                         var options = ko.unwrap(allBindingsAccessor().chartOptions);
 
                         var line = null;
-                        if (allBindingsAccessor().line != null)
+                        if (allBindingsAccessor().line != null) {
                             line = allBindingsAccessor().line();
+                        }
                         charting.barChart(data, element, options, line);
                     }
                 };

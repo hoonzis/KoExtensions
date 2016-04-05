@@ -238,16 +238,6 @@ define(['d3','./kotools'], function (d3,koTools) {
         return el;
     };
 
-    charting.apllyYClasses = function (axis) {
-        axis.selectAll("g").filter(function(d) {
-            return d;
-        }).classed("minor", true);
-
-        axis.selectAll("g").filter(function(d) {
-            return d === 0 || d === yScale.domain()[0];
-        }).classed("major", true);
-    };
-
     charting.createYAxis = function (svg, options, yScale, dims) {
         var yAxis = d3.svg.axis().scale(yScale).tickSize(dims.width).orient("right");
 
@@ -297,7 +287,11 @@ define(['d3','./kotools'], function (d3,koTools) {
             return v;
         });
 
-        def.xKeys = def.xKeys.concat(newKeys);
+        if(def.xKeys){
+            def.xKeys = def.xKeys.concat(newKeys);
+        }else{
+            def.xKeys = newKeys;
+        }
         def.scaleType = def.allNumbers ? 'linear' : def.allDates ? 'date' : 'ordinal';
         def.xUnitFormat = def.allDates ? koTools.getIdealDateFormat([def.min,def.max]) : null;
         if(!options.xUnitFormat){
@@ -322,7 +316,7 @@ define(['d3','./kotools'], function (d3,koTools) {
         data.forEach(function(i) {
             var filteredData = i.values;
             if(filteredDomain){
-                var filteredData = i.values.filter(function(d){
+                filteredData = i.values.filter(function(d){
                     return d.x >= filteredDomain[0] && d.x <= filteredDomain[1];
                 });
             }

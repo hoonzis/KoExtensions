@@ -17,7 +17,7 @@
     "node": true,
     "nomen": false,
     "passfail": false,
-    "plusplus": false,
+    "plusplus": true,
     "predef": [
         "define",
         "angular",
@@ -30,6 +30,8 @@
     "sub": false,
     "todo": false,
     "unparam": true,
-    "vars": false,
-    "white": true
+    "vars": true,
+    "unused": true,
+    "white": true,
+    "multivar":false
 }
