@@ -7,7 +7,7 @@
     </head>
 <body>
 	<h2>Stacked bar chart</h2>
-  <div id="monthlySales" data-bind="barchart: carSales, chartOptions:{legend:true, width:800,height:300,style:'stack',xcoord:'month'}">
+  <div id="monthlySales" data-bind="barchart: carSales, chartOptions:{legend:true, width:800,height:300,style:'stack',xcoord:'month', yAxisLabel: 'Sold cars', xAxisLabel:'Month'}">
   </div>
 
   <h2>Stacked bar chart - with datetime x axis</h2>
@@ -15,7 +15,7 @@
   </div>
 
 	<h2>Grouped barchart</h2>
-	<div id="monthlySales2" data-bind="barchart: carSales,chartOptions:{legend:true, width:800,height:300,style:'bar',xcoord:'month',unitTransform:valueToLabel}">
+	<div id="monthlySales2" data-bind="barchart: carSales,chartOptions:{legend:true, width:800,height:300,style:'bar',xcoord:'month',yFormat:valueToLabel}">
 	</div>
 
 

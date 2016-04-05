@@ -82,7 +82,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             .style("opacity",0.9)
             .each(function(d) {
                 d.percentage = d.data.y / sum;
-                d.formatted = options.unitTransform ? options.unitTransform(d.data.y) : d.data.y;
+                d.formatted = options.yFormat ? options.yFormat(d.data.y) : d.data.y;
             });
 
         arcs.append("text")

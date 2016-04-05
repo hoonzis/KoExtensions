@@ -192,7 +192,7 @@ define(['d3', './../charting', './../kotools'], function (d3, charting, koTools)
 
             var sliderAxis = d3.svg.axis()
                 .scale(slidderScale)
-                .tickFormat(options.xUnitFormat)
+                .tickFormat(options.xFormat)
                 .orient("bottom");
 
             var sliderAxisElement = context.append("g")

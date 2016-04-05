@@ -148,11 +148,19 @@ define(['d3','./kotools'], function (d3,koTools) {
         dims.margin = { top: 20, right: options.right || 50, bottom: 30 , left: options.left || 50 };
         dims.width = options.width || 200;
         dims.height = options.height || 100;
+        dims.yAxisWidth = 40;
+        if(options.yAxisLabel){
+            dims.yAxisWidth = 50;
+        }
         if (options.xAxisTextAngle) {
-            dims.margin.bottom = options.xAxisTextAngle*40/90 + dims.margin.bottom;
+            dims.margin.bottom = options.xAxisTextAngle*50/90 + dims.margin.bottom;
+        }
+
+        if(options.xAxisLabel) {
+            dims.margin.bottom+= 15;
         }
         dims.containerHeight = dims.height + dims.margin.top + dims.margin.bottom;
-        dims.containerWidth = dims.width + dims.margin.left + dims.margin.right;
+        dims.containerWidth = dims.width + dims.yAxisWidth + dims.margin.left + dims.margin.right;
 
         if (options.horizontalSlider) {
             var sliderSpace = 30;
@@ -185,8 +193,8 @@ define(['d3','./kotools'], function (d3,koTools) {
         .scale(x)
         .orient("bottom");
 
-        if (options.xUnitFormat){
-            xAxis.tickFormat(options.xUnitFormat);
+        if (options.xFormat){
+            xAxis.tickFormat(options.xFormat);
         }
 
         if (options.tickValues){
@@ -203,11 +211,13 @@ define(['d3','./kotools'], function (d3,koTools) {
 
         if (options.xAxisLabel){
             svg.append("text")
-                .style("font-size", "15px")
+                .style("font-size", "13")
+                .style("font-family", "sans-serif")
+                .style("font-weight","bold")
                 .attr("class", "x label")
                 .attr("text-anchor", "end")
-                .attr("x", dims.width)
-                .attr("y", dims.height + 40)
+                .attr("x", (dims.width / 2) + 35 )
+                .attr("y", dims.height + dims.margin.bottom)
                 .text(options.xAxisLabel);
         }
         return xAxis;
@@ -229,12 +239,16 @@ define(['d3','./kotools'], function (d3,koTools) {
         el.select("path").style("display","none");
         el.selectAll("line").style("shape-rendering","crispEdges").style("stroke","#000");
         el.selectAll("line").style("stroke","#777").style("stroke-dasharray","2.2");
+        el.style("font-family", "sans-serif");
+        el.style("font-size", "13");
     };
 
     charting.xAxisStyle = function(el){
         el.select("path").style("display","none");
         el.select("line").style("shape-rendering","crispEdges").style("stroke","#000");
         el.selectAll("line").style("stroke","#000");
+        el.style("font-family", "sans-serif");
+        el.style("font-size", "13");
         return el;
     };
 
@@ -251,11 +265,13 @@ define(['d3','./kotools'], function (d3,koTools) {
             svg.append("text")
                 .attr("class", "y label")
                 .attr("text-anchor", "end")
-                .attr("y", 6)
+                .attr("y", 0)
                 .attr("dy", ".75em")
-                .style("font-size", "15px")
+                .style("font-size", "13")
+                .style("font-family", "sans-serif")
+                .style("font-weight","bold")
                 .text(options.yAxisLabel)
-                .attr("transform", "translate(" + dims.width + "," + 40 + ")rotate(-90)");
+                .attr("transform", "translate(" + (dims.width+dims.yAxisWidth) + "," + (dims.height/2) + ")rotate(-90)");
         }
         return yAxis;
     };
@@ -293,9 +309,9 @@ define(['d3','./kotools'], function (d3,koTools) {
             def.xKeys = newKeys;
         }
         def.scaleType = def.allNumbers ? 'linear' : def.allDates ? 'date' : 'ordinal';
-        def.xUnitFormat = def.allDates ? koTools.getIdealDateFormat([def.min,def.max]) : null;
-        if(!options.xUnitFormat){
-            options.xUnitFormat = def.xUnitFormat;
+        def.xFormat = def.allDates ? koTools.getIdealDateFormat([def.min,def.max]) : null;
+        if(!options.xFormat){
+            options.xFormat = def.xFormat;
         }
 
         return def;
@@ -444,7 +460,7 @@ define(['d3','./kotools'], function (d3,koTools) {
 
     charting.singlePointOver = function (element, options, d) {
         var info = {};
-        var xValue = options.xUnitFormat ? options.xUnitFormat(d.x) : d.x;
+        var xValue = options.xFormat ? options.xFormat(d.x) : d.x;
         info[xValue] = "";
         var valueName = d.linename || "value";
         info[valueName] = d.y;

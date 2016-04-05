@@ -50,16 +50,19 @@ There are two ways to reference KoExtensions:
 * Reference single [KoExtensions.js](https://github.com/hoonzis/KoExtensions/blob/master/src/KoExtensions.js) file. See the [example.html](https://github.com/hoonzis/KoExtensions/blob/master/src/example.html) file. If used in such way, global variable **koExtensions** is defined which exposes all the functionality.
 * Use RequireJS. All files in the *testpages* folder use this approach. KoExtension expects D3 to be defined globally before being loaded.
 
-Both approaches can be used whether KoExtensions is used as standalone charting library or with KnockoutJS. The charting library has to be initialized by calling **charting.initializeCharts**. In order for the automatic bindings to work with KnockoutJS, **registerExtensions** method has to be called.
+Both approaches can be used whether KoExtensions is used as standalone charting library or with KnockoutJS.
 
 ```javascript
 <script src="d3.js"></script>
 <script src="KoExtensions.js"></script>
-//if you want to use knockout binding, just call
-koExtensions.registerExtensions()
+koext.charting.lineChart(testData, el, {width:"100px"});
+```
 
-//otherwise, if you want to use the charts as standalone library
-koext.charting.lineChart(testData, el, chartOptions);
+```javascript
+<script src="d3.js"></script>
+<script src="knockout.js"></script>
+<script src="KoExtensions.js"></script>
+<div data-bind="linechart:testData, chartOptions:{width:100px}"
 ```
 
 ####Contributing and building
@@ -76,7 +79,7 @@ Tests can be run with QUnit:
 phantomjs run-qunit.js Tests/Tests.html
 ```
 
-#### Some usefull tips ####
+#### Some useful tips ####
 - Showing multiple charts in knockout foreach loop can be achieved as follows:
 
 [foreachpiechart]: http://hoonzis.github.com/KoExtensions/img/multiple_pie.PNG

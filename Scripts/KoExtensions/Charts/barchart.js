@@ -37,7 +37,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
         // for bar chart the x-scale is always ordinary with range bounds
         // but we run the determining X Scale method anyway
-        // because it can help determine the xUnitFormat
+        // because it can help determine the xFormat
         charting.determineXScale(xKeys, null, options);
 
         var x = d3.scale.ordinal()
@@ -63,12 +63,12 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
                     return;
                 }
                 var xLabel = newD.x;
-                if (options.xUnitFormat){
-                    xLabel = options.xUnitFormat(newD.x);
+                if (options.xFormat){
+                    xLabel = options.xFormat(newD.x);
                 }
                 var formattedValue = d[m];
-                if (options.unitTransform){
-                    formattedValue = options.unitTransform(d[m]);
+                if (options.yFormat){
+                    formattedValue = options.yFormat(d[m]);
                 }
 
                 var value = {
@@ -261,6 +261,6 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             .style("cursor", "pointer")
             .on("mouseover", function(d) { charting.singlePointOver(this, options, d);})
             .on("click", function(d) { charting.singlePointOver(this, options, d);})
-            .on("mouseout", function(d) { charting.singlePointOut(this);})
+            .on("mouseout", function(d) { charting.singlePointOut(this);});
     };
 });
