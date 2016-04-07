@@ -7,7 +7,7 @@
     </head>
 <body>
   <!-- Testing some chart options, setting the min value specifically, setting the margin coeficients, not showing data points -->
-  <div id="lineChart2" data-bind="linechart: simpleLine, chartOptions:{height:300,width:800,showDataPoints:false,yMin:-100,xTick:10,marginCoef:2.0}">
+  <div data-bind="linechart: simpleLine, chartOptions:options">
   </div>
   <script>
 
@@ -20,9 +20,8 @@
       });
 
       var ko;
-      require(['KoExtensions/koextensions','knockout-3.2.0.debug','d3'], function(koext,kol,d3) {
+      require(['KoExtensions/koextensions','knockout-3.2.0.debug'], function(koext,kol) {
           ko = kol;
-          koext.registerExtensions();
 
           function TestViewModels() {
               var self = this;
@@ -37,10 +36,23 @@
                   linename: "test",
                   values: simpleData
               }]);
+
+              self.options = {
+                  height:300,
+                  width:800,
+                  showDataPoints:false,
+                  yMin:-100,
+                  xTick:10,
+                  marginCoef:2.0,
+                  yFormat: function(d){
+                      return "Value: " + d
+                  },
+                  yAxisLabel: "Y - axis description"
+              };
           }
 
           var vm = new TestViewModels();
-
+          koext.registerExtensions();
           ko.applyBindings(vm);
       });
 </script>

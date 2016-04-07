@@ -149,8 +149,8 @@ define(['d3','./kotools'], function (d3,koTools) {
         dims.width = options.width || 200;
         dims.height = options.height || 100;
         dims.yAxisWidth = 40;
-        if(options.yAxisLabel){
-            dims.yAxisWidth = 50;
+        if(options.yAxisLabel) {
+            dims.yAxisWidth = 80;
         }
         if (options.xAxisTextAngle) {
             dims.margin.bottom = options.xAxisTextAngle*50/90 + dims.margin.bottom;
@@ -254,6 +254,10 @@ define(['d3','./kotools'], function (d3,koTools) {
 
     charting.createYAxis = function (svg, options, yScale, dims) {
         var yAxis = d3.svg.axis().scale(yScale).tickSize(dims.width).orient("right");
+
+        if (options.yFormat){
+            yAxis.tickFormat(options.yFormat);
+        }
 
         var axis = svg.append("g")
             .attr("class", "y axis")

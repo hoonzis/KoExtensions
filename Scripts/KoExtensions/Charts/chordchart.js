@@ -11,6 +11,7 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
             width: 800,
             height: 800,
             fillParentController:false,
+            chordMouseOver: null
         };
 
         options = koTools.setDefaultOptions(defaultOptions, options);
@@ -45,12 +46,20 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
             .attr("id", "circle")
             .attr("transform", "translate(" + dims.width / 2 + "," + dims.height / 2 + ")");
 
-        var chord_mouse_over = function (g, i) {
+        var formatValue = function(value){
+            if(options.chordFormat){
+                value = options.chordFormat(value);
+            }
+            return value;
+        };
+
+        var chordMouseOver = function (g, i) {
             var a1 = data.names[g.source.index];
             var a2 = data.names[g.source.subindex];
             var title = a1 + " - " + a2;
             var info = {};
-            info[title] = g.source.value;
+            var value = formatValue(g.source.value);
+            info[title] = value;
 
             //get all except this chord and put it in background
             svg.selectAll(".chord")
@@ -63,7 +72,7 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
             charting.showTooltip(info);
         };
 
-        var chord_mouse_out = function (g, i) {
+        var chordMouseOut = function (g, i) {
             svg.selectAll(".chord")
                 .transition()
                 .style("opacity", 1);
@@ -71,7 +80,7 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
             charting.hideTooltip();
         };
 
-        var fade = function(opacity) {
+        var mouseOverArc = function(opacity) {
             return function (g, i) {
                 svg.selectAll(".chord")
                     .filter(function (d) {
@@ -81,7 +90,8 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
                     .style("opacity", opacity);
 
                 var info = {};
-                info[descGetter(g)] = g.value;
+                var value = formatValue(g.value);
+                info[descGetter(g)] = value;
                 charting.showTooltip(info);
             };
         };
@@ -97,8 +107,8 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
             .attr("id", function(d, i) { return "group" + i; })
             .attr("d", arc)
             .style("fill", function(d, i) { return color(i); })
-            .on("mouseover", fade(0.1))
-            .on("mouseout", fade(1));
+            .on("mouseover", mouseOverArc(0.1))
+            .on("mouseout", mouseOverArc(1));
 
         group.append("text")
             .each(function(d) { d.angle = (d.startAngle + d.endAngle) / 2; })
@@ -119,8 +129,10 @@ define(['d3','./../charting', './../kotools'], function(d3,charting, koTools) {
             .enter().append("path")
             .attr("class", "chord")
             .style("fill", function(d) { return color(d.source.index); })
+            .style("cursor","pointer")
             .attr("d", path)
-            .on("mouseover", chord_mouse_over)
-            .on("mouseout", chord_mouse_out);
+            .on("mouseover", chordMouseOver)
+            .on("mouseout", chordMouseOut)
+            .on("click", chordMouseOver);
     };
 });

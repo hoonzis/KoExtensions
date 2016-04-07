@@ -6,9 +6,8 @@
     <script src="../Scripts/require.js"></script>
 </head>
 <body>
-    <div id="chordChart" data-bind="chordChart: chordChartData, chartOptions:{height:500,width:500,fillParentController:true}"></div>
+    <div id="chordChart" data-bind="chordChart: chordChartData, chartOptions:chordOptions"></div>
     <script>
-
             window.document.onload = function (e) {
                 initialize();
             }
@@ -36,6 +35,15 @@
                 function TestViewModel() {
                     var self = this;
                     self.chordChartData = ko.observable();
+
+                    self.chordOptions = {
+                        height:500,
+                        width:500,
+                        fillParentController:true,
+                        chordFormat: function(d){
+                            return "Some value: " + d
+                        }
+                    }
                 }
 
                 var vm = new TestViewModel();
