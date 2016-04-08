@@ -6,8 +6,9 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         };
 
         var el = charting.getElementAndCheckData(element, data);
-        if (el == null)
+        if (el === null) {
             return;
+        }
 
         options = koTools.setDefaultOptions(defaultOptions, options);
         var dims = charting.getDimensions(options, el);
@@ -24,7 +25,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
 
         var svg = charting.appendContainer(el, dims);
-        charting.showStandardLegend(el, xKeys, color, options.legend, dims.height);
+        charting.showStandardLegend(el, xKeys, color, options, dims);
         charting.createXAxis(svg, options, xScale, dims);
         charting.createYAxis(svg, options, yScale, dims);
 
@@ -42,5 +43,5 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             .style("stroke-width", "2")
             .style("stroke", "black")
             .style("cursor", "pointer");
-    }
+    };
 });

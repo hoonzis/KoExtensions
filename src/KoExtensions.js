@@ -585,13 +585,18 @@ define('KoExtensions/kotools',['d3'],function (d3) {
 
         self.getHeight = function(el)
         {
-            if (el.clientHeight){
-                return el.clientWidth;
+            if (el.clientHeight && el.clientHeight !== 0){
+                return el.clientHeight;
             }
 
             if (Array.isArray(el) && el.length > 0) {
-                return self.getWidth(el[0]);
+                return self.getHeight(el[0]);
             }
+
+            if (el.parentElement !== null) {
+                return self.getHeight(el.parentElement);
+            }
+
             return null;
         };
 
@@ -1008,8 +1013,8 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
         return maxWidth * 10;
     };
 
-    charting.showStandardLegend = function (parent, data, color, showLegend, height) {
-        if (showLegend) {
+    charting.showStandardLegend = function (parent, data, color, options, dims) {
+        if (options.legend) {
             var maxWidth = charting.getLegendWidth(data);
 
             //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
@@ -1019,11 +1024,12 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
                 legend = parent
                     .append("svg")
                     .attr("width", legendWidth)
-                    .attr("height", height)
+                    .attr("height", dims.height)
                     .selectAll("g")
                     .data(data)
                     .enter().append("g")
                     .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
+            dims.legendWidth = legendWidth;
 
             legend.append("rect")
                   .attr("width", size)
@@ -1122,12 +1128,8 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
     };
 
     charting.getDimensions = function (options, el) {
-        if (options.fillParentController) {
-            options.width = koTools.getWidth(el);
-            options.height = d3.max([koTools.getHeight(el), options.height]);
-        }
         var dims = {};
-        dims.margin = { top: 20, right: options.right || 50, bottom: 30 , left: options.left || 50 };
+        dims.margin = { top: options.top || 20, right: options.right || 50, bottom: options.bottom || 30 , left: options.left || 50 };
         dims.width = options.width || 200;
         dims.height = options.height || 100;
         dims.yAxisWidth = 40;
@@ -1138,11 +1140,27 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
             dims.margin.bottom = options.xAxisTextAngle*50/90 + dims.margin.bottom;
         }
 
+        dims.legendWidth = 0;
+
+        // TODO: would be good to have the real width of the leged here
+        if(options.legend){
+            dims.legendWidth = 150;
+        }
+
         if(options.xAxisLabel) {
             dims.margin.bottom+= 15;
         }
         dims.containerHeight = dims.height + dims.margin.top + dims.margin.bottom;
-        dims.containerWidth = dims.width + dims.yAxisWidth + dims.margin.left + dims.margin.right;
+        dims.containerWidth = dims.width + dims.yAxisWidth + dims.margin.left + dims.margin.right + dims.legendWidth;
+
+        if (options.fillParentController) {
+            dims.containerWidth = koTools.getWidth(el) - dims.legendWidth -  20;
+            dims.containerHeight = d3.max([koTools.getHeight(el), options.height]) - 30;
+
+            dims.height = dims.containerHeight - (dims.margin.top + dims.margin.bottom);
+            dims.width = dims.containerWidth - (dims.yAxisWidth + dims.margin.left + dims.margin.right);
+            dims.fillParentController = true;
+        }
 
         if (options.horizontalSlider) {
             var sliderSpace = 30;
@@ -1162,10 +1180,10 @@ define('KoExtensions/charting',['d3','./kotools'], function (d3,koTools) {
 
     charting.appendContainer = function (el, dims) {
         var svg = el.append("svg")
-        .attr("width", dims.containerWidth)
-        .attr("height", dims.containerHeight)
-      .append("g")
-        .attr("transform", "translate(" + dims.margin.left + "," + dims.margin.top + ")");
+            .attr("width", dims.containerWidth)
+            .attr("height", dims.containerHeight)
+            .append("g")
+            .attr("transform", "translate(" + dims.margin.left + "," + dims.margin.top + ")");
 
         return svg;
     };
@@ -1570,7 +1588,7 @@ define('KoExtensions/Charts/barchart',['d3','./../charting','./../kotools'], fun
             arrangedByX[newD.x] = newD;
         });
 
-        charting.showStandardLegend(el, keys,color, options.legend, dims.height);
+        charting.showStandardLegend(el, keys,color, options, dims);
 
         var svg = charting.appendContainer(el, dims);
 
@@ -1778,7 +1796,7 @@ define('KoExtensions/Charts/piechart',['d3','./../charting','./../kotools'], fun
 
         //piechart shows the values in the legend as well
         //that's why it passes the whole data collection and both, description and value function provider
-        charting.showStandardLegend(el, xKeys, color, options.legend, dims.height);
+        charting.showStandardLegend(el, xKeys, color, options, dims);
         var svg = charting.appendContainer(el, dims);
         svg.data([data]);
 
@@ -1915,7 +1933,7 @@ define('KoExtensions/Charts/linechart',['d3', './../charting', './../kotools'], 
 
         var svg = charting.appendContainer(el, dims);
 
-        charting.showStandardLegend(el, linenames, color, options.legend, dims.height);
+        charting.showStandardLegend(el, linenames, color, options, dims);
 
         if (options.xTick) {
             var xValues = scaleDef.xKeys.filter(function (k) {
@@ -2239,8 +2257,9 @@ define('KoExtensions/Charts/scatterplot',['d3','./../charting','./../kotools'], 
         };
 
         var el = charting.getElementAndCheckData(element, data);
-        if (el == null)
+        if (el === null) {
             return;
+        }
 
         options = koTools.setDefaultOptions(defaultOptions, options);
         var dims = charting.getDimensions(options, el);
@@ -2257,7 +2276,7 @@ define('KoExtensions/Charts/scatterplot',['d3','./../charting','./../kotools'], 
 
 
         var svg = charting.appendContainer(el, dims);
-        charting.showStandardLegend(el, xKeys, color, options.legend, dims.height);
+        charting.showStandardLegend(el, xKeys, color, options, dims);
         charting.createXAxis(svg, options, xScale, dims);
         charting.createYAxis(svg, options, yScale, dims);
 
@@ -2275,7 +2294,7 @@ define('KoExtensions/Charts/scatterplot',['d3','./../charting','./../kotools'], 
             .style("stroke-width", "2")
             .style("stroke", "black")
             .style("cursor", "pointer");
-    }
+    };
 });
 
 
@@ -2464,7 +2483,7 @@ define('KoExtensions/Charts/bubblechart',['d3','./../charting','./../kotools'], 
         var colors = koTools.distinct(data, options.bubbleColor);
         var colorScale = charting.colors.domain(colors);
 
-        charting.showStandardLegend(el, colors, colorScale, options.legend, dims.height);
+        charting.showStandardLegend(el, colors, colorScale, options, dims);
         var svg = charting.appendContainer(el, dims);
 
         charting.createXAxis(svg, options, xScale, dims);

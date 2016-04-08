@@ -45,7 +45,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
         var colors = koTools.distinct(data, options.bubbleColor);
         var colorScale = charting.colors.domain(colors);
 
-        charting.showStandardLegend(el, colors, colorScale, options.legend, dims.height);
+        charting.showStandardLegend(el, colors, colorScale, options, dims);
         var svg = charting.appendContainer(el, dims);
 
         charting.createXAxis(svg, options, xScale, dims);

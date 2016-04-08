@@ -26,8 +26,8 @@ define(['d3','./kotools'], function (d3,koTools) {
         return maxWidth * 10;
     };
 
-    charting.showStandardLegend = function (parent, data, color, showLegend, height) {
-        if (showLegend) {
+    charting.showStandardLegend = function (parent, data, color, options, dims) {
+        if (options.legend) {
             var maxWidth = charting.getLegendWidth(data);
 
             //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
@@ -37,11 +37,12 @@ define(['d3','./kotools'], function (d3,koTools) {
                 legend = parent
                     .append("svg")
                     .attr("width", legendWidth)
-                    .attr("height", height)
+                    .attr("height", dims.height)
                     .selectAll("g")
                     .data(data)
                     .enter().append("g")
                     .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
+            dims.legendWidth = legendWidth;
 
             legend.append("rect")
                   .attr("width", size)
@@ -140,12 +141,8 @@ define(['d3','./kotools'], function (d3,koTools) {
     };
 
     charting.getDimensions = function (options, el) {
-        if (options.fillParentController) {
-            options.width = koTools.getWidth(el);
-            options.height = d3.max([koTools.getHeight(el), options.height]);
-        }
         var dims = {};
-        dims.margin = { top: 20, right: options.right || 50, bottom: 30 , left: options.left || 50 };
+        dims.margin = { top: options.top || 20, right: options.right || 50, bottom: options.bottom || 30 , left: options.left || 50 };
         dims.width = options.width || 200;
         dims.height = options.height || 100;
         dims.yAxisWidth = 40;
@@ -156,11 +153,27 @@ define(['d3','./kotools'], function (d3,koTools) {
             dims.margin.bottom = options.xAxisTextAngle*50/90 + dims.margin.bottom;
         }
 
+        dims.legendWidth = 0;
+
+        // TODO: would be good to have the real width of the leged here
+        if(options.legend){
+            dims.legendWidth = 150;
+        }
+
         if(options.xAxisLabel) {
             dims.margin.bottom+= 15;
         }
         dims.containerHeight = dims.height + dims.margin.top + dims.margin.bottom;
-        dims.containerWidth = dims.width + dims.yAxisWidth + dims.margin.left + dims.margin.right;
+        dims.containerWidth = dims.width + dims.yAxisWidth + dims.margin.left + dims.margin.right + dims.legendWidth;
+
+        if (options.fillParentController) {
+            dims.containerWidth = koTools.getWidth(el) - dims.legendWidth -  20;
+            dims.containerHeight = d3.max([koTools.getHeight(el), options.height]) - 30;
+
+            dims.height = dims.containerHeight - (dims.margin.top + dims.margin.bottom);
+            dims.width = dims.containerWidth - (dims.yAxisWidth + dims.margin.left + dims.margin.right);
+            dims.fillParentController = true;
+        }
 
         if (options.horizontalSlider) {
             var sliderSpace = 30;
@@ -180,10 +193,10 @@ define(['d3','./kotools'], function (d3,koTools) {
 
     charting.appendContainer = function (el, dims) {
         var svg = el.append("svg")
-        .attr("width", dims.containerWidth)
-        .attr("height", dims.containerHeight)
-      .append("g")
-        .attr("transform", "translate(" + dims.margin.left + "," + dims.margin.top + ")");
+            .attr("width", dims.containerWidth)
+            .attr("height", dims.containerHeight)
+            .append("g")
+            .attr("transform", "translate(" + dims.margin.left + "," + dims.margin.top + ")");
 
         return svg;
     };

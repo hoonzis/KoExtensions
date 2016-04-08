@@ -141,13 +141,18 @@ define(['d3'],function (d3) {
 
         self.getHeight = function(el)
         {
-            if (el.clientHeight){
-                return el.clientWidth;
+            if (el.clientHeight && el.clientHeight !== 0){
+                return el.clientHeight;
             }
 
             if (Array.isArray(el) && el.length > 0) {
-                return self.getWidth(el[0]);
+                return self.getHeight(el[0]);
             }
+
+            if (el.parentElement !== null) {
+                return self.getHeight(el.parentElement);
+            }
+
             return null;
         };
 

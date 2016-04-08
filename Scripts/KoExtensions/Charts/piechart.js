@@ -47,7 +47,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
 
         //piechart shows the values in the legend as well
         //that's why it passes the whole data collection and both, description and value function provider
-        charting.showStandardLegend(el, xKeys, color, options.legend, dims.height);
+        charting.showStandardLegend(el, xKeys, color, options, dims);
         var svg = charting.appendContainer(el, dims);
         svg.data([data]);
 

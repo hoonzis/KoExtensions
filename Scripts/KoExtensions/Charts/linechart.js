@@ -81,7 +81,7 @@ define(['d3', './../charting', './../kotools'], function (d3, charting, koTools)
 
         var svg = charting.appendContainer(el, dims);
 
-        charting.showStandardLegend(el, linenames, color, options.legend, dims.height);
+        charting.showStandardLegend(el, linenames, color, options, dims);
 
         if (options.xTick) {
             var xValues = scaleDef.xKeys.filter(function (k) {

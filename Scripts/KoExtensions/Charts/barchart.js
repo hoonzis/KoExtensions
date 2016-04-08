@@ -106,7 +106,7 @@ define(['d3','./../charting','./../kotools'], function (d3,charting,koTools) {
             arrangedByX[newD.x] = newD;
         });
 
-        charting.showStandardLegend(el, keys,color, options.legend, dims.height);
+        charting.showStandardLegend(el, keys,color, options, dims);
 
         var svg = charting.appendContainer(el, dims);
 
