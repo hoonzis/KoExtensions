@@ -4,13 +4,14 @@ KoExtensions
 
 KoExtensions can be used as standalone JavaScript charting library based on D3JS or plug-in for KnockoutJS. Besides charting, when used with Knockout it provides other useful bindings. Available charts:
 
-[piechart]: http://hoonzis.github.com/KoExtensions/img/small/piechart.PNG
-[cashflow]: http://hoonzis.github.com/KoExtensions/img/small/cashflow.PNG
-[linechart]: http://hoonzis.github.com/KoExtensions/img/small/linechart.PNG
-[chordchart]: http://hoonzis.github.com/KoExtensions/img/small/chordchart.PNG
-[bubblechart]: http://hoonzis.github.com/KoExtensions/img/small/bubblechart.PNG
-[histochart]: http://hoonzis.github.com/KoExtensions/img/small/histogram.PNG
-[mapbinding]: http://hoonzis.github.com/KoExtensions/img/mapbinding.PNG
+[piechart]: https://raw.githubusercontent.com/hoonzis/KoExtensions/gh-pages/img/small/piechart.PNG
+[cashflow]: https://raw.githubusercontent.com/hoonzis/KoExtensions/gh-pages/img/small/cashflow.PNG
+[linechart]: https://raw.githubusercontent.com/hoonzis/KoExtensions/gh-pages/img/small/linechart.PNG
+[chordchart]: https://raw.githubusercontent.com/hoonzis/KoExtensions/gh-pages/img/small/chordchart.PNG
+[bubblechart]: https://raw.githubusercontent.com/hoonzis/KoExtensions/gh-pages/img/small/bubblechart.PNG
+[histochart]: https://raw.githubusercontent.com/hoonzis/KoExtensions/gh-pages/img/small/histogram.PNG
+[mapbinding]: https://raw.githubusercontent.com/hoonzis/KoExtensions/gh-pages/img/mapbinding.PNG
+[linechartslidder]: https://raw.githubusercontent.com/hoonzis/KoExtensions/gh-pages/img/small/horizontalslidder.PNG
 
 [piechartex]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/piecharts.html
 [cashFlowEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/CashFlowExample.html
@@ -28,14 +29,16 @@ KoExtensions can be used as standalone JavaScript charting library based on D3JS
 
 |         Pie Chart       | Bar Chart             | Line Chart             |
 | ------------------------|:---------------------:| ----------------------:|
-| ![alt text][piechart]   | ![alt text][cashflow] | ![alt text][linechart] |
+| ![alt text][piechart]   | ![alt text][cashflow] | ![alt text][linechartslidder] |
 | [Example][piechartex]     | [Example1][barchartex] [Example2][cashFlowEx]  | [Example1][linechartex] [Example2][normalizedLineEx] [With Slidder][lineSlidder]|
 
-|         Chord Chart       | Bubble Chart             | Histogram             |
-| ------------------------|:---------------------:| ----------------------:|
+|         Chord Chart     | Bubble Chart        | Histogram             |
+| ------------------------|:-------------------:| ---------------------:|
 | ![alt text][chordchart]   | ![alt text][bubblechart] | ![alt text][histochart] |
 | [Example][chordEx]    | [Example][bubbleEx] | [Example][histoEx] |
 
+Fiddle to play around:
+https://jsfiddle.net/u4sL2x67/4/
 
 **Other bindings useful for Knockout:**
 
@@ -82,7 +85,7 @@ phantomjs run-qunit.js Tests/Tests.html
 #### Some useful tips ####
 - Showing multiple charts in knockout foreach loop can be achieved as follows:
 
-[foreachpiechart]: http://hoonzis.github.com/KoExtensions/img/multiple_pie.PNG
+[foreachpiechart]: https://raw.githubusercontent.com/hoonzis/KoExtensions/gh-pages/img/multiple_pie.PNG
 ![alt text][foreachpiechart]
 
 ```html
@@ -96,7 +99,7 @@ phantomjs run-qunit.js Tests/Tests.html
 
 - Interesting usage of barchart can be "cashflow chart" which shows a single line, going through the bars being the addition of the bars values. This can be achieved as follows:
 
-[cashflowchart]: http://hoonzis.github.com/KoExtensions/img/cashflowchart.png
+[cashflowchart]: https://raw.githubusercontent.com/hoonzis/KoExtensions/gh-pages/img/cashflowchart.png
 ![alt text][cashflowchart]
 
 ```html
@@ -118,7 +121,7 @@ function TestViewModels (expenses){
 ```
 - Histogram chart has some additional properties which can be used to visualize the statistical distribution, using either Mean or Median and standard variance or MAD (Median absolute deviation)
 
-[histogram]: http://hoonzis.github.com/KoExtensions/img/histogram.PNG
+[histogram]: https://raw.githubusercontent.com/hoonzis/KoExtensions/gh-pages/img/histogram.PNG
 ![alt text][histogram]
 
 ```html
