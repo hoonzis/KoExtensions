@@ -14,44 +14,69 @@ define(['d3','./kotools'], function (d3,koTools) {
         return el;
     };
 
-    charting.getLegendWidth = function (data) {
+    charting.getLegendWidthAndFontSize = function (data) {
         //when there is no legend, just return 0 pixels
         if (!data || data.length === 0) {
             return 0;
         }
-        var maxWidth = d3.max(data, function (el) {
+        var longest = d3.max(data, function (el) {
             return el.length;
         });
-        //asuming 7px per character
-        return maxWidth * 10;
+
+        if (longest > 19) {
+            return {
+                fontSize: "7px",
+                width: 7 * longest,
+                rectangle: 9
+            }
+        }
+
+        if (longest > 15) {
+            return {
+                fontSize: "9px",
+                width: 9 * longest,
+                rectangle: 12
+            }
+        }
+
+        if (longest > 10) {
+            return {
+                fontSize: "11px",
+                width: 11 * longest,
+                rectangle: 15
+            }
+        }
+
+        return {
+            fontSize: "13px",
+            width: 13 * longest,
+            rectangle: 18
+        }
     };
 
-    charting.showStandardLegend = function (parent, data, color, options, dims) {
-        if (options.legend) {
-            var maxWidth = charting.getLegendWidth(data);
+    charting.showStandardLegend = function (parent, data, color, showLegend, height) {
+        if (showLegend) {
+            var legendDims = charting.getLegendWidthAndFontSize(data);
 
             //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
-            var legendWidth = 25 + maxWidth,
-                size = legendWidth > 70 ? 15 : 18,
-                fontSize = legendWidth > 70 ? "13px" : "16px",
+            var legendWidth = 25 + legendDims.width,
                 legend = parent
                     .append("svg")
                     .attr("width", legendWidth)
-                    .attr("height", dims.height)
+                    .attr("height", height)
                     .selectAll("g")
                     .data(data)
                     .enter().append("g")
                     .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
-            dims.legendWidth = legendWidth;
 
             legend.append("rect")
-                  .attr("width", size)
-                  .attr("height", size)
+                  .attr("width", legendDims.rectangle)
+                  .attr("height", legendDims.rectangle)
                   .style("fill", function(i) { return color(i); });
             legend.append("text")
                   .attr("x", 24)
                   .attr("y", 9)
-                  .attr("font-size", fontSize)
+                  .attr("font-size", legendDims.fontSize)
                   .attr("dy", ".35em")
                   .text(function (t) { return t; });
         }

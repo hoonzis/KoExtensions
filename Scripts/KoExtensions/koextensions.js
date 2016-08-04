@@ -171,47 +171,6 @@ define(['./charting', './kotools', './Charts/barchart', './Charts/piechart', './
                     }
                 };
 
-                ko.bindingHandlers.eventDrops = {
-                    update: function(element, valueAccessor, allBindingsAccessor) {
-
-                        var chartData = {
-                            data: ko.unwrap(allBindingsAccessor().eventDrops),
-                            options: ko.unwrap(allBindingsAccessor().chartOptions)
-                        };
-
-                        //if the eventColor was specified, need to get all possible colors to create a scale
-                        var allItemsColorValues = chartData.data.map(function(f) {
-                            return f.dates.map(chartData.options.eventColor);
-                        });
-
-                        //flattening the data since it is grouped in 2 dimensional array
-                        var flatColorsArray = d3.set([].concat.apply([], allItemsColorValues)).values();
-
-                        var color = d3.scale.category20().domain(flatColorsArray);
-
-                        element._chartData = chartData;
-
-                        var eventDropsChart = d3.chart.eventDrops()
-                            .start(chartData.options.start)
-                            .end(chartData.options.end)
-                            .width(chartData.options.width)
-                            .eventColor(function(d) {
-                                return color(chartData.options.eventColor(d));
-                            })
-                            //.eventSize(chartData.options.eventSize)
-                            .eventDate(chartData.options.eventDate)
-                            .eventHover(chartData.options.eventHover)
-                            .minPercentile(chartData.options.minPercentile)
-                            .maxPercentile(chartData.options.maxPercentile)
-                            .scale(chartData.options.scale);
-
-                        d3.select(element)
-                            .datum(chartData.data)
-                            .call(eventDropsChart);
-
-                    }
-                };
-
                 ko.bindingHandlers.histogram = {
                     update: function(element, valueAccessor, allBindingsAccessor) {
                         var data = ko.unwrap(valueAccessor());
