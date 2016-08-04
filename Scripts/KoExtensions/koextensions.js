@@ -146,18 +146,7 @@ define(['./charting', './kotools', './Charts/barchart', './Charts/piechart', './
                     update: function(element, valueAccessor, allBindingsAccessor) {
                         var data = allBindingsAccessor().piechart();
                         var options = allBindingsAccessor().chartOptions;
-                        nv.addGraph(function() {
-                          var chart = nv.models.pieChart();
-
-                          chart.options(options);
-                          var chartDiv = d3.select(element);
-                          var chartSvg = chartDiv.append("svg");
-
-                          chartSvg
-                              .datum(data)
-                              .transition().duration(500)
-                              .call(chart);
-                        });
+                        charting.pieChart(data, element, options);
                     }
                 };
 
