@@ -8,7 +8,7 @@
         <link href='https://api.mapbox.com/mapbox.js/v2.2.3/mapbox.css' rel='stylesheet' />
         <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v2.0.2/turf.min.js'></script>
 
-        <script src="../Scripts/require.js"></script>
+        <script src="../references/require.js"></script>
     </head>
     <body>
         <table>
@@ -43,12 +43,16 @@
         </table>
 
         <script>
-            require.config({
-                baseUrl: "../Scripts"
-            });
+        require.config({
+            baseUrl: "../src",
+            paths:{
+              'ko':'../references/knockout-3.2.0.debug',
+              'd3':'../references/d3',
+            }
+        });
 
             var ko;
-            require(['KoExtensions/koextensions','knockout-3.2.0.debug'], function(koext,kol) {
+            require(['koextensions','ko'], function(koext,kol) {
                 ko = kol;
                 koext.registerExtensions();
                 var stationsData = {

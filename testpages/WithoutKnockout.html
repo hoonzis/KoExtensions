@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF8">
     <title>Charting Test Page</title>
-    <script src="../Scripts/require.js"></script>
+    <script src="../references/require.js"></script>
     <link type="text/css" rel="stylesheet" href="../styles/kostyles.css" />
 </head>
 <body>
@@ -12,10 +12,14 @@
     </div>
     <script>
             require.config({
-                baseUrl: "../Scripts"
+                baseUrl: "../src",
+                paths:{
+                  'ko':'../references/knockout-3.2.0.debug',
+                  'd3':'../references/d3',
+                }
             });
 
-            require(['KoExtensions/koextensions'], function (koext) {
+            require(['koextensions'], function (koext) {
                 //without knockout, don't register extensions!
                 //koext.registerExtensions();
                 var testData = [

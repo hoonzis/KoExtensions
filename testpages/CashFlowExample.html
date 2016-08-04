@@ -3,83 +3,84 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=UTF8">
         <title>Chashflow example</title>
-        <script src="../Scripts/require.js"></script>
+        <script src="../references/require.js"></script>
     </head>
     <body>
         <script type="text/javascript">
 
-            require.config({
-                baseUrl: "../Scripts"
+        require.config({
+            baseUrl: "../src",
+            paths:{
+              'ko':'../references/knockout-3.2.0.debug',
+              'd3':'../references/d3',
+            }
+        });
+
+        var lifeExpenses = [
+            {
+                month: 'january',
+                rent: -500,
+                salary: 2200,
+                parties: -300,
+                phone: -100
+            },
+            {
+                month: 'february',
+                rent: -1000,
+                salary: 1500,
+                parties: -400,
+                phone: -80
+            },
+            {
+                month: 'marz',
+                rent: -800,
+                salary: 2500,
+                parties: -800,
+                phone: -120
+            },
+            {
+                month: 'april',
+                rent: -700,
+                salary: 2000,
+                parties: -200,
+                phone: -100
+            }
+        ];
+
+        function TestViewModels(expenses, d3) {
+            var self = this;
+            self.lifeExpenses = ko.observableArray([]);
+            self.expensesPerMonth = ko.observableArray([]);
+
+            var totalPerMonth = expenses.map(function(item) {
+                var keys = Object.keys(item).filter(function(key) { return key != 'month'; });
+
+                var monthTotal =
+                {
+                    x: item['month'],
+                    y: d3.sum(keys, function(key) { return item[key]; })
+                };
+
+                return monthTotal;
             });
 
-            var ko;
-            require(['knockout-3.2.0.debug','KoExtensions/koextensions','d3'], function(kol,koext,d3) {
-                ko = kol;
-                koext.registerExtensions();
-                var lifeExpenses = [
-                    {
-                        month: 'january',
-                        rent: -500,
-                        salary: 2200,
-                        parties: -300,
-                        phone: -100
-                    },
-                    {
-                        month: 'february',
-                        rent: -1000,
-                        salary: 1500,
-                        parties: -400,
-                        phone: -80
-                    },
-                    {
-                        month: 'marz',
-                        rent: -800,
-                        salary: 2500,
-                        parties: -800,
-                        phone: -120
-                    },
-                    {
-                        month: 'april',
-                        rent: -700,
-                        salary: 2000,
-                        parties: -200,
-                        phone: -100
-                    }
-                ];
 
-                function TestViewModels(expenses) {
-                    var self = this;
-                    self.lifeExpenses = ko.observableArray([]);
-                    self.expensesPerMonth = ko.observableArray([]);
+            self.lifeExpenses(expenses);
+            self.expensesPerMonth(totalPerMonth);
+        }
 
-                    var totalPerMonth = expenses.map(function(item) {
-                        var keys = Object.keys(item).filter(function(key) { return key != 'month'; });
-
-                        var monthTotal =
-                        {
-                            x: item['month'],
-                            y: d3.sum(keys, function(key) { return item[key]; })
-                        };
-
-                        return monthTotal;
-                    });
-
-
-                    self.lifeExpenses(expenses);
-                    self.expensesPerMonth(totalPerMonth);
-                }
-
-                var vm = new TestViewModels(lifeExpenses);
-
-                ko.applyBindings(vm);
-
-            });
-        </script>
+        var ko;
+        require(['ko','koextensions','d3'], function(kol,koext,d3) {
+            ko = kol;
+            koext.registerExtensions();
+            var vm = new TestViewModels(lifeExpenses, d3);
+            ko.applyBindings(vm);
+        });
+      </script>
 
         <h2>Cash-Flow Chart:</h2>
         <h2>Monthly Sales</h2>
         <div id="cashFlow" data-bind="barchart: lifeExpenses, line:expensesPerMonth,chartOptions:{legend:true, width:280,height:150,style:'stack',sameScaleLinesAndBars:true,xcoord:'month'}">
-
         </div>
     </body>
 </html>

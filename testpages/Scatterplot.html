@@ -1,7 +1,7 @@
 <html>
     <head>
         <title>Scatterplot example</title>
-        <script src="../Scripts/require.js"></script>
+        <script src="../references/require.js"></script>
     </head>
     <body>
     <h2>Scatterplot</h2>
@@ -10,11 +10,15 @@
         </div>
         <script>
             require.config({
-                baseUrl: "../Scripts"
+                baseUrl: "../src",
+                paths:{
+                  'ko':'../references/knockout-3.2.0.debug',
+                  'd3':'../references/d3',
+                }
             });
 
             var ko;
-            require(['KoExtensions/koextensions','knockout-3.2.0.debug'], function(koext,kol) {
+            require(['koextensions','ko'], function(koext,kol) {
                 ko = kol;
                 koext.registerExtensions();
                 var hours = [30, 35, 40, 45, 50, 55, 60, 65, 70, 10, 12, 30];

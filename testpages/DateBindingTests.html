@@ -3,11 +3,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Datepicker binding tests</title>
-    <link href="../Content/bootstrap.css" rel="stylesheet" />
-    <link href="../Content/bootstrap-theme.css" rel="stylesheet" />
-    <link href="../Content/bootstrap-datepicker.css" rel="stylesheet" />
-    <script src="../Scripts/require.js"></script>
-    <link type="text/css" rel="stylesheet" href="../styles/kostyles.css" />
+    <link href="../content/bootstrap.css" rel="stylesheet" />
+    <link href="../content/bootstrap-theme.css" rel="stylesheet" />
+    <link href="../content/bootstrap-datepicker.css" rel="stylesheet" />
+    <script src="../references/require.js"></script>
 </head>
 <body>
 <br/>
@@ -41,12 +40,17 @@
     <script>
 
     require.config({
-        baseUrl: "../Scripts",
-        urlArgs: "bust=2" + (new Date()).getTime()
+        baseUrl: "../src",
+        paths:{
+          'ko':'../references/knockout-3.2.0.debug',
+          'd3':'../references/d3',
+          'bootstrap':'../references/bootstrap',
+          'jquery':'../references/jquery-2.1.1',
+          'bootstrap-datepicker':'../references/bootstrap-datepicker',
+        }
     });
-
     var ko;
-    require(['KoExtensions/koextensions','knockout-3.2.0.debug', 'jquery-2.1.1',], function (koext,kol) {
+    require(['koextensions','ko', 'jquery',], function (koext,kol) {
         ko = kol;
         koext.registerExtensions();
         require(['bootstrap', 'bootstrap-datepicker'], function() {

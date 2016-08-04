@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF8">
     <title>BubbleChart Chart</title>
-    <script src="../Scripts/require.js"></script>
+    <script src="../references/require.js"></script>
 </head>
 <body>
 <h2>Bubble Chart Example</h2>
@@ -15,13 +15,14 @@
     }
 
     require.config({
-        baseUrl: "../Scripts",
+        baseUrl: "../src",
         paths:{
-          'ko':'knockout-3.2.0.debug'
+          'ko':'../references/knockout-3.2.0.debug',
+          'd3':'../references/d3',
         }
     });
 
-    require(['ko','KoExtensions/koextensions'], function(kol,koext) {
+    require(['ko','koextensions'], function(kol,koext) {
         ko = kol;
         koext.registerExtensions();
 

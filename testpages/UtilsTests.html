@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Map Test Page</title>
-    <script src="../Scripts/require.js"></script>
+    <script src="../references/require.js"></script>
 </head>
 <body>
 	<b>Price:</b>
@@ -11,7 +11,7 @@
 	<br/><b>Power:</b>
 	<span data-bind="formattedValue:power, currency:'kW'"></span>
 	<br/><b>Efficiency:</b>
-	<span data-bind="formattedValue:efficiency, currency:'%', transformation:koextensions.tools.toPercent"></span>
+	<span data-bind="formattedValue:efficiency, currency:'%'"></span>
 	<br/><b>Consumption:</b>
 	<span data-bind="formattedValue:consumption100, currency:'l/100km'"></span>
 	<br/><b>Distance:</b>
@@ -21,15 +21,18 @@
     <br/><b>Test date:</b>
     <span data-bind="formattedValue: date"></span>
     <script type="text/javascript">
-        var koextensions;
+
         require.config({
-            baseUrl: "../Scripts"
+            baseUrl: "../src",
+            paths:{
+              'ko':'../references/knockout-3.2.0.debug',
+              'd3':'../references/d3',
+            }
         });
 
         var ko;
-        require(['KoExtensions/koextensions','knockout-3.2.0.debug'], function(koext,kol) {
+        require(['koextensions','ko'], function(koext,kol) {
             ko = kol;
-            koextensions = koext;
             koext.registerExtensions();
             function CarViewModel() {
                 var self = this;

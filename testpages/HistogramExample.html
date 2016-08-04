@@ -1,7 +1,7 @@
 <html>
     <head>
         <title>Histogram example</title>
-        <script src="../Scripts/require.js"></script>
+        <script src="../references/require.js"></script>
     </head>
     <body>
     <h2>Detecting the outliers</h2>
@@ -21,13 +21,16 @@
     <input type="checkbox" data-bind="checked: showOutliers" />
     <div id="histogram" data-bind="histogram: data, chartOptions : chartOptions"></div>
         <script>
-            require.config({
-                baseUrl: "../Scripts"
-            });
-
+          require.config({
+              baseUrl: "../src",
+              paths:{
+                'ko':'../references/knockout-3.2.0.debug',
+                'd3':'../references/d3',
+              }
+          });
 
             var ko;
-            require(['KoExtensions/koextensions','knockout-3.2.0.debug'], function(koext,kol) {
+            require(['koextensions','ko'], function(koext,kol) {
                 ko = kol;
                 var histogramDataExample = "3.9,3.8,3.9,2.7,2.8,1.9,2.7,3.5, 4.4, 2.8, 3.4, 8.6, 4.5, 3.5, 3.6, 3.8, 4.3, 4.5, 3.5,30,33,31";
 

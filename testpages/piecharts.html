@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=UTF8">
         <title>Charting Test Page</title>
-        <script src="../Scripts/require.js"></script>
+        <script src="../references/require.js"></script>
     </head>
 <body>
 	<h2>Simple piechart:</h2>
@@ -26,11 +26,15 @@
             }
 
             require.config({
-                baseUrl: "../Scripts"
+                baseUrl: "../src",
+                paths:{
+                  'ko':'../references/knockout-3.2.0.debug',
+                  'd3':'../references/d3',
+                }
             });
 
             var ko;
-            require(['KoExtensions/koextensions','knockout-3.2.0.debug','d3'], function(koext,kol,d3) {
+            require(['koextensions','ko','d3'], function(koext,kol, d3) {
                 ko = kol;
                 koext.registerExtensions();
                 var lastWeek = [
