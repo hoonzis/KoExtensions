@@ -22,6 +22,10 @@ define(['./charting', './kotools', './Charts/barchart', './Charts/piechart', './
                         }
                     },
                     update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+                        if (typeof (L) === 'undefined') {
+                            return;
+                        }
+
                         if (element._mapBoxLayer) {
                             element._mapBox.removeLayer(element._mapBoxLayer);
                         }
@@ -155,11 +159,7 @@ define(['./charting', './kotools', './Charts/barchart', './Charts/piechart', './
                     update: function(element, valueAccessor, allBindingsAccessor) {
                         var data = ko.unwrap(valueAccessor());
                         var options = ko.unwrap(allBindingsAccessor().chartOptions);
-
-                        var line = null;
-                        if (allBindingsAccessor().line != null) {
-                            line = allBindingsAccessor().line();
-                        }
+                        var line = ko.unwrap(allBindingsAccessor().line);
                         charting.barChart(data, element, options, line);
                     }
                 };

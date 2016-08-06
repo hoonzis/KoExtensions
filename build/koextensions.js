@@ -855,6 +855,19 @@ define('charting',['d3','./kotools'], function (d3,koTools) {
         return el;
     };
 
+    charting.legendFont = function(longest){
+      if (longest > 20) {
+          return 8;
+      }
+      if(longest > 15) {
+        return 10;
+      }
+      if(longest > 10) {
+        return 12;
+      }
+      return 13;
+    }
+
     charting.getLegendWidthAndFontSize = function (data) {
         //when there is no legend, just return 0 pixels
         if (!data || data.length === 0) {
@@ -863,60 +876,37 @@ define('charting',['d3','./kotools'], function (d3,koTools) {
         var longest = d3.max(data, function (el) {
             return el.length;
         });
-
-        if (longest > 19) {
-            return {
-                fontSize: "7px",
-                width: 7 * longest,
-                rectangle: 9
-            }
-        }
-
-        if (longest > 15) {
-            return {
-                fontSize: "9px",
-                width: 9 * longest,
-                rectangle: 12
-            }
-        }
-
-        if (longest > 10) {
-            return {
-                fontSize: "11px",
-                width: 11 * longest,
-                rectangle: 15
-            }
-        }
-
+        // we determine the optimal font size and from it calculate the rest (rectangle size and legend width)
+        var fontSize = charting.legendFont(longest);
+        var rectangleSize = fontSize + 2;
         return {
-            fontSize: "13px",
-            width: 13 * longest,
-            rectangle: 18
-        }
+          fontSize: fontSize + "px",
+          width: rectangleSize + (fontSize - 3) * longest,
+          rectangle: rectangleSize
+        };
     };
 
     charting.showStandardLegend = function (parent, data, color, showLegend, height) {
         if (showLegend) {
             var legendDims = charting.getLegendWidthAndFontSize(data);
 
-            //assuming 25 pixels for the small rectangle and 7 pixels per character, rough estimation which more or less works
-            var legendWidth = 25 + legendDims.width,
-                legend = parent
-                    .append("svg")
-                    .attr("width", legendWidth)
-                    .attr("height", height)
-                    .selectAll("g")
-                    .data(data)
-                    .enter().append("g")
-                    .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
+            var legend = parent
+                  .append("svg")
+                  .attr("width", legendDims.width)
+                  .selectAll("g")
+                  .data(data)
+                  .enter().append("g")
+                  .attr("transform", function (d, i) { return "translate(0," + i * (legendDims.rectangle  + 4) + ")"; });
 
             legend.append("rect")
                   .attr("width", legendDims.rectangle)
                   .attr("height", legendDims.rectangle)
                   .style("fill", function(i) { return color(i); });
+
+
             legend.append("text")
-                  .attr("x", 24)
-                  .attr("y", 9)
+                  .attr("x", legendDims.rectangle + 4)
+                  .attr("y", legendDims.rectangle / 2)
                   .attr("font-size", legendDims.fontSize)
                   .attr("dy", ".35em")
                   .text(function (t) { return t; });
@@ -1030,7 +1020,7 @@ define('charting',['d3','./kotools'], function (d3,koTools) {
             dims.margin.bottom+= 15;
         }
         dims.containerHeight = dims.height + dims.margin.top + dims.margin.bottom;
-        dims.containerWidth = dims.width + dims.yAxisWidth + dims.margin.left + dims.margin.right + dims.legendWidth;
+        dims.containerWidth = dims.width + dims.yAxisWidth + dims.margin.left + dims.margin.right;
 
         if (options.fillParentController) {
             dims.containerWidth = koTools.getWidth(el) - dims.legendWidth -  20;
@@ -2424,6 +2414,10 @@ define('koextensions',['./charting', './kotools', './Charts/barchart', './Charts
                         }
                     },
                     update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+                        if (typeof (L) === 'undefined') {
+                            return;
+                        }
+
                         if (element._mapBoxLayer) {
                             element._mapBox.removeLayer(element._mapBoxLayer);
                         }
@@ -2557,11 +2551,7 @@ define('koextensions',['./charting', './kotools', './Charts/barchart', './Charts
                     update: function(element, valueAccessor, allBindingsAccessor) {
                         var data = ko.unwrap(valueAccessor());
                         var options = ko.unwrap(allBindingsAccessor().chartOptions);
-
-                        var line = null;
-                        if (allBindingsAccessor().line != null) {
-                            line = allBindingsAccessor().line();
-                        }
+                        var line = ko.unwrap(allBindingsAccessor().line);
                         charting.barChart(data, element, options, line);
                     }
                 };
