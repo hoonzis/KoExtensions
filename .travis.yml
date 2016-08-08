@@ -1,2 +1,2 @@
 language: node_js
-script: phantomjs run-qunit.js Tests/Tests.html
+script: phantomjs tests/run-qunit.js tests/Tests.html
