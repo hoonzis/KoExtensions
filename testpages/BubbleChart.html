@@ -3,76 +3,60 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF8">
     <title>BubbleChart Chart</title>
-    <script src="../references/require.js"></script>
+    <script src="../references/d3.js"></script>
+    <script src="../references/knockout-3.4.0.js"></script>
+    <script src="../build/koextensions.js"></script>
 </head>
 <body>
 <h2>Bubble Chart Example</h2>
 <div id="bullChart" data-bind="bubblechart: bubbleChartData, chartOptions:bubbleChartOptions"></div>
 <script>
-
-    window.document.onload = function(e) {
-        initialize();
+    function TestViewModel() {
+        var self = this;
+        self.bubbleChartData = ko.observableArray([]);
+        self.bubbleChartOptions = {
+            bubbleHorizontal: function(d) { return d.day; },
+            bubbleVertical: function(d) { return d.strike; },
+            bubbleSize: function(d) { return d.price; },
+            bubbleColor: function(d) { return d.type; },
+            legend: true,
+            maxBubbleSize: 20,
+            height: 350,
+            xAxisTextAngle: 45,
+            yMin: -20,
+            marginCoef: 1.2,
+            width:500
+        }
     }
 
-    require.config({
-        baseUrl: "../src",
-        paths:{
-          'ko':'../references/knockout-3.2.0.debug',
-          'd3':'../references/d3',
-        }
-    });
+    var vm = new TestViewModel();
+    ko.applyBindings(vm);
 
-    require(['ko','koextensions'], function(kol,koext) {
-        ko = kol;
-        koext.registerExtensions();
+    var day1 = new Date(2015, 1, 1);
+    var day2 = new Date(2015, 1, 2);
+    var day3 = new Date(2015, 1, 3);
+    var day4 = new Date(2015, 1, 4);
 
-        function TestViewModel() {
-            var self = this;
-            self.bubbleChartData = ko.observableArray([]);
-            self.bubbleChartOptions = {
-                bubbleHorizontal: function(d) { return d.day; },
-                bubbleVertical: function(d) { return d.strike; },
-                bubbleSize: function(d) { return d.price; },
-                bubbleColor: function(d) { return d.type; },
-                legend: true,
-                maxBubbleSize: 20,
-                height: 350,
-                xAxisTextAngle: 45,
-                yMin: -20,
-                marginCoef: 1.2,
-                width:500
-            }
-        }
+    var data = [
+        { strike: 100, day: day1, price: 4.45, type: "PUT" },
+        { strike: 100, day: day2, price: 5.45, type: "CALL" },
+        { strike: 100, day: day3, price: 6.45, type: "PUT" },
+        { strike: 110, day: day1, price: 5.8, type: "CALL" },
+        { strike: 110, day: day2, price: 6.8, type: "PUT" },
+        { strike: 110, day: day3, price: 7.45, type: "CALL" },
+        { strike: 20, day: day3, price: 7.45, type: "CASH" },
+        { strike: 40, day: day2, price: 7.45, type: "CASH" },
+        { strike: 120, day: day1, price: 8.45, type: "CALL" },
+        { strike: 120, day: day2, price: 9.2, type: "CALL" },
+        { strike: 120, day: day3, price: 10.45, type: "CALL" },
+        { strike: 120, day: day4, price: 8.45, type: "CALL" },
+        { strike: 110, day: day4, price: 9.2, type: "CALL" },
+        { strike: 105, day: day4, price: 10.45, type: "CASH" },
+        { strike: 1, day: day4, price: 10.45, type: "CASH" },
+        { strike: 2, day: day4, price: 10.45, type: "CASH" }
+    ];
 
-        var vm = new TestViewModel();
-        ko.applyBindings(vm);
-
-        var day1 = new Date(2015, 1, 1);
-        var day2 = new Date(2015, 1, 2);
-        var day3 = new Date(2015, 1, 3);
-        var day4 = new Date(2015, 1, 4);
-
-        var data = [
-            { strike: 100, day: day1, price: 4.45, type: "PUT" },
-            { strike: 100, day: day2, price: 5.45, type: "CALL" },
-            { strike: 100, day: day3, price: 6.45, type: "PUT" },
-            { strike: 110, day: day1, price: 5.8, type: "CALL" },
-            { strike: 110, day: day2, price: 6.8, type: "PUT" },
-            { strike: 110, day: day3, price: 7.45, type: "CALL" },
-            { strike: 20, day: day3, price: 7.45, type: "CASH" },
-            { strike: 40, day: day2, price: 7.45, type: "CASH" },
-            { strike: 120, day: day1, price: 8.45, type: "CALL" },
-            { strike: 120, day: day2, price: 9.2, type: "CALL" },
-            { strike: 120, day: day3, price: 10.45, type: "CALL" },
-            { strike: 120, day: day4, price: 8.45, type: "CALL" },
-            { strike: 110, day: day4, price: 9.2, type: "CALL" },
-            { strike: 105, day: day4, price: 10.45, type: "CASH" },
-            { strike: 1, day: day4, price: 10.45, type: "CASH" },
-            { strike: 2, day: day4, price: 10.45, type: "CASH" }
-        ];
-
-        vm.bubbleChartData(data);
-    });
+    vm.bubbleChartData(data);
 </script>
 </body>
 </html>

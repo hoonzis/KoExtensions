@@ -3,7 +3,9 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF8">
     <title>Charting Test Page</title>
-    <script src="../references/require.js"></script>
+    <script src="../references/d3.js"></script>
+    <script src="../references/knockout-3.4.0.js"></script>
+    <script src="../build/koextensions.js"></script>
 </head>
 <body>
     <h2>3 Normalized non-linked data series</h2>
@@ -14,50 +16,31 @@
     <div id="lineChart3" data-bind="linechart: dateTimeLine,chartOptions:{height:200,width:300,horizontalSlider:true,legend:true,xAxisTextAngle: 45}">
     </div>
     <script>
+        function TestViewModels() {
+            var self = this;
+            self.longLine = ko.observableArray();
+            self.dateTimeLine = ko.observableArray();
 
-            window.document.onload = function (e) {
-                initialize();
+            var longLine = [];
+            var dateTimeLine = [];
+            for(var i=0;i<20;i++){
+              longLine[i] = {
+                x: i,
+                y: i*10
+              }
+
+              dateTimeLine[i] = {
+                x: new Date(2010,1,i),
+                y: i*10
+              }
             }
 
-            require.config({
-                baseUrl: "../src",
-                paths:{
-                  'ko':'../references/knockout-3.2.0.debug',
-                  'd3':'../references/d3',
-                }
-            });
+            self.longLine([{linename:"long  line",values:longLine}]);
+            self.dateTimeLine([{linename:"date  line",values:dateTimeLine}]);
+        }
 
-            var ko;
-            require(['koextensions','ko'], function(koext,kol) {
-                ko = kol;
-                koext.registerExtensions();
-                function TestViewModels() {
-                    var self = this;
-                    self.longLine = ko.observableArray();
-                    self.dateTimeLine = ko.observableArray();
-
-                    var longLine = [];
-                    var dateTimeLine = [];
-                    for(var i=0;i<20;i++){
-                      longLine[i] = {
-                        x: i,
-                        y: i*10
-                      }
-
-                      dateTimeLine[i] = {
-                        x: new Date(2010,1,i),
-                        y: i*10
-                      }
-                    }
-
-                    self.longLine([{linename:"long  line",values:longLine}]);
-                    self.dateTimeLine([{linename:"date  line",values:dateTimeLine}]);
-                }
-
-                var vm = new TestViewModels();
-
-                ko.applyBindings(vm);
-            });
+        var vm = new TestViewModels();
+        ko.applyBindings(vm);
     </script>
 </body>
 </html>

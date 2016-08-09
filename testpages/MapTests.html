@@ -2,13 +2,15 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF8">
         <title>Map Test Page</title>
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
         <script src='https://api.mapbox.com/mapbox.js/v2.2.3/mapbox.js'></script>
         <link href='https://api.mapbox.com/mapbox.js/v2.2.3/mapbox.css' rel='stylesheet' />
         <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v2.0.2/turf.min.js'></script>
-
-        <script src="../references/require.js"></script>
+        <script src="../references/d3.js"></script>
+        <script src="../references/knockout-3.4.0.js"></script>
+        <script src="../build/koextensions.js"></script>
     </head>
     <body>
         <table>
@@ -41,75 +43,59 @@
                 </tr>
             </tbody>
         </table>
-
         <script>
-        require.config({
-            baseUrl: "../src",
-            paths:{
-              'ko':'../references/knockout-3.2.0.debug',
-              'd3':'../references/d3',
-            }
-        });
+          var stationsData = {
+              "stations": [
+                  {
+                      "lat": 55.16,
+                      "lng": 55.335,
+                      "name": "Station 1"
+                  },
+                  {
+                      "lat": 55.25,
+                      "lng": 55.34,
+                      "name": "Station 2"
+                  },
+                  {
+                      "lat": 55.23,
+                      "lng": 55.345,
+                      "name": "Station 3"
+                  }
+              ],
+          };
 
-            var ko;
-            require(['koextensions','ko'], function(koext,kol) {
-                ko = kol;
-                koext.registerExtensions();
-                var stationsData = {
-                    "stations": [
-                        {
-                            "lat": 55.16,
-                            "lng": 55.335,
-                            "name": "Station 1"
-                        },
-                        {
-                            "lat": 55.25,
-                            "lng": 55.34,
-                            "name": "Station 2"
-                        },
-                        {
-                            "lat": 55.23,
-                            "lng": 55.345,
-                            "name": "Station 3"
-                        }
-                    ],
-                };
+          function PointViewModel(data) {
+              var self = this;
+              self.lat = ko.observable();
+              self.lng = ko.observable();
+              self.name = ko.observable();
+              self.selected = ko.observable();
 
-                function PointViewModel(data) {
-                    var self = this;
-                    self.lat = ko.observable();
-                    self.lng = ko.observable();
-                    self.name = ko.observable();
-                    self.selected = ko.observable();
+              if (data != null) {
+                  self.lat(data.lat);
+                  self.lng(data.lng);
+                  self.name(data.name);
+              }
+          }
 
-                    if (data != null) {
-                        self.lat(data.lat);
-                        self.lng(data.lng);
-                        self.name(data.name);
-                    }
-                }
+          function StationListViewModel(json) {
+              var self = this;
+              self.points = ko.observableArray([]);
+              self.selectedPoint = ko.observable();
 
-                function StationListViewModel(json) {
-                    var self = this;
-                    self.points = ko.observableArray([]);
-                    self.selectedPoint = ko.observable();
+              self.pointSelected = function(point){
+                  if(self.selectedPoint())
+                      self.selectedPoint().selected(false);
+                  point.selected(true);
+                  self.selectedPoint(point);
+              };
 
-                    self.pointSelected = function(point){
-                        if(self.selectedPoint())
-                            self.selectedPoint().selected(false);
-                        point.selected(true);
-                        self.selectedPoint(point);
-                    };
+              self.points(json.stations.map(function(x) { return new PointViewModel(x); }));
+          }
 
-                    self.points(json.stations.map(function(x) { return new PointViewModel(x); }));
-                }
-
-                var vm = new StationListViewModel(stationsData);
-                L.mapbox.accessToken = 'pk.eyJ1IjoiaG9vbnppcyIsImEiOiJjaWpqNHZmbHgwMDRpdmVtNG9ieWs4Mjg1In0.mKQEXA9KZhJe5w7o-9znEQ';
-                ko.applyBindings(vm);
-            });
-
-
+          var vm = new StationListViewModel(stationsData);
+          L.mapbox.accessToken = 'pk.eyJ1IjoiaG9vbnppcyIsImEiOiJjaWpqNHZmbHgwMDRpdmVtNG9ieWs4Mjg1In0.mKQEXA9KZhJe5w7o-9znEQ';
+          ko.applyBindings(vm);
         </script>
     </body>
 </html>

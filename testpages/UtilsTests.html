@@ -2,8 +2,11 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF8">
     <title>Map Test Page</title>
-    <script src="../references/require.js"></script>
+    <script src="../references/d3.js"></script>
+    <script src="../references/knockout-3.4.0.js"></script>
+    <script src="../build/koextensions.js"></script>
 </head>
 <body>
 	<b>Price:</b>
@@ -21,37 +24,23 @@
     <br/><b>Test date:</b>
     <span data-bind="formattedValue: date"></span>
     <script type="text/javascript">
+      function CarViewModel() {
+          var self = this;
+          self.efficiency = ko.observable(0.95);
+          self.price = ko.observable(1000000);
+          self.priceCurrency = ko.observable('EUR');
+          self.power = ko.observable(120);
+          self.consumption100 = ko.observable(7);
+          self.distance = ko.observable();
+          self.totalConsumption = ko.computed(function() {
+              return self.distance() * self.consumption100();
+          });
 
-        require.config({
-            baseUrl: "../src",
-            paths:{
-              'ko':'../references/knockout-3.2.0.debug',
-              'd3':'../references/d3',
-            }
-        });
+          self.date = ko.observable(new Date());
+      }
 
-        var ko;
-        require(['koextensions','ko'], function(koext,kol) {
-            ko = kol;
-            koext.registerExtensions();
-            function CarViewModel() {
-                var self = this;
-                self.efficiency = ko.observable(0.95);
-                self.price = ko.observable(1000000);
-                self.priceCurrency = ko.observable('EUR');
-                self.power = ko.observable(120);
-                self.consumption100 = ko.observable(7);
-                self.distance = ko.observable();
-                self.totalConsumption = ko.computed(function() {
-                    return self.distance() * self.consumption100();
-                });
-
-                self.date = ko.observable(new Date());
-            }
-
-            var vm = new CarViewModel();
-            ko.applyBindings(vm);
-        });
+      var vm = new CarViewModel();
+      ko.applyBindings(vm);
     </script>
 </body>
 </html>

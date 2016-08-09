@@ -3,7 +3,9 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=UTF8">
         <title>Charting Test Page</title>
-        <script src="../references/require.js"></script>
+        <script src="../references/d3.js"></script>
+        <script src="../references/knockout-3.4.0.js"></script>
+        <script src="../build/koextensions.js"></script>
     </head>
 <body>
 	<h2>Stacked bar chart</h2>
@@ -18,83 +20,64 @@
 	<div id="monthlySales2" data-bind="barchart: carSales,chartOptions:{legend:true, width:800,height:300,style:'bar',xcoord:'month',yFormat:valueToLabel}">
 	</div>
 
+  <script>
+      var data = [
+            {
+                date: new Date(2012,1,1),
+                month: 'january',
+                peugot: 100,
+                audit: 200,
+                bmw: 300
+            },
+            {
+                date: new Date(2012,2,2),
+                month: 'february',
+                peugot: 50,
+                audit: 110,
+                bmw: 80
+            },
+            {
+                date: new Date(2012,3,3),
+                month: 'marz',
+                peugot: 120,
+                audit: 230,
+                bmw: 115
+            },
+            {
+                date: new Date(2012,4,4),
+                month: 'april',
+                peugot: 80,
+                audit: 120,
+                bmw: 75
+            },
+            {
+                date: new Date(2012,5,5),
+                month: 'may',
+                peugot: 100,
+                audit: 140,
+                bmw: 80
+            },
+            //negative values
+            {
+                date: new Date(2012,5,5),
+                month: 'may',
+                peugot: -100,
+                audit: -140,
+                bmw: -80
+            }
+        ];
 
-    <script>
-
-        window.document.onload = function (e) {
-            initialize();
+        function TestViewModels() {
+            var self = this;
+            self.carSales = ko.observableArray([]);
+            self.carSales(data);
+            self.valueToLabel = function (x) {
+                return x + " cars sold";
+            }
         }
 
-        require.config({
-            baseUrl: "../src",
-            paths:{
-              'ko':'../references/knockout-3.2.0.debug',
-              'd3':'../references/d3',
-            }
-        });
-
-        var ko;
-        require(['koextensions','ko'], function(koext,kol) {
-            ko = kol;
-            koext.registerExtensions();
-            var data = [
-                {
-                    date: new Date(2012,1,1),
-                    month: 'january',
-                    peugot: 100,
-                    audit: 200,
-                    bmw: 300
-                },
-                {
-                    date: new Date(2012,2,2),
-                    month: 'february',
-                    peugot: 50,
-                    audit: 110,
-                    bmw: 80
-                },
-                {
-                    date: new Date(2012,3,3),
-                    month: 'marz',
-                    peugot: 120,
-                    audit: 230,
-                    bmw: 115
-                },
-                {
-                    date: new Date(2012,4,4),
-                    month: 'april',
-                    peugot: 80,
-                    audit: 120,
-                    bmw: 75
-                },
-                {
-                    date: new Date(2012,5,5),
-                    month: 'may',
-                    peugot: 100,
-                    audit: 140,
-                    bmw: 80
-                },
-                //negative values
-                {
-                    date: new Date(2012,5,5),
-                    month: 'may',
-                    peugot: -100,
-                    audit: -140,
-                    bmw: -80
-                }
-            ];
-
-            function TestViewModels() {
-                var self = this;
-                self.carSales = ko.observableArray([]);
-                self.carSales(data);
-                self.valueToLabel = function (x) {
-                    return x + " cars sold";
-                }
-            }
-
-            var vm = new TestViewModels();
-            ko.applyBindings(vm);
-        });
+        var vm = new TestViewModels();
+        ko.applyBindings(vm);
 </script>
 </body>
 </html>

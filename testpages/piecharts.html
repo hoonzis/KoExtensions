@@ -3,7 +3,9 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=UTF8">
         <title>Charting Test Page</title>
-        <script src="../references/require.js"></script>
+        <script src="../references/d3.js"></script>
+        <script src="../references/knockout-3.4.0.js"></script>
+        <script src="../build/koextensions.js"></script>
     </head>
 <body>
 	<h2>Simple piechart:</h2>
@@ -20,94 +22,76 @@
 	 	</div>
 	 <!-- /ko -->
         <script>
+          var lastWeek = [
+              {
+                  name: "peugot",
+                  sales: [
+                      { model: 'model1-long-name', amount: 100 },
+                      { model: 'model2-long-name', amount: 200 },
+                      { model: 'model3-long-name', amount: 300 }
+                  ]
+              },
+              {
+                  name: "audi",
+                  sales: [
+                      { model: 'a3', amount: 200 },
+                      { model: 'qutro', amount: 300 },
+                      { model: 'a8', amount: 100 },
+                      { model: 'a6', amount: 80 },
+                      { model: 'a2', amount: 250 },
+                      { model: 'a1', amount: 250 },
+                      { model: 'a0', amount: 250 }
+                  ]
+              },
+              {
+                  name: "bmw",
+                  sales: [
+                      { model: 'model5', amount: 200 },
+                      { model: 'model8', amount: 100 },
+                      { model: 'model3', amount: 150 }
+                  ]
+              }
+          ];
 
-            window.document.onload = function (e) {
-                initialize();
-            }
+          function CarViewModel(data) {
+              var self = this;
+              self.sales = ko.observableArray([]);
+              self.name = ko.observable();
 
-            require.config({
-                baseUrl: "../src",
-                paths:{
-                  'ko':'../references/knockout-3.2.0.debug',
-                  'd3':'../references/d3',
-                }
-            });
+              self.totalSales = ko.computed(function() {
+                  return d3.sum(self.sales().map(function(item) {
+                      return item.amount;
+                  }));
+              }, self);
 
-            var ko;
-            require(['koextensions','ko','d3'], function(koext,kol, d3) {
-                ko = kol;
-                koext.registerExtensions();
-                var lastWeek = [
-                    {
-                        name: "peugot",
-                        sales: [
-                            { model: 'model1-long-name', amount: 100 },
-                            { model: 'model2-long-name', amount: 200 },
-                            { model: 'model3-long-name', amount: 300 }
-                        ]
-                    },
-                    {
-                        name: "audi",
-                        sales: [
-                            { model: 'a3', amount: 200 },
-                            { model: 'qutro', amount: 300 },
-                            { model: 'a8', amount: 100 },
-                            { model: 'a6', amount: 80 },
-                            { model: 'a2', amount: 250 },
-                            { model: 'a1', amount: 250 },
-                            { model: 'a0', amount: 250 }
-                        ]
-                    },
-                    {
-                        name: "bmw",
-                        sales: [
-                            { model: 'model5', amount: 200 },
-                            { model: 'model8', amount: 100 },
-                            { model: 'model3', amount: 150 }
-                        ]
-                    }
-                ];
+              if (data != null) {
+                  self.sales(data.sales);
+                  self.name(data.name);
+              }
 
-                function CarViewModel(data) {
-                    var self = this;
-                    self.sales = ko.observableArray([]);
-                    self.name = ko.observable();
+              self.salesChart = ko.computed(function () {
+                  return self.sales().map(function (car) {
+                      return { x: car.model, y: car.amount };
+                  });
+              });
+          }
 
-                    self.totalSales = ko.computed(function() {
-                        return d3.sum(self.sales().map(function(item) {
-                            return item.amount;
-                        }));
-                    }, self);
+          function TestViewModels() {
+              var self = this;
+              self.cars = ko.observableArray([]);
 
-                    if (data != null) {
-                        self.sales(data.sales);
-                        self.name(data.name);
-                    }
+              self.carsChart = ko.computed(function () {
+                  return self.cars().map(function (car) {
+                      return { x: car.name(), y: car.totalSales() };
+                  });
+              });
 
-                    self.salesChart = ko.computed(function () {
-                        return self.sales().map(function (car) {
-                            return { x: car.model, y: car.amount };
-                        });
-                    });
-                }
+              var carsVMs = lastWeek.map(function(x) { return new CarViewModel(x); });
+              self.cars(carsVMs);
+          }
 
-                function TestViewModels() {
-                    var self = this;
-                    self.cars = ko.observableArray([]);
-
-                    self.carsChart = ko.computed(function () {
-                        return self.cars().map(function (car) {
-                            return { x: car.name(), y: car.totalSales() };
-                        });
-                    });
-
-                    var carsVMs = lastWeek.map(function(x) { return new CarViewModel(x); });
-                    self.cars(carsVMs);
-                }
-
-                var vm = new TestViewModels();
-                ko.applyBindings(vm);
-            });
+          var vm = new TestViewModels();
+          ko.applyBindings(vm);
     </script>
 </body>
 </html>

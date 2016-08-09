@@ -47,36 +47,32 @@ https://jsfiddle.net/u4sL2x67/4/
 
 All charts are created with [D3JS](http://d3js.org/) and based on multiple examples provided in the documentation.
 
-#### Referencing and using KoExtensions
-There are two ways to reference KoExtensions:
-* Reference single [koextensions.js](https://github.com/hoonzis/KoExtensions/blob/master/src/KoExtensions.js) file. See the [example.html](https://github.com/hoonzis/KoExtensions/blob/master/src/example.html) file. If used in such way, global variable **koExtensions** is defined which exposes all the functionality.
-* Use RequireJS. All files in the *testpages* folder use this approach. KoExtension expects D3 to be defined globally before being loaded.
-
-Both approaches can be used whether KoExtensions is used as standalone charting library or with KnockoutJS.
+#### Using KoExtensions
+KoExtensions can be used either together with Knockout or as a separate charting library.
 
 ```javascript
+// As separate charting library
 <script src="d3.js"></script>
 <script src="koextensions.js"></script>
 koext.charting.lineChart(testData, el, {width:"100px"});
 ```
 
 ```javascript
+// Together with knockout
 <script src="d3.js"></script>
 <script src="knockout.js"></script>
 <script src="koextensions.js"></script>
 <div data-bind="linechart:testData, chartOptions:{width:100px}"
 ```
 
-####Contributing and building
-RequireJS is used to handle dependencies as well as to bundle single JS file, which can be built with NodeJS and RequireJS optimizer:
+#### Contributing and building
+Browserify is used to combine the files in **src** folder and create the bundle.
 
 ```
-cd build
-node r.js -o app.build.js
+browserify src\koextensions.js  --external d3 --standalone koextensions -o build\koextensions.js
 ```
 
 Tests can be run with QUnit:
-
 ```
 phantomjs run-qunit.js Tests/Tests.html
 ```

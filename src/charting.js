@@ -1,509 +1,511 @@
 ﻿"use strict";
-define(['d3','./kotools'], function (d3,koTools) {
-    var charting = {};
 
-    charting.colors = d3.scale.ordinal().range(["#1f77b4", "#2ca02c", "#d62728", "#393b79", "#ff7f0e", "#8c564b", "#843c39"]);
+var koTools = require('./kotools');
 
-    charting.getElementAndCheckData = function (element, data) {
-        var el = d3.select(element);
-        if (data === null || data === undefined || data.length === 0) {
-            element.innerHTML = "No data available";
-            return null;
-        }
-        element.innerHTML = "";
-        return el;
+var charting = {};
+
+charting.colors = d3.scale.ordinal().range(["#1f77b4", "#2ca02c", "#d62728", "#393b79", "#ff7f0e", "#8c564b", "#843c39"]);
+
+charting.getElementAndCheckData = function (element, data) {
+    var el = d3.select(element);
+    if (data === null || data === undefined || data.length === 0) {
+        element.innerHTML = "No data available";
+        return null;
+    }
+    element.innerHTML = "";
+    return el;
+};
+
+charting.legendFont = function(longest){
+  if (longest > 20) {
+      return 8;
+  }
+  if(longest > 15) {
+    return 10;
+  }
+  if(longest > 10) {
+    return 12;
+  }
+  return 13;
+}
+
+charting.getLegendWidthAndFontSize = function (data) {
+    //when there is no legend, just return 0 pixels
+    if (!data || data.length === 0) {
+        return 0;
+    }
+    var longest = d3.max(data, function (el) {
+        return el.length;
+    });
+    // we determine the optimal font size and from it calculate the rest (rectangle size and legend width)
+    var fontSize = charting.legendFont(longest);
+    var rectangleSize = fontSize + 2;
+    return {
+      fontSize: fontSize + "px",
+      width: rectangleSize + (fontSize - 3) * longest,
+      rectangle: rectangleSize
     };
+};
 
-    charting.legendFont = function(longest){
-      if (longest > 20) {
-          return 8;
-      }
-      if(longest > 15) {
-        return 10;
-      }
-      if(longest > 10) {
-        return 12;
-      }
-      return 13;
+charting.showStandardLegend = function (parent, data, color, showLegend, height) {
+    if (showLegend) {
+        var legendDims = charting.getLegendWidthAndFontSize(data);
+
+        var legend = parent
+              .append("svg")
+              .attr("width", legendDims.width)
+              .selectAll("g")
+              .data(data)
+              .enter().append("g")
+              .attr("transform", function (d, i) { return "translate(0," + i * (legendDims.rectangle  + 4) + ")"; });
+
+        legend.append("rect")
+              .attr("width", legendDims.rectangle)
+              .attr("height", legendDims.rectangle)
+              .style("fill", function(i) { return color(i); });
+
+
+        legend.append("text")
+              .attr("x", legendDims.rectangle + 4)
+              .attr("y", legendDims.rectangle / 2)
+              .attr("font-size", legendDims.fontSize)
+              .attr("dy", ".35em")
+              .text(function (t) { return t; });
+    }
+};
+
+charting.headerStyle = function (el) {
+    el
+         .style("text-align", "left")
+         .style("font-size", "12px")
+         .style("font-family", "sans-serif")
+         .style("margin-bottom", "4px")
+         .style("color", "#FFFFFF")
+         .style("font-weight", "bold")
+         .style("clear", "both")
+         .style("float", "left");
+};
+
+charting.valueStyle = function (el) {
+    el
+        .style("text-align", "left")
+        .style("font-size", "12px")
+        .style("font-family", "sans-serif")
+        // botom marging is 4 so that the padding of the tooltip on bottom is 6, gives 10 as the padding
+        // on top of the tooltip
+        .style("margin-bottom", "4px")
+        .style("margin-left", "6px")
+        .style("color", "#FFFFFF")
+        .style("float", "left");
+};
+
+charting.showTooltip = function (info) {
+    if(d3.select("#toolTipBorder")[0]){
+        charting.createTooltip();
     }
 
-    charting.getLegendWidthAndFontSize = function (data) {
-        //when there is no legend, just return 0 pixels
-        if (!data || data.length === 0) {
-            return 0;
-        }
-        var longest = d3.max(data, function (el) {
-            return el.length;
-        });
-        // we determine the optimal font size and from it calculate the rest (rectangle size and legend width)
-        var fontSize = charting.legendFont(longest);
-        var rectangleSize = fontSize + 2;
-        return {
-          fontSize: fontSize + "px",
-          width: rectangleSize + (fontSize - 3) * longest,
-          rectangle: rectangleSize
-        };
-    };
+    var tooltip = d3.select("#toolTipBorder");
+    var tooltipContent = d3.select("#toolTip");
+    var key;
+    var value;
 
-    charting.showStandardLegend = function (parent, data, color, showLegend, height) {
-        if (showLegend) {
-            var legendDims = charting.getLegendWidthAndFontSize(data);
+    tooltipContent.html("");
+    for (key in info) {
+         if (info.hasOwnProperty(key)) {
+            value = info[key];
+            charting.headerStyle(tooltipContent.append("div").text(key));
 
-            var legend = parent
-                  .append("svg")
-                  .attr("width", legendDims.width)
-                  .selectAll("g")
-                  .data(data)
-                  .enter().append("g")
-                  .attr("transform", function (d, i) { return "translate(0," + i * (legendDims.rectangle  + 4) + ")"; });
-
-            legend.append("rect")
-                  .attr("width", legendDims.rectangle)
-                  .attr("height", legendDims.rectangle)
-                  .style("fill", function(i) { return color(i); });
-
-
-            legend.append("text")
-                  .attr("x", legendDims.rectangle + 4)
-                  .attr("y", legendDims.rectangle / 2)
-                  .attr("font-size", legendDims.fontSize)
-                  .attr("dy", ".35em")
-                  .text(function (t) { return t; });
-        }
-    };
-
-    charting.headerStyle = function (el) {
-        el
-             .style("text-align", "left")
-             .style("font-size", "12px")
-             .style("font-family", "sans-serif")
-             .style("margin-bottom", "4px")
-             .style("color", "#FFFFFF")
-             .style("font-weight", "bold")
-             .style("clear", "both")
-             .style("float", "left");
-    };
-
-    charting.valueStyle = function (el) {
-        el
-            .style("text-align", "left")
-            .style("font-size", "12px")
-            .style("font-family", "sans-serif")
-            // botom marging is 4 so that the padding of the tooltip on bottom is 6, gives 10 as the padding
-            // on top of the tooltip
-            .style("margin-bottom", "4px")
-            .style("margin-left", "6px")
-            .style("color", "#FFFFFF")
-            .style("float", "left");
-    };
-
-    charting.showTooltip = function (info) {
-        if(d3.select("#toolTipBorder")[0]){
-            charting.createTooltip();
-        }
-
-        var tooltip = d3.select("#toolTipBorder");
-        var tooltipContent = d3.select("#toolTip");
-        var key;
-        var value;
-
-        tooltipContent.html("");
-        for (key in info) {
-             if (info.hasOwnProperty(key)) {
-                value = info[key];
-                charting.headerStyle(tooltipContent.append("div").text(key));
-
-                if (value) {
-                    if (koTools.isDate(value)) {
-                        charting.valueStyle(tooltipContent.append("div").text(value.toFormattedString()));
-                    } else {
-                        charting.valueStyle(tooltipContent.append("div").text(value));
-                    }
+            if (value) {
+                if (koTools.isDate(value)) {
+                    charting.valueStyle(tooltipContent.append("div").text(value.toFormattedString()));
+                } else {
+                    charting.valueStyle(tooltipContent.append("div").text(value));
                 }
             }
         }
+    }
 
-          tooltip.transition()
-              .duration(200)
-              .style("opacity", ".83");
+      tooltip.transition()
+          .duration(200)
+          .style("opacity", ".83");
 
-          tooltip.style("left", (d3.event.pageX + 15) + "px")
-              .style("top", (d3.event.pageY - 75) + "px");
-    };
+      tooltip.style("left", (d3.event.pageX + 15) + "px")
+          .style("top", (d3.event.pageY - 75) + "px");
+};
 
-    charting.hideTooltip = function () {
-        var toolTip = d3.select("#toolTipBorder");
-        toolTip.transition()
-            .duration(300)
-            .style("opacity", "0");
-    };
+charting.hideTooltip = function () {
+    var toolTip = d3.select("#toolTipBorder");
+    toolTip.transition()
+        .duration(300)
+        .style("opacity", "0");
+};
 
-    charting.createTooltip = function () {
-        var tooltip = d3.select("body")
-            .append("div");
+charting.createTooltip = function () {
+    var tooltip = d3.select("body")
+        .append("div");
 
-        tooltip
-            .attr("id", "toolTipBorder")
-            .style("position", "absolute")
-            .style("opacity", 0)
-            .style("background-color", "#111111")
-            .style("border-radius", "6px")
-            .style("padding", "10px")
-            .style("padding-bottom", "6px")
-            .append("div")
-            .attr("id", "toolTip")
-            .style("z-index", 100000);
-    };
+    tooltip
+        .attr("id", "toolTipBorder")
+        .style("position", "absolute")
+        .style("opacity", 0)
+        .style("background-color", "#111111")
+        .style("border-radius", "6px")
+        .style("padding", "10px")
+        .style("padding-bottom", "6px")
+        .append("div")
+        .attr("id", "toolTip")
+        .style("z-index", 100000);
+};
 
-    charting.getDimensions = function (options, el) {
-        var dims = {};
-        dims.margin = { top: options.top || 20, right: options.right || 50, bottom: options.bottom || 30 , left: options.left || 50 };
-        dims.width = options.width || 200;
-        dims.height = options.height || 100;
-        dims.yAxisWidth = 40;
-        if(options.yAxisLabel) {
-            dims.yAxisWidth = 80;
-        }
+charting.getDimensions = function (options, el) {
+    var dims = {};
+    dims.margin = { top: options.top || 20, right: options.right || 50, bottom: options.bottom || 30 , left: options.left || 50 };
+    dims.width = options.width || 200;
+    dims.height = options.height || 100;
+    dims.yAxisWidth = 40;
+    if(options.yAxisLabel) {
+        dims.yAxisWidth = 80;
+    }
+    if (options.xAxisTextAngle) {
+        dims.margin.bottom = options.xAxisTextAngle*50/90 + dims.margin.bottom;
+    }
+
+    dims.legendWidth = 0;
+
+    // TODO: would be good to have the real width of the leged here
+    if(options.legend){
+        dims.legendWidth = 150;
+    }
+
+    if(options.xAxisLabel) {
+        dims.margin.bottom+= 15;
+    }
+    dims.containerHeight = dims.height + dims.margin.top + dims.margin.bottom;
+    dims.containerWidth = dims.width + dims.yAxisWidth + dims.margin.left + dims.margin.right;
+
+    if (options.fillParentController) {
+        dims.containerWidth = koTools.getWidth(el) - dims.legendWidth -  20;
+        dims.containerHeight = d3.max([koTools.getHeight(el), options.height]) - 30;
+
+        dims.height = dims.containerHeight - (dims.margin.top + dims.margin.bottom);
+        dims.width = dims.containerWidth - (dims.yAxisWidth + dims.margin.left + dims.margin.right);
+        dims.fillParentController = true;
+    }
+
+    if (options.horizontalSlider) {
+        var sliderSpace = 30;
+        var afterSlider = 60;
+
         if (options.xAxisTextAngle) {
-            dims.margin.bottom = options.xAxisTextAngle*50/90 + dims.margin.bottom;
+            sliderSpace = 60;
+            afterSlider = 80;
         }
 
-        dims.legendWidth = 0;
+        dims.sliderHeight = 20;
+        dims.containerHeight = dims.height + dims.sliderHeight + sliderSpace + afterSlider;
+        dims.sliderOffset = dims.height + sliderSpace;
+    }
+    return dims;
+};
 
-        // TODO: would be good to have the real width of the leged here
-        if(options.legend){
-            dims.legendWidth = 150;
-        }
+charting.appendContainer = function (el, dims) {
+    var svg = el.append("svg")
+        .attr("width", dims.containerWidth)
+        .attr("height", dims.containerHeight)
+        .append("g")
+        .attr("transform", "translate(" + dims.margin.left + "," + dims.margin.top + ")");
 
-        if(options.xAxisLabel) {
-            dims.margin.bottom+= 15;
-        }
-        dims.containerHeight = dims.height + dims.margin.top + dims.margin.bottom;
-        dims.containerWidth = dims.width + dims.yAxisWidth + dims.margin.left + dims.margin.right;
+    return svg;
+};
 
-        if (options.fillParentController) {
-            dims.containerWidth = koTools.getWidth(el) - dims.legendWidth -  20;
-            dims.containerHeight = d3.max([koTools.getHeight(el), options.height]) - 30;
+charting.createXAxis = function (svg,options,x,dims) {
+  var xAxis = d3.svg.axis()
+     .scale(x)
+     .orient("bottom");
 
-            dims.height = dims.containerHeight - (dims.margin.top + dims.margin.bottom);
-            dims.width = dims.containerWidth - (dims.yAxisWidth + dims.margin.left + dims.margin.right);
-            dims.fillParentController = true;
-        }
+    if (options.xFormat){
+        xAxis.tickFormat(options.xFormat);
+    }
 
-        if (options.horizontalSlider) {
-            var sliderSpace = 30;
-            var afterSlider = 60;
+    if (options.tickValues){
+        xAxis.tickValues(options.tickValues);
+    }
 
-            if (options.xAxisTextAngle) {
-                sliderSpace = 60;
-                afterSlider = 80;
-            }
+    var axis = svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + dims.height + ")")
+        .call(xAxis);
 
-            dims.sliderHeight = 20;
-            dims.containerHeight = dims.height + dims.sliderHeight + sliderSpace + afterSlider;
-            dims.sliderOffset = dims.height + sliderSpace;
-        }
-        return dims;
-    };
+    charting.xAxisStyle(axis);
+    charting.rotateAxisText(axis, options);
 
-    charting.appendContainer = function (el, dims) {
-        var svg = el.append("svg")
-            .attr("width", dims.containerWidth)
-            .attr("height", dims.containerHeight)
-            .append("g")
-            .attr("transform", "translate(" + dims.margin.left + "," + dims.margin.top + ")");
+    if (options.xAxisLabel){
+        svg.append("text")
+            .style("font-size", "13")
+            .style("font-family", "sans-serif")
+            .style("font-weight","bold")
+            .attr("class", "x label")
+            .attr("text-anchor", "end")
+            .attr("x", (dims.width / 2) + 35 )
+            .attr("y", dims.height + dims.margin.bottom)
+            .text(options.xAxisLabel);
+    }
+    return xAxis;
+};
 
-        return svg;
-    };
+charting.rotateAxisText = function (axis, options) {
+    if (options.xAxisTextAngle) {
+        axis.selectAll("text")
+            .attr("y", 0)
+            .attr("x", 9)
+            .attr("dy", ".35em")
+            .attr("transform", "rotate(" + options.xAxisTextAngle + ")")
+            .style("text-anchor", "start");
+    }
+};
 
-    charting.createXAxis = function (svg,options,x,dims) {
-        var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
+charting.yAxisStyle = function(el)
+{
+    el.select("path").style("display","none");
+    el.selectAll("line").style("shape-rendering","crispEdges").style("stroke","#000");
+    el.selectAll("line").style("stroke","#777").style("stroke-dasharray","2.2");
+    el.style("font-family", "sans-serif");
+    el.style("font-size", "13");
+};
 
-        if (options.xFormat){
-            xAxis.tickFormat(options.xFormat);
-        }
+charting.xAxisStyle = function(el){
+    el.select("path").style("display","none");
+    el.select("line").style("shape-rendering","crispEdges").style("stroke","#000");
+    el.selectAll("line").style("stroke","#000");
+    el.style("font-family", "sans-serif");
+    el.style("font-size", "13");
+    return el;
+};
 
-        if (options.tickValues){
-            xAxis.tickValues(options.tickValues);
-        }
+charting.createYAxis = function (svg, options, yScale, dims) {
+    var yAxis = d3.svg.axis().scale(yScale).tickSize(dims.width).orient("right");
 
-        var axis = svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + dims.height + ")")
-            .call(xAxis);
+    if (options.yFormat){
+        yAxis.tickFormat(options.yFormat);
+    }
 
-        charting.xAxisStyle(axis);
-        charting.rotateAxisText(axis, options);
+    var axis = svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
 
-        if (options.xAxisLabel){
-            svg.append("text")
-                .style("font-size", "13")
-                .style("font-family", "sans-serif")
-                .style("font-weight","bold")
-                .attr("class", "x label")
-                .attr("text-anchor", "end")
-                .attr("x", (dims.width / 2) + 35 )
-                .attr("y", dims.height + dims.margin.bottom)
-                .text(options.xAxisLabel);
-        }
-        return xAxis;
-    };
+    charting.yAxisStyle(axis);
 
-    charting.rotateAxisText = function (axis, options) {
-        if (options.xAxisTextAngle) {
-            axis.selectAll("text")
-                .attr("y", 0)
-                .attr("x", 9)
-                .attr("dy", ".35em")
-                .attr("transform", "rotate(" + options.xAxisTextAngle + ")")
-                .style("text-anchor", "start");
-        }
-    };
+    if (options.yAxisLabel) {
+        svg.append("text")
+            .attr("class", "y label")
+            .attr("text-anchor", "end")
+            .attr("y", 0)
+            .attr("dy", ".75em")
+            .style("font-size", "13")
+            .style("font-family", "sans-serif")
+            .style("font-weight","bold")
+            .text(options.yAxisLabel)
+            .attr("transform", "translate(" + (dims.width+dims.yAxisWidth) + "," + (dims.height/2) + ")rotate(-90)");
+    }
+    return yAxis;
+};
 
-    charting.yAxisStyle = function(el)
-    {
-        el.select("path").style("display","none");
-        el.selectAll("line").style("shape-rendering","crispEdges").style("stroke","#000");
-        el.selectAll("line").style("stroke","#777").style("stroke-dasharray","2.2");
-        el.style("font-family", "sans-serif");
-        el.style("font-size", "13");
-    };
-
-    charting.xAxisStyle = function(el){
-        el.select("path").style("display","none");
-        el.select("line").style("shape-rendering","crispEdges").style("stroke","#000");
-        el.selectAll("line").style("stroke","#000");
-        el.style("font-family", "sans-serif");
-        el.style("font-size", "13");
-        return el;
-    };
-
-    charting.createYAxis = function (svg, options, yScale, dims) {
-        var yAxis = d3.svg.axis().scale(yScale).tickSize(dims.width).orient("right");
-
-        if (options.yFormat){
-            yAxis.tickFormat(options.yFormat);
-        }
-
-        var axis = svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis);
-
-        charting.yAxisStyle(axis);
-
-        if (options.yAxisLabel) {
-            svg.append("text")
-                .attr("class", "y label")
-                .attr("text-anchor", "end")
-                .attr("y", 0)
-                .attr("dy", ".75em")
-                .style("font-size", "13")
-                .style("font-family", "sans-serif")
-                .style("font-weight","bold")
-                .text(options.yAxisLabel)
-                .attr("transform", "translate(" + (dims.width+dims.yAxisWidth) + "," + (dims.height/2) + ")rotate(-90)");
-        }
-        return yAxis;
-    };
-
-    charting.determineXScale = function (data, def,options) {
-        if (!def) {
-            def = {
-                allNumbers: true,
-                allDates: true,
-                min: Number.MAX_VALUE,
-                max: Number.MIN_VALUE,
-                xKeys:[]
-            };
-        }
-
-        var newKeys = data.map(function (v) {
-            if (!koTools.isNumber(v)){
-                def.allNumbers = false;
-            }
-            if (!koTools.isDate(v)){
-                def.allDates = false;
-            }
-            if (v < def.min){
-                def.min = v;
-            }
-            if (v > def.max){
-                def.max = v;
-            }
-            return v;
-        });
-
-        if(def.xKeys){
-            def.xKeys = def.xKeys.concat(newKeys);
-        }else{
-            def.xKeys = newKeys;
-        }
-        def.scaleType = def.allNumbers ? 'linear' : def.allDates ? 'date' : 'ordinal';
-        def.xFormat = def.allDates ? koTools.getIdealDateFormat([def.min,def.max]) : null;
-        if(!options.xFormat){
-            options.xFormat = def.xFormat;
-        }
-
-        return def;
-    };
-
-    charting.getXScaleForMultiLines = function (data,options) {
-        var def = null;
-        data.forEach(function(i) {
-            def = charting.determineXScale(i.values.map(function(v) {
-                return v.x;
-            }), def,options);
-        });
-        return def;
-    };
-
-    charting.getYScaleDefForMultiline = function (data,options,filteredDomain){
-        var def = null;
-        data.forEach(function(i) {
-            var filteredData = i.values;
-            if(filteredDomain){
-                filteredData = i.values.filter(function(d){
-                    return d.x >= filteredDomain[0] && d.x <= filteredDomain[1];
-                });
-            }
-            def = charting.determineYScale(filteredData.map(function(v) {
-                return v.y;
-            }), def,options);
-        });
-        return def;
-    };
-
-    charting.determineYScale = function (data, def,options) {
-        if (!def) {
-            def = {
-                min: Number.MAX_VALUE,
-                max: Number.MIN_VALUE
-            };
-        }
-
-        data.forEach(function(v) {
-            if (v < def.min){
-                def.min = v;
-            }
-            if (v > def.max){
-                def.max = v;
-            }
-        });
-
-        //setting up margings. how much more on the bottom and on the top of the chart should be shown
-        //bellow or above the max and minimum value - carefull to handle negative max values
-        if(options.marginCoef){
-            var reversedCoef = - options.marginCoef;
-            def.max = def.max > 0 ? def.max * options.marginCoef : def.max * reversedCoef;
-            def.min = def.min < 0 ? def.min * options.marginCoef : def.min * reversedCoef;
-        }
-
-        //the min and max can also be specified in the options directly
-        def.min = options.yMin || def.min;
-        def.max = options.yMax || def.max;
-        return def;
-    };
-
-    //takes the result of determineXScale and creates D3 scale
-    charting.getXScaleFromConfig = function (def,dims) {
-        var x;
-
-        if (def.scaleType === 'linear') {
-            x = d3.scale.linear().range([0, dims.width], 0.1);
-            x.domain([def.min, def.max]);
-        } else if (def.scaleType === 'ordinal') {
-            x = d3.scale.ordinal()
-                .rangeRoundBands([0, dims.width], 0.1);
-            x.domain(def.xKeys);
-        } else if (def.scaleType === 'date') {
-            x = d3.time.scale().range([0, dims.width], 0.1);
-            x.domain([def.min, def.max]);
-            x.ticks(10);
-        } else {
-            throw "invalid scale type";
-        }
-        return x;
-    };
-
-    charting.xGetter = function (scaleDef, x) {
-        return function(d) {
-            if (scaleDef.scaleType === 'ordinal'){
-                return x(d) + x.rangeBand() / 2;
-            }
-            if (scaleDef.scaleType === 'date' || scaleDef.scaleType === 'linear'){
-                return x(d);
-            }
-            throw "invalid Scale Type";
+charting.determineXScale = function (data, def,options) {
+    if (!def) {
+        def = {
+            allNumbers: true,
+            allDates: true,
+            min: Number.MAX_VALUE,
+            max: Number.MIN_VALUE,
+            xKeys:[]
         };
-    };
+    }
 
-    charting.createVerticalLine = function (svg,x,y){
-      return svg.append("line")
-          .attr("x1",x)
-          .attr("y1", 0)
-          .attr("x2", x)
-          .attr("y2", y)
-          .attr("stroke-width", 2)
-          .attr("stroke", "black");
-    };
+    var newKeys = data.map(function (v) {
+        if (!koTools.isNumber(v)){
+            def.allNumbers = false;
+        }
+        if (!koTools.isDate(v)){
+            def.allDates = false;
+        }
+        if (v < def.min){
+            def.min = v;
+        }
+        if (v > def.max){
+            def.max = v;
+        }
+        return v;
+    });
 
-    charting.mouseCoordinates = function (context,x,y){
-      var coordinates = d3.mouse(context);
-      return {
-          x : coordinates[0],
-          y : coordinates[1],
-          rY: y.invert(coordinates[1]),
-          rX: x.invert(coordinates[0])
-      };
-    };
+    if(def.xKeys){
+        def.xKeys = def.xKeys.concat(newKeys);
+    }else{
+        def.xKeys = newKeys;
+    }
+    def.scaleType = def.allNumbers ? 'linear' : def.allDates ? 'date' : 'ordinal';
+    def.xFormat = def.allDates ? koTools.getIdealDateFormat([def.min,def.max]) : null;
+    if(!options.xFormat){
+        options.xFormat = def.xFormat;
+    }
 
-    charting.moveLine = function(line, x){
-      var current = line.attr("x1");
-      var trans = x - current;
-      line.attr("transform", "translate(" + trans + ",0)");
-    };
+    return def;
+};
 
-    charting.createMouseMoveListener = function(svg,dims,callback){
-      svg.append("rect")
-        .attr("class", "overlay")
-        .attr("width", dims.width)
-        .attr("height", dims.height)
-        .style("fill","none")
-        .style("pointer-events","all")
-        .on("mousemove", callback);
-    };
+charting.getXScaleForMultiLines = function (data,options) {
+    var def = null;
+    data.forEach(function(i) {
+        def = charting.determineXScale(i.values.map(function(v) {
+            return v.x;
+        }), def,options);
+    });
+    return def;
+};
 
-    charting.createOrMoveVerticalLine = function(line,svg,dims,x){
-      if (!line) {
-          return charting.createVerticalLine(svg,x,dims.height);
-      }
+charting.getYScaleDefForMultiline = function (data,options,filteredDomain){
+    var def = null;
+    data.forEach(function(i) {
+        var filteredData = i.values;
+        if(filteredDomain){
+            filteredData = i.values.filter(function(d){
+                return d.x >= filteredDomain[0] && d.x <= filteredDomain[1];
+            });
+        }
+        def = charting.determineYScale(filteredData.map(function(v) {
+            return v.y;
+        }), def,options);
+    });
+    return def;
+};
 
-      charting.moveLine(line,x);
-      return line;
-    };
-
-    charting.passOptions = function (func, options){
-        return function(d) {
-            func(options, d);
+charting.determineYScale = function (data, def,options) {
+    if (!def) {
+        def = {
+            min: Number.MAX_VALUE,
+            max: Number.MIN_VALUE
         };
-    };
+    }
 
-    charting.singlePointOver = function (element, options, d) {
-        var info = {};
-        var xValue = options.xFormat ? options.xFormat(d.x) : d.x;
-        info[xValue] = "";
-        var valueName = d.linename || "value";
-        info[valueName] = d.y;
-        charting.showTooltip(info);
-        d3.select(element).style("fill", "black");
-    };
+    data.forEach(function(v) {
+        if (v < def.min){
+            def.min = v;
+        }
+        if (v > def.max){
+            def.max = v;
+        }
+    });
 
-    charting.singlePointOut = function (element) {
-        d3.select(element).style("fill", "white");
-        charting.hideTooltip();
-    };
+    //setting up margings. how much more on the bottom and on the top of the chart should be shown
+    //bellow or above the max and minimum value - carefull to handle negative max values
+    if(options.marginCoef){
+        var reversedCoef = - options.marginCoef;
+        def.max = def.max > 0 ? def.max * options.marginCoef : def.max * reversedCoef;
+        def.min = def.min < 0 ? def.min * options.marginCoef : def.min * reversedCoef;
+    }
 
-    return charting;
-});
+    //the min and max can also be specified in the options directly
+    def.min = options.yMin || def.min;
+    def.max = options.yMax || def.max;
+    return def;
+};
+
+//takes the result of determineXScale and creates D3 scale
+charting.getXScaleFromConfig = function (def,dims) {
+    var x;
+
+    if (def.scaleType === 'linear') {
+        x = d3.scale.linear().range([0, dims.width], 0.1);
+        x.domain([def.min, def.max]);
+    } else if (def.scaleType === 'ordinal') {
+        x = d3.scale.ordinal()
+            .rangeRoundBands([0, dims.width], 0.1);
+        x.domain(def.xKeys);
+    } else if (def.scaleType === 'date') {
+        x = d3.time.scale().range([0, dims.width], 0.1);
+        x.domain([def.min, def.max]);
+        x.ticks(10);
+    } else {
+        throw "invalid scale type";
+    }
+    return x;
+};
+
+charting.xGetter = function (scaleDef, x) {
+    return function(d) {
+        if (scaleDef.scaleType === 'ordinal'){
+            return x(d) + x.rangeBand() / 2;
+        }
+        if (scaleDef.scaleType === 'date' || scaleDef.scaleType === 'linear'){
+            return x(d);
+        }
+        throw "invalid Scale Type";
+    };
+};
+
+charting.createVerticalLine = function (svg,x,y){
+  return svg.append("line")
+      .attr("x1",x)
+      .attr("y1", 0)
+      .attr("x2", x)
+      .attr("y2", y)
+      .attr("stroke-width", 2)
+      .attr("stroke", "black");
+};
+
+charting.mouseCoordinates = function (context,x,y){
+  var coordinates = d3.mouse(context);
+  return {
+      x : coordinates[0],
+      y : coordinates[1],
+      rY: y.invert(coordinates[1]),
+      rX: x.invert(coordinates[0])
+  };
+};
+
+charting.moveLine = function(line, x){
+  var current = line.attr("x1");
+  var trans = x - current;
+  line.attr("transform", "translate(" + trans + ",0)");
+};
+
+charting.createMouseMoveListener = function(svg,dims,callback){
+  svg.append("rect")
+    .attr("class", "overlay")
+    .attr("width", dims.width)
+    .attr("height", dims.height)
+    .style("fill","none")
+    .style("pointer-events","all")
+    .on("mousemove", callback);
+};
+
+charting.createOrMoveVerticalLine = function(line,svg,dims,x){
+  if (!line) {
+      return charting.createVerticalLine(svg,x,dims.height);
+  }
+
+  charting.moveLine(line,x);
+  return line;
+};
+
+charting.passOptions = function (func, options){
+    return function(d) {
+        func(options, d);
+    };
+};
+
+charting.singlePointOver = function (element, options, d) {
+    var info = {};
+    var xValue = options.xFormat ? options.xFormat(d.x) : d.x;
+    info[xValue] = "";
+    var valueName = d.linename || "value";
+    info[valueName] = d.y;
+    charting.showTooltip(info);
+    d3.select(element).style("fill", "black");
+};
+
+charting.singlePointOut = function (element) {
+    d3.select(element).style("fill", "white");
+    charting.hideTooltip();
+};
+
+
+module.exports = charting;

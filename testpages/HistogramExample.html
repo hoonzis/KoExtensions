@@ -1,7 +1,10 @@
 <html>
     <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF8">
         <title>Histogram example</title>
-        <script src="../references/require.js"></script>
+        <script src="../references/d3.js"></script>
+        <script src="../references/knockout-3.4.0.js"></script>
+        <script src="../build/koextensions.js"></script>
     </head>
     <body>
     <h2>Detecting the outliers</h2>
@@ -21,59 +24,47 @@
     <input type="checkbox" data-bind="checked: showOutliers" />
     <div id="histogram" data-bind="histogram: data, chartOptions : chartOptions"></div>
         <script>
-          require.config({
-              baseUrl: "../src",
-              paths:{
-                'ko':'../references/knockout-3.2.0.debug',
-                'd3':'../references/d3',
-              }
-          });
 
-            var ko;
-            require(['koextensions','ko'], function(koext,kol) {
-                ko = kol;
-                var histogramDataExample = "3.9,3.8,3.9,2.7,2.8,1.9,2.7,3.5, 4.4, 2.8, 3.4, 8.6, 4.5, 3.5, 3.6, 3.8, 4.3, 4.5, 3.5,30,33,31";
+        var histogramDataExample = "3.9,3.8,3.9,2.7,2.8,1.9,2.7,3.5, 4.4, 2.8, 3.4, 8.6, 4.5, 3.5, 3.6, 3.8, 4.3, 4.5, 3.5,30,33,31";
 
-                function TestViewModel() {
-                    var self = this;
-                    self.tolerance = ko.observable();
-                    self.showProbabilityDistribution = ko.observable();
-                    self.min = ko.observable();
-                    self.expected = ko.observable();
-                    self.useMAD = ko.observable();
-                    self.showOutliers = ko.observable();
-                    self.showProbabilityDistribution = ko.observable();
+        function TestViewModel() {
+            var self = this;
+            self.tolerance = ko.observable();
+            self.showProbabilityDistribution = ko.observable();
+            self.min = ko.observable();
+            self.expected = ko.observable();
+            self.useMAD = ko.observable();
+            self.showOutliers = ko.observable();
+            self.showProbabilityDistribution = ko.observable();
 
-                    self.stringData = ko.observable();
-                    self.data = ko.computed(function() {
-                        if (self.stringData() == null)
-                            return [];
-                        return self.stringData().split(",").map(function(i) {
-                            return parseFloat(i);
-                        });
-                    });
-
-                    self.stringData(histogramDataExample);
-                    self.chartOptions = ko.computed(function() {
-                        return {
-                            tolerance: self.tolerance(),
-                            showProbabilityDistribution: self.showProbabilityDistribution(),
-                            min: koext.tools.tryConvertToNumber(self.min()),
-                            expected: self.expected(),
-                            useMAD: self.useMAD(),
-                            showOutliers: self.showOutliers(),
-                            width: 400,
-                            height:150,
-                            xAxisTextAngle: 45,
-                            fillParentController : false
-                        }
-                    });
-                }
-
-                var vm = new TestViewModel();
-                koext.registerExtensions();
-                ko.applyBindings(vm);
+            self.stringData = ko.observable();
+            self.data = ko.computed(function() {
+                if (self.stringData() == null)
+                    return [];
+                return self.stringData().split(",").map(function(i) {
+                    return parseFloat(i);
+                });
             });
-        </script>
+
+            self.stringData(histogramDataExample);
+            self.chartOptions = ko.computed(function() {
+                return {
+                    tolerance: self.tolerance(),
+                    showProbabilityDistribution: self.showProbabilityDistribution(),
+                    min: koextensions.tools.tryConvertToNumber(self.min()),
+                    expected: self.expected(),
+                    useMAD: self.useMAD(),
+                    showOutliers: self.showOutliers(),
+                    width: 400,
+                    height:150,
+                    xAxisTextAngle: 45,
+                    fillParentController : false
+                }
+            });
+        }
+
+        var vm = new TestViewModel();
+        ko.applyBindings(vm);
+    </script>
 </body>
 </html>

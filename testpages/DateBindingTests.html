@@ -2,11 +2,18 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF8">
     <title>Datepicker binding tests</title>
     <link href="../content/bootstrap.css" rel="stylesheet" />
     <link href="../content/bootstrap-theme.css" rel="stylesheet" />
     <link href="../content/bootstrap-datepicker.css" rel="stylesheet" />
-    <script src="../references/require.js"></script>
+    <script src="../references/d3.js"></script>
+    <script src="../references/knockout-3.4.0.js"></script>
+    <script src="../build/koextensions.js"></script>
+    <script src="../references/jquery-2.1.1.js"></script>
+    <script src="../references/bootstrap.js"></script>
+    <script src="../references/bootstrap-datepicker.js"></script>
+
 </head>
 <body>
 <br/>
@@ -38,65 +45,47 @@
         </div>
     </div>
     <script>
+        //taken from StackOverflow
+        function daysBetween(first, second) {
 
-    require.config({
-        baseUrl: "../src",
-        paths:{
-          'ko':'../references/knockout-3.2.0.debug',
-          'd3':'../references/d3',
-          'bootstrap':'../references/bootstrap',
-          'jquery':'../references/jquery-2.1.1',
-          'bootstrap-datepicker':'../references/bootstrap-datepicker',
+            if (first == null || second == null)
+                return null;
+
+            // Copy date parts of the timestamps, discarding the time parts.
+            var one = new Date(first.getFullYear(), first.getMonth(), first.getDate());
+            var two = new Date(second.getFullYear(), second.getMonth(), second.getDate());
+
+            // Do the math.
+            var millisecondsPerDay = 1000 * 60 * 60 * 24;
+            var millisBetween = two.getTime() - one.getTime();
+            var days = millisBetween / millisecondsPerDay;
+
+            // Round down.
+            return Math.floor(days);
         }
-    });
-    var ko;
-    require(['koextensions','ko', 'jquery',], function (koext,kol) {
-        ko = kol;
-        koext.registerExtensions();
-        require(['bootstrap', 'bootstrap-datepicker'], function() {
-            //taken from StackOverflow
-            function daysBetween(first, second) {
 
-                if (first == null || second == null)
-                    return null;
+        function VoyageViewModel(data) {
+            var self = this;
+            self.start = ko.observable();
+            self.end = ko.observable();
+            self.destination = ko.observable();
 
-                // Copy date parts of the timestamps, discarding the time parts.
-                var one = new Date(first.getFullYear(), first.getMonth(), first.getDate());
-                var two = new Date(second.getFullYear(), second.getMonth(), second.getDate());
+            self.duration = ko.computed(function() { return daysBetween(self.start(), self.end()); }, self);
 
-                // Do the math.
-                var millisecondsPerDay = 1000 * 60 * 60 * 24;
-                var millisBetween = two.getTime() - one.getTime();
-                var days = millisBetween / millisecondsPerDay;
-
-                // Round down.
-                return Math.floor(days);
+            if (data != null) {
+                self.start(data.start);
+                self.end(data.end);
+                self.destination(data.destination);
             }
+        }
 
-            function VoyageViewModel(data) {
-                var self = this;
-                self.start = ko.observable();
-                self.end = ko.observable();
-                self.destination = ko.observable();
-
-                self.duration = ko.computed(function() { return daysBetween(self.start(), self.end()); }, self);
-
-                if (data != null) {
-                    self.start(data.start);
-                    self.end(data.end);
-                    self.destination(data.destination);
-                }
-            }
-
-            var voyage = new VoyageViewModel({
-                "start": new Date(),
-                "end": null,
-                "destination": "Paris"
-            });
-
-            ko.applyBindings(voyage);
+        var voyage = new VoyageViewModel({
+            "start": new Date(),
+            "end": null,
+            "destination": "Paris"
         });
-    });
+
+        ko.applyBindings(voyage);
     </script>
 </body>
 </html>

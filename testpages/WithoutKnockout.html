@@ -3,34 +3,20 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF8">
     <title>Charting Test Page</title>
-    <script src="../references/require.js"></script>
-    <link type="text/css" rel="stylesheet" href="../styles/kostyles.css" />
+    <script src="../references/d3.js"></script>
+    <script src="../build/koextensions.js"></script>
 </head>
 <body>
     <h2>3 Normalized non-linked data series</h2>
     <div id="lineChartDiv">
     </div>
     <script>
-            require.config({
-                baseUrl: "../src",
-                paths:{
-                  'ko':'../references/knockout-3.2.0.debug',
-                  'd3':'../references/d3',
-                }
-            });
-
-            require(['koextensions'], function (koext) {
-                //without knockout, don't register extensions!
-                //koext.registerExtensions();
-                var testData = [
-                    { linename: "Price:", values: [100.0, 125.0, 130, 145, 101] },
-                    { linename: "Consumption", values: [1, 0.5, 0.8, 0.2, 0.1] }
-                ];
-                var chartOptions = {height:100, normalizeSeries:true}
-                var el = document.getElementById("lineChartDiv");
-
-                koext.charting.lineChart(testData, el, chartOptions);
-            });
+        var testData = [
+            { linename: "Price:", values: [{x:0, y:100.0}, {x:1, y:125.0}, {x:2,y:130}, {x:3, y:145}, {x:4,y:101}] },
+        ];
+        var chartOptions = {height:100 }
+        var el = document.getElementById("lineChartDiv");
+        koextensions.charting.lineChart(testData, el, chartOptions);
     </script>
 </body>
 </html>
