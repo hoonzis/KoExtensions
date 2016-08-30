@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF8">
+        <title>Charting Test Page</title>
+        <script src="../references/d3.js"></script>
+        <script src="../references/knockout-3.4.0.js"></script>
+        <script src="../build/koextensions.min.js"></script>
+    </head>
+<body>
+	<h2>Stacked bar chart</h2>
+  <div id="monthlySales" data-bind="barchart: carSales, chartOptions:{legend:true, width:800,height:300,style:'stack',xcoord:'month', yAxisLabel: 'Sold cars', xAxisLabel:'Month'}">
+  </div>
+
+  <h2>Stacked bar chart - with datetime x axis</h2>
+  <div id="monthlySales" data-bind="barchart: carSales, chartOptions:{legend:true, width:800,height:300,style:'stack',xcoord:'date', xAxisTextAngle:45}">
+  </div>
+
+	<h2>Grouped barchart</h2>
+	<div id="monthlySales2" data-bind="barchart: carSales,chartOptions:{legend:true, width:800,height:300,style:'bar',xcoord:'month',yFormat:valueToLabel}">
+	</div>
+
+  <script>
+      var data = [
+            {
+                date: new Date(2012,1,1),
+                month: 'january',
+                peugot: 100,
+                audit: 200,
+                bmw: 300
+            },
+            {
+                date: new Date(2012,2,2),
+                month: 'february',
+                peugot: 50,
+                audit: 110,
+                bmw: 80
+            },
+            {
+                date: new Date(2012,3,3),
+                month: 'marz',
+                peugot: 120,
+                audit: 230,
+                bmw: 115
+            },
+            {
+                date: new Date(2012,4,4),
+                month: 'april',
+                peugot: 80,
+                audit: 120,
+                bmw: 75
+            },
+            {
+                date: new Date(2012,5,5),
+                month: 'may',
+                peugot: 100,
+                audit: 140,
+                bmw: 80
+            },
+            //negative values
+            {
+                date: new Date(2012,5,5),
+                month: 'may',
+                peugot: -100,
+                audit: -140,
+                bmw: -80
+            }
+        ];
+
+        function TestViewModels() {
+            var self = this;
+            self.carSales = ko.observableArray([]);
+            self.carSales(data);
+            self.valueToLabel = function (x) {
+                return x + " cars sold";
+            }
+        }
+
+        var vm = new TestViewModels();
+        ko.applyBindings(vm);
+</script>
+</body>
+</html>
