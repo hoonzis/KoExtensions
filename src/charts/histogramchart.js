@@ -1,6 +1,6 @@
 "use strict";
 
-var koTools = require ('./../koTools');
+var koTools = require ('./../kotools');
 var charting = require('./../charting');
 
 charting.histogram = function(data, element, options) {
@@ -13,7 +13,7 @@ charting.histogram = function(data, element, options) {
     };
 
     var el = charting.getElementAndCheckData(element,data);
-    if (el == null) {
+    if (el === null) {
         return;
     }
 

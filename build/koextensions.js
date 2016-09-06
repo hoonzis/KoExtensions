@@ -511,7 +511,7 @@ charting.singlePointOut = function (element) {
 
 module.exports = charting;
 
-},{"./kotools":10}],2:[function(_dereq_,module,exports){
+},{"./kotools":9}],2:[function(_dereq_,module,exports){
 "use strict";
 
 var koTools = _dereq_('./../kotools');
@@ -781,7 +781,7 @@ charting.barChart = function (data, element, options, lineData) {
         .on("mouseout", function(d) { charting.singlePointOut(this);});
 };
 
-},{"./../charting":1,"./../kotools":10}],3:[function(_dereq_,module,exports){
+},{"./../charting":1,"./../kotools":9}],3:[function(_dereq_,module,exports){
 "use strict";
 var koTools = _dereq_('./../kotools');
 var charting = _dereq_('./../charting');
@@ -872,7 +872,7 @@ charting.bubbleChart = function (data, element, options) {
         .on("mouseout", bubblenodeMouseout);
 };
 
-},{"./../charting":1,"./../kotools":10}],4:[function(_dereq_,module,exports){
+},{"./../charting":1,"./../kotools":9}],4:[function(_dereq_,module,exports){
 "use strict";
 
 var koTools = _dereq_ ('./../kotools');
@@ -1014,10 +1014,10 @@ charting.chordChart = function(data, element, options) {
       .on("click", chordMouseOver);
 };
 
-},{"./../charting":1,"./../kotools":10}],5:[function(_dereq_,module,exports){
+},{"./../charting":1,"./../kotools":9}],5:[function(_dereq_,module,exports){
 "use strict";
 
-var koTools = _dereq_ ('./../koTools');
+var koTools = _dereq_ ('./../kotools');
 var charting = _dereq_('./../charting');
 
 charting.histogram = function(data, element, options) {
@@ -1030,7 +1030,7 @@ charting.histogram = function(data, element, options) {
     };
 
     var el = charting.getElementAndCheckData(element,data);
-    if (el == null) {
+    if (el === null) {
         return;
     }
 
@@ -1184,10 +1184,10 @@ charting.histogram = function(data, element, options) {
     }
 }
 
-},{"./../charting":1,"./../koTools":9}],6:[function(_dereq_,module,exports){
+},{"./../charting":1,"./../kotools":9}],6:[function(_dereq_,module,exports){
 "use strict";
 
-var koTools = _dereq_ ('./../koTools');
+var koTools = _dereq_ ('./../kotools');
 var charting = _dereq_('./../charting');
 
 //Takes as input collection of items [data]. Each item has two values [x] and [y].
@@ -1415,10 +1415,10 @@ charting.lineChart = function (data, element, options) {
     }
 };
 
-},{"./../charting":1,"./../koTools":9}],7:[function(_dereq_,module,exports){
+},{"./../charting":1,"./../kotools":9}],7:[function(_dereq_,module,exports){
 "use strict";
 
-var koTools = _dereq_ ('./../koTools');
+var koTools = _dereq_ ('./../kotools');
 var charting = _dereq_('./../charting');
 
 charting.pieChart = function(data, element,options) {
@@ -1519,7 +1519,7 @@ charting.pieChart = function(data, element,options) {
         });
 };
 
-},{"./../charting":1,"./../koTools":9}],8:[function(_dereq_,module,exports){
+},{"./../charting":1,"./../kotools":9}],8:[function(_dereq_,module,exports){
 "use strict";
 
 var kotools = _dereq_ ('./kotools');
@@ -1700,7 +1700,7 @@ koext.registerExtensions();
 
 module.exports = koext;
 
-},{"./charting":1,"./charts/barchart":2,"./charts/bubblechart":3,"./charts/chordchart":4,"./charts/histogramchart":5,"./charts/linechart":6,"./charts/piechart":7,"./kotools":10}],9:[function(_dereq_,module,exports){
+},{"./charting":1,"./charts/barchart":2,"./charts/bubblechart":3,"./charts/chordchart":4,"./charts/histogramchart":5,"./charts/linechart":6,"./charts/piechart":7,"./kotools":9}],9:[function(_dereq_,module,exports){
 "use strict";
 
 function kotools() {
@@ -2098,8 +2098,6 @@ function kotools() {
 
   module.exports = new kotools();
 
-},{}],10:[function(_dereq_,module,exports){
-module.exports=_dereq_(9)
 },{}]},{},[8])
 (8)
 });

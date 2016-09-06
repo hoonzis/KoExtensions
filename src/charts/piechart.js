@@ -1,6 +1,6 @@
 "use strict";
 
-var koTools = require ('./../koTools');
+var koTools = require ('./../kotools');
 var charting = require('./../charting');
 
 charting.pieChart = function(data, element,options) {

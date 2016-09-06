@@ -1,6 +1,6 @@
 "use strict";
 
-var koTools = require ('./../koTools');
+var koTools = require ('./../kotools');
 var charting = require('./../charting');
 
 //Takes as input collection of items [data]. Each item has two values [x] and [y].
