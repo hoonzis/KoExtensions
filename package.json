@@ -1,0 +1,39 @@
+{
+  "name": "koextensions",
+  "version": "1.0.0",
+  "description": "Charts & Tools for Knockout",
+  "author": "Jan Fajfr",
+  "devDependencies": {
+    "browserify": "^13.0.0",
+    "gulp": "^3.9.0",
+    "gulp-browserify": "^0.5.1",
+    "gulp-qunit": "^1.4.0",
+    "watchify": "^3.7.0"
+  },
+  "main": "gulpfile.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "gulp-browserify": "^0.5.1",
+    "browserify": "^13.1.0",
+    "gulp": "^3.9.1",
+    "watchify": "^3.7.0"
+  },
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoonzis/KoExtensions.git"
+  },
+  "keywords": [
+    "knockout",
+    "charts"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hoonzis/KoExtensions/issues"
+  },
+  "homepage": "https://github.com/hoonzis/KoExtensions#readme"
+}

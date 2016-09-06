@@ -1,2 +1,0 @@
-call browserify src\koextensions.js  --external d3 --standalone koextensions -o build\koextensions.js
-call browserify src\koextensions.js  --external d3 --standalone koextensions | uglifyjs > build\koextensions.min.js
