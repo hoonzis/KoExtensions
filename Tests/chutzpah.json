@@ -1,7 +1,0 @@
-﻿{
-    "Framework": "qunit",
-    "References": [
-        { "Path": "../Scripts/r.js"},
-        { "Path": "../Scripts/require.js" }
-    ]
-}
