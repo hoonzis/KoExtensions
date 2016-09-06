@@ -9,6 +9,7 @@
     "gulp-browserify": "^0.5.1",
     "gulp-qunit": "^1.4.0",
     "gulp-uglifyjs": "^0.6.2",
+    "gulp-watch": "^4.3.9",
     "watchify": "^3.7.0"
   },
   "main": "gulpfile.js",
