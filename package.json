@@ -7,6 +7,7 @@
     "browserify": "^13.0.0",
     "gulp": "^3.9.0",
     "gulp-browserify": "^0.5.1",
+    "gulp-plumber": "^1.1.0",
     "gulp-qunit": "^1.4.0",
     "gulp-uglifyjs": "^0.6.2",
     "gulp-watch": "^4.3.9",
