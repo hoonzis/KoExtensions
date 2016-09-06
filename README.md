@@ -19,7 +19,6 @@ KoExtensions can be used as standalone JavaScript charting library based on D3JS
 [chordEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/ChordChart.html
 [bubbleEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/BubbleChart.html
 [histoEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/HistogramExample.html
-[googleMapsEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/MapTests.html
 [datepickerEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/DateBindingTests.html
 [formattingEx]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/UtilsTests.html
 [linechartex]: https://github.com/hoonzis/KoExtensions/blob/master/testpages/linetests.html
@@ -41,7 +40,6 @@ https://jsfiddle.net/u4sL2x67/4/
 
 **Other bindings useful for Knockout:**
 
-* Google maps and Mapbox binding [Example] [googleMapsEx]
 * Bootstrap DateTime picker binding [Example] [datepickerEx]
 * FormattedValue binding - showing data values in the UI with applied formatting (currencies, rounding). [Example][formattingEx]
 
@@ -66,17 +64,12 @@ koext.charting.lineChart(testData, el, {width:"100px"});
 ```
 
 #### Contributing and building
-Browserify is used to combine the files in **src** folder and create the bundle.
+Browserify is used to combine the files in **src** folder and create the bundle, few tests are written with QUnit. Gulp tasks are avaiable for both:
 
 ```
-browserify src\koextensions.js  --external d3 --standalone koextensions -o build\koextensions.js
+gulp build
+gulp test
 ```
-
-Tests can be run with QUnit:
-```
-phantomjs run-qunit.js Tests/Tests.html
-```
-
 #### Some useful tips ####
 - Showing multiple charts in knockout foreach loop can be achieved as follows:
 
@@ -126,17 +119,4 @@ function TestViewModels (expenses){
         expected: 'median',
         useMAD: true,
         showOutliers: true}"></div>
-```
-
-#### Maps binding for Knockout
-Google maps and Mapbox bindings are available to visualize set of points in geographic map.
-Google maps binding currently accepts function which is invoked when the marker is clicked on the map.
-
-![maps binding][mapbinding]
-
-```html
-<div id="map" style="width:300px;height:300px" data-bind="gmap:points, markerSelected:pointSelected">
-</div>
-<div id="mapbox" style="width:300px;height:300px" data-bind="mapbox:points">
-</div>
 ```
